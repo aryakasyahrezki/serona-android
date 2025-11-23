@@ -1,4 +1,4 @@
-package com.example.serona
+package com.example.serona.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
