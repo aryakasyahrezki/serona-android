@@ -1,5 +1,6 @@
 package com.example.serona.ui.ui.auth.login
 
+import android.widget.Button
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,17 +23,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.serona.R
 import com.example.serona.ui.theme.AuthPageGrad
 import com.example.serona.ui.theme.Primary
+import com.example.serona.ui.theme.Primary20
 import com.example.serona.ui.theme.White
 import com.example.serona.ui.theme.figtreeFontFamily
 import com.example.serona.ui.theme.glassColor
 import com.example.serona.ui.theme.leagueSpartanFontFamily
 import com.example.serona.ui.ui.auth.AuthState
+import com.example.serona.ui.ui.auth.ForgotPasswordFormState
+import com.example.serona.ui.ui.auth.ForgotPasswordState
 import com.example.serona.ui.ui.auth.LoginFormState
 import com.example.serona.ui.ui.component.AuthPasswordField
 import com.example.serona.ui.ui.component.AuthTextField
 
 @Composable
 fun LoginPage(loginViewModel: LoginViewModel) {
+
+    var forgotPasswordDialogBox by remember { mutableStateOf(false) }
+
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -64,13 +71,28 @@ fun LoginPage(loginViewModel: LoginViewModel) {
                 letterSpacing = 5.sp
             )
 
-            LoginCard(loginViewModel)
+            LoginCard(
+                loginViewModel,
+                onForgotPasswordClick = {
+                    forgotPasswordDialogBox = true
+                }
+            )
+
+            if (forgotPasswordDialogBox) {
+                ForgotPasswordDialog(
+                    viewModel = loginViewModel,
+                    onDismiss = { forgotPasswordDialogBox = false }
+                )
+            }
         }
     }
 }
 
 @Composable
-fun LoginCard(loginViewModel: LoginViewModel) {
+fun LoginCard(
+    loginViewModel: LoginViewModel,
+    onForgotPasswordClick: () -> Unit = {}
+) {
 
     val form = loginViewModel.loginFormState.observeAsState(LoginFormState()).value
     val authState = loginViewModel.loginState.observeAsState()
@@ -128,14 +150,13 @@ fun LoginCard(loginViewModel: LoginViewModel) {
                 )
 
                 TextButton(
-                    onClick = {},
+                    onClick = onForgotPasswordClick,
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(
                         "Forgot Password",
                         color = Primary,
-
-                        )
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(25.dp))
@@ -181,4 +202,69 @@ fun LoginCard(loginViewModel: LoginViewModel) {
             }
         }
     }
+}
+
+@Composable
+fun ForgotPasswordDialog(
+    viewModel: LoginViewModel,
+    onDismiss: () -> Unit
+) {
+    val form = viewModel.forgotPasswordFormState.observeAsState(ForgotPasswordFormState()).value
+    val state by viewModel.forgotPasswordState
+        .observeAsState(ForgotPasswordState.Idle)
+    AlertDialog(
+        title = {Text("Forgot Password")},
+        text = {
+            Column{
+                Text("Enter your email to reset your password")
+
+                Spacer(Modifier.height(8.dp))
+
+                AuthTextField(
+                    value = form.resetEmail,
+                    onValueChange = viewModel::onResetEmailChanged,
+                    label = "Email",
+                    error = form.resetEmailError,
+                    color = Primary20
+                )
+
+                if (state is ForgotPasswordState.Error) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = (state as ForgotPasswordState.Error).message,
+                        color = Primary20
+                    )
+                }
+
+                if (state is ForgotPasswordState.Success) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = "Email has been sent",
+                        color = Primary20
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { viewModel.sendResetPasswordEmail() },
+                enabled = state !is ForgotPasswordState.Loading
+            ) {
+                Text("Send")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = {
+                viewModel.resetForgotPasswordState()
+                onDismiss()
+            }) {
+                Text("Cancel")
+            }
+        },
+        onDismissRequest = {
+            viewModel.resetForgotPasswordState()
+            onDismiss()
+        }
+    )
+
 }

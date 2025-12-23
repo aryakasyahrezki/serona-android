@@ -43,7 +43,8 @@ fun AuthTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    error: String?
+    error: String?,
+    color: Color = White
 ) {
     Column() {
         OutlinedTextField(
@@ -61,10 +62,10 @@ fun AuthTextField(
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.White.copy(alpha = 0.4f),
-                focusedIndicatorColor = Color.White.copy(alpha = 0.5f),
-                unfocusedLabelColor = White10.copy(alpha = 0.8f),
-                focusedLabelColor = White10,
+                unfocusedIndicatorColor = color.copy(alpha = 0.4f),
+                focusedIndicatorColor =color.copy(alpha = 0.5f),
+                unfocusedLabelColor = color.copy(alpha = 0.8f),
+                focusedLabelColor = color,
                 errorContainerColor = Color.Transparent,
                 errorIndicatorColor = Primary50.copy(alpha = 0.7f),
                 errorLabelColor = Primary50,

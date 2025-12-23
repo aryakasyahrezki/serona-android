@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.serona.ui.data.repository.AuthRepository
 import com.example.serona.ui.ui.auth.AuthState
+import com.example.serona.ui.ui.auth.ForgotPasswordFormState
+import com.example.serona.ui.ui.auth.ForgotPasswordState
 import com.example.serona.ui.ui.auth.LoginFormState
 
 class LoginViewModel(
@@ -59,4 +61,51 @@ class LoginViewModel(
                 )
         }
     }
+
+    // Forgot Password Func
+
+    private val _forgotPasswordFormState = MutableLiveData(ForgotPasswordFormState())
+    val forgotPasswordFormState : LiveData<ForgotPasswordFormState> = _forgotPasswordFormState
+
+    private val _forgotPasswordState = MutableLiveData<ForgotPasswordState>(ForgotPasswordState.Idle)
+    val forgotPasswordState : LiveData<ForgotPasswordState> = _forgotPasswordState
+
+    fun onResetEmailChanged(value : String){
+        _forgotPasswordFormState.value = forgotPasswordFormState.value?.copy(
+            resetEmail = value,
+            resetEmailError = null
+        )
+    }
+
+    fun sendResetPasswordEmail(){
+        val state = _forgotPasswordFormState.value ?: return
+
+        val emailErr = if (state.resetEmail.isBlank()) "Email can't be empty" else null
+
+        if (emailErr != null){
+            _forgotPasswordFormState.value = state.copy(
+                resetEmailError = emailErr
+            )
+            return
+        }
+
+        _forgotPasswordState.value = ForgotPasswordState.Loading
+
+        repo.forgotPassword(state.resetEmail){ result ->
+            if (result.isSuccess){
+                _forgotPasswordState.value = ForgotPasswordState.Success
+            }else{
+                _forgotPasswordState.value = ForgotPasswordState.Error(
+                    result.exceptionOrNull()?.message ?: "Unknown Error"
+                )
+            }
+        }
+    }
+
+    fun resetForgotPasswordState(){
+        _forgotPasswordFormState.value = ForgotPasswordFormState()
+        _forgotPasswordState.value = ForgotPasswordState.Idle
+    }
+
+
 }

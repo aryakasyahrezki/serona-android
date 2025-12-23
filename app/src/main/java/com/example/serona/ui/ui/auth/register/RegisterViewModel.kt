@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.serona.ui.data.repository.AuthRepository
 import com.example.serona.ui.ui.auth.AuthState
+import com.example.serona.ui.ui.auth.EmailVerificationState
 import com.example.serona.ui.ui.auth.RegisterFormState
 
 class RegisterViewModel(
@@ -16,6 +17,10 @@ class RegisterViewModel(
 
     private val _registerState = MutableLiveData<AuthState>()
     val registerState: LiveData<AuthState> = _registerState
+
+    private val _emailVerificationState = MutableLiveData<EmailVerificationState>(
+        EmailVerificationState.Idle)
+    val emailVerificationState: LiveData<EmailVerificationState> = _emailVerificationState
 
 
     fun onNameChanged(value: String) {
@@ -51,6 +56,22 @@ class RegisterViewModel(
             isAgree = value,
             agreeError = null
         )
+    }
+
+    private fun sendVerificationEmail(){
+        _emailVerificationState.value = EmailVerificationState.Sending
+
+        repo.emailVerification { result ->
+            if(result.isSuccess) {
+                _emailVerificationState.postValue(EmailVerificationState.EmailSent)
+            }else{
+                _emailVerificationState.postValue(
+                    EmailVerificationState.Error(
+                        result.exceptionOrNull()?.message?: "Failed to send email"
+                    )
+                )
+            }
+        }
     }
 
 
@@ -97,11 +118,27 @@ class RegisterViewModel(
 
         repo.register(state.name, state.email, state.password) { result ->
             if (result.isSuccess)
-                _registerState.postValue(AuthState.Authenticated)
+                sendVerificationEmail()
             else
                 _registerState.postValue(
                     AuthState.Error(result.exceptionOrNull()?.message ?: "Error")
                 )
         }
+    }
+
+    fun checkEmailVerification(){
+        repo.reloadUser { verified ->
+            if (verified) {
+                _emailVerificationState.postValue(EmailVerificationState.Verified)
+            } else {
+                _emailVerificationState.postValue(
+                    EmailVerificationState.NotVerified
+                )
+            }
+        }
+    }
+
+    fun resetEmailVerificationState() {
+        _emailVerificationState.value = EmailVerificationState.Idle
     }
 }
