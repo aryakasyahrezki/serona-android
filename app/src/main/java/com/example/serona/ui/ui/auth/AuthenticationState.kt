@@ -1,10 +1,17 @@
 package com.example.serona.ui.ui.auth
 
 sealed class AuthState{
-    object Authenticated : AuthState()
-    object Unauthenticated : AuthState()
     object Loading : AuthState()
-    data class Error(val message : String) : AuthState()
+    object Unauthenticated : AuthState()
+    object Authenticated : AuthState()
+    data class Error(val message: String) : AuthState()
+}
+
+sealed class RegisterState {
+    object Idle : RegisterState()
+    object Loading : RegisterState()
+    object Success : RegisterState() // register sukses
+    data class Error(val message: String) : RegisterState()
 }
 
 data class RegisterFormState(

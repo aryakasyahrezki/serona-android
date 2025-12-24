@@ -11,7 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -19,12 +21,14 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.serona.R
 import com.example.serona.ui.theme.AuthPageGrad
+import com.example.serona.ui.theme.ForgotPasswordBorderGrad
 import com.example.serona.ui.theme.Primary
 import com.example.serona.ui.theme.White
 import com.example.serona.ui.theme.figtreeFontFamily
@@ -33,6 +37,7 @@ import com.example.serona.ui.theme.leagueSpartanFontFamily
 import com.example.serona.ui.ui.auth.AuthState
 import com.example.serona.ui.ui.auth.EmailVerificationState
 import com.example.serona.ui.ui.auth.RegisterFormState
+import com.example.serona.ui.ui.auth.RegisterState
 import com.example.serona.ui.ui.component.AuthPasswordField
 import com.example.serona.ui.ui.component.AuthTextField
 import com.example.serona.ui.ui.component.RoundedCheckbox
@@ -105,15 +110,13 @@ fun RegisterCard(registerViewModel: RegisterViewModel) {
 
     LaunchedEffect(registerState.value) {
         when (val state = registerState.value) {
-            is AuthState.Error -> {
+            is RegisterState.Error -> {
                 Toast.makeText(
                     context,
                     state.message,
                     Toast.LENGTH_SHORT
                 ).show()
-            }
-            is AuthState.Authenticated -> {
-                // TODO: navigate ke home / login
+                registerViewModel.resetRegisterState()
             }
             else -> Unit
         }
@@ -208,7 +211,7 @@ fun RegisterCard(registerViewModel: RegisterViewModel) {
                         )
                         withStyle(
                             style = SpanStyle(
-                                color = Primary, // warna link kamu
+                                color = Primary,
                                 textDecoration = TextDecoration.Underline,
                                 fontSize = 14.sp,
                                 fontFamily = figtreeFontFamily
@@ -267,42 +270,112 @@ fun EmailVerificationDialog(
     viewModel: RegisterViewModel,
     onDismiss: () -> Unit
 ) {
+    val dialogText = TextStyle(
+        fontFamily = figtreeFontFamily,
+        fontWeight = FontWeight.Normal,
+        color = Primary,
+        textAlign = TextAlign.Center
+    )
+
+    val buttonText = TextStyle(
+        fontFamily = figtreeFontFamily,
+        fontWeight = FontWeight.SemiBold
+    )
+
     AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {Text("Email Verification")},
+        modifier = Modifier.drawBehind {
+            drawRoundRect(
+                brush = ForgotPasswordBorderGrad,
+                style = Stroke(width = 3.dp.toPx()),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(28.dp.toPx())
+            )
+        },
+        containerColor = Color(0xFFECD3D4).copy(alpha = 0.9f),
+        onDismissRequest = {},
+        title = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "Email Verification",
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Primary,
+                )
+            }
+        },
         text = {
-            when (state){
-                EmailVerificationState.Sending ->
-                    Text("Sending Verification Email...")
-                EmailVerificationState.EmailSent ->
-                    Text("Verification Email has been sent. Please check your inbox")
-                EmailVerificationState.Verified ->
-                    Text("Your email has been verified successfully!")
-                EmailVerificationState.NotVerified ->
-                    Text("Email not verified yet. Please check your inbox.")
-                else -> {}
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                when (state) {
+                    EmailVerificationState.Sending ->
+                        Text(
+                            "Sending Verification Email...",
+                            style = dialogText
+                        )
+
+                    EmailVerificationState.EmailSent ->
+                        Text(
+                            "Verification Email has been sent. Please check your inbox or spam",
+                            style = dialogText
+                        )
+
+                    EmailVerificationState.Verified ->
+                        Text(
+                            "Your email has been verified successfully!",
+                            style = dialogText
+                        )
+
+                    EmailVerificationState.NotVerified ->
+                        Text(
+                            "Email not verified yet. Please check your inbox or spam email.",
+                            style = dialogText
+                        )
+
+                    else -> {}
+                }
             }
         },
         confirmButton = {
-            if(state == EmailVerificationState.EmailSent || state == EmailVerificationState.NotVerified){
-                Button(
-                    onClick = {
-                        viewModel.checkEmailVerification()
+            Column(){
+                if(state == EmailVerificationState.EmailSent || state == EmailVerificationState.NotVerified){
+                    Button(
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary.copy(alpha = 0.8f)),
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        onClick = {
+                            viewModel.checkEmailVerification()
+                        }
+                    ) {
+                        Text(
+                            "I've Verified My Email",
+                            style = buttonText,
+                            color = White
+                        )
                     }
-                ) {
-                    Text("I've Verified My Email")
+
+                    TextButton(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        onClick = {
+                            viewModel.resetEmailVerificationState()
+                            viewModel.deleteAccount()
+                            onDismiss()
+                        }
+                    ) {
+                        Text(
+                            "Use another email",
+                            style = buttonText,
+                            color = Primary
+                        )
+                    }
                 }
             }
         },
-        dismissButton = {
-            if(state != EmailVerificationState.Verified){
-                TextButton(onClick = {
-                    onDismiss()
-                }) {
-                    Text("Back to Register Page")
-                }
-            }
-        }
+        dismissButton = {}
     )
 
 

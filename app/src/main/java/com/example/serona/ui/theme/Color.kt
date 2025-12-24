@@ -114,6 +114,14 @@ val AuthPageGrad = Brush.verticalGradient(
     0.97f to WarmSoftCoral.copy(0.78f)
 )
 
+val ForgotPasswordBorderGrad = Brush.horizontalGradient(
+    0.0f to WarmSoftCoral.copy(0.78f),
+    0.32f to WarmRedOrange,
+    0.62f to Tertiary20,
+    0.79f to WarmRedPinkSoft,
+    0.97f to WarmLightPink
+)
+
 val BgGrad = Brush.verticalGradient(
     0.4f to White10,
     1f to PrimaryContainer

@@ -1,6 +1,5 @@
 package com.example.serona.ui.data.repository
 
-import androidx.compose.animation.core.animateFloatAsState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.userProfileChangeRequest
 import java.lang.Exception
@@ -8,10 +7,7 @@ import java.lang.Exception
 class AuthRepository (
     private val auth : FirebaseAuth = FirebaseAuth.getInstance()
 ){
-    fun isLoggedIn(): Boolean {
-        val user = auth.currentUser ?: return false
-        return user.isEmailVerified || true // sementara
-    }
+    fun getCurrentUser() = auth.currentUser
 
     fun login(
         email : String,
@@ -94,4 +90,24 @@ class AuthRepository (
     }
 
     fun logout() = auth.signOut()
+
+    fun deleteCurrentUser(
+        callback: (Result<Unit>) -> Unit
+    ) {
+        val user = auth.currentUser
+            ?: return callback(Result.failure(Exception("User not logged in")))
+
+        user.delete()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    callback(Result.success(Unit))
+                } else {
+                    callback(
+                        Result.failure(
+                            task.exception ?: Exception("Failed to delete user")
+                        )
+                    )
+                }
+            }
+    }
 }

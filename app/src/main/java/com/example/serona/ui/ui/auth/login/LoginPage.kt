@@ -12,18 +12,26 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.serona.R
 import com.example.serona.ui.theme.AuthPageGrad
+import com.example.serona.ui.theme.ForgotPasswordBorderGrad
 import com.example.serona.ui.theme.Primary
 import com.example.serona.ui.theme.Primary20
+import com.example.serona.ui.theme.Secondary
+import com.example.serona.ui.theme.WarmLightPink
 import com.example.serona.ui.theme.White
 import com.example.serona.ui.theme.figtreeFontFamily
 import com.example.serona.ui.theme.glassColor
@@ -212,27 +220,54 @@ fun ForgotPasswordDialog(
     val form = viewModel.forgotPasswordFormState.observeAsState(ForgotPasswordFormState()).value
     val state by viewModel.forgotPasswordState
         .observeAsState(ForgotPasswordState.Idle)
+
     AlertDialog(
-        title = {Text("Forgot Password")},
-        text = {
-            Column{
-                Text("Enter your email to reset your password")
-
-                Spacer(Modifier.height(8.dp))
-
-                AuthTextField(
-                    value = form.resetEmail,
-                    onValueChange = viewModel::onResetEmailChanged,
-                    label = "Email",
-                    error = form.resetEmailError,
-                    color = Primary20
+        modifier = Modifier.drawBehind {
+            // Gambar garis (stroke) di sekeliling dialog
+            drawRoundRect(
+                brush = ForgotPasswordBorderGrad,
+                style = Stroke(width = 3.dp.toPx()), // Menggunakan Stroke untuk membuat garis
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(28.dp.toPx())
+            )
+        },
+        containerColor = Color(0xFFECD3D4).copy(alpha = 0.9f),
+        title = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "Forgot Password",
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Primary,
+                    textAlign = TextAlign.Center
                 )
-
-                if (state is ForgotPasswordState.Error) {
-                    Spacer(Modifier.height(8.dp))
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
-                        text = (state as ForgotPasswordState.Error).message,
-                        color = Primary20
+                        "Enter your email to reset your password",
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = Primary
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    AuthTextField(
+                        value = form.resetEmail,
+                        onValueChange = viewModel::onResetEmailChanged,
+                        label = "Email",
+                        error = form.resetEmailError,
+                        color = Primary
                     )
                 }
 
@@ -240,27 +275,52 @@ fun ForgotPasswordDialog(
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = "Email has been sent",
-                        color = Primary20
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 8.dp),
+                        color = Primary,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Start
                     )
                 }
             }
         },
         confirmButton = {
-            Button(
-                onClick = { viewModel.sendResetPasswordEmail() },
-                enabled = state !is ForgotPasswordState.Loading
-            ) {
-                Text("Send")
+            Column{
+                Button(
+                    onClick = { viewModel.sendResetPasswordEmail() },
+                    enabled = state !is ForgotPasswordState.Loading,
+                    colors = ButtonDefaults.buttonColors(containerColor = Primary.copy(alpha = 0.8f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        "Send Email",
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                TextButton(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onClick = {
+                        viewModel.resetForgotPasswordState()
+                        onDismiss()
+                    }
+                ) {
+                    Text(
+                        "Cancel",
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Primary
+                    )
+                }
             }
+
         },
-        dismissButton = {
-            TextButton(onClick = {
-                viewModel.resetForgotPasswordState()
-                onDismiss()
-            }) {
-                Text("Cancel")
-            }
-        },
+        dismissButton = {},
         onDismissRequest = {
             viewModel.resetForgotPasswordState()
             onDismiss()

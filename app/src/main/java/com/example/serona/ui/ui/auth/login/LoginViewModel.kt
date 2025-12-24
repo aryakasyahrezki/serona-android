@@ -75,6 +75,10 @@ class LoginViewModel(
             resetEmail = value,
             resetEmailError = null
         )
+
+        if (_forgotPasswordState.value is ForgotPasswordState.Success) {
+            _forgotPasswordState.value = ForgotPasswordState.Idle
+        }
     }
 
     fun sendResetPasswordEmail(){

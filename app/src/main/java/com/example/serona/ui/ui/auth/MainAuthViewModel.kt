@@ -10,10 +10,18 @@ class MainAuthViewModel (
     private val _authState = MutableLiveData<AuthState>()
     val authState : LiveData<AuthState> = _authState
 
-    fun checkAuthStatus(){
-        _authState.value =
-            if (authRepo.isLoggedIn()) AuthState.Authenticated
-            else AuthState.Unauthenticated
+    // ini untuk ngecek UI pertama harus mulai dari mna?
+    fun checkAuthStatus() {
+        _authState.value = AuthState.Loading
+
+        val user = authRepo.getCurrentUser()
+
+        if (user == null) {
+            _authState.value = AuthState.Unauthenticated
+            return
+        }
+
+        _authState.value = AuthState.Authenticated
     }
 
     fun logout(){

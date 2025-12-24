@@ -7,6 +7,7 @@ import com.example.serona.ui.data.repository.AuthRepository
 import com.example.serona.ui.ui.auth.AuthState
 import com.example.serona.ui.ui.auth.EmailVerificationState
 import com.example.serona.ui.ui.auth.RegisterFormState
+import com.example.serona.ui.ui.auth.RegisterState
 
 class RegisterViewModel(
     private val repo: AuthRepository = AuthRepository()
@@ -15,8 +16,8 @@ class RegisterViewModel(
     private val _formState = MutableLiveData(RegisterFormState())
     val formState: LiveData<RegisterFormState> = _formState
 
-    private val _registerState = MutableLiveData<AuthState>()
-    val registerState: LiveData<AuthState> = _registerState
+    private val _registerState = MutableLiveData<RegisterState>(RegisterState.Idle)
+    val registerState: LiveData<RegisterState> = _registerState
 
     private val _emailVerificationState = MutableLiveData<EmailVerificationState>(
         EmailVerificationState.Idle)
@@ -58,7 +59,7 @@ class RegisterViewModel(
         )
     }
 
-    private fun sendVerificationEmail(){
+    fun sendVerificationEmail(){
         _emailVerificationState.value = EmailVerificationState.Sending
 
         repo.emailVerification { result ->
@@ -114,16 +115,22 @@ class RegisterViewModel(
         }
 
         // Kalo tidak ada error
-        _registerState.value = AuthState.Loading
+        _registerState.value = RegisterState.Loading
 
         repo.register(state.name, state.email, state.password) { result ->
-            if (result.isSuccess)
+            if (result.isSuccess) {
+                _registerState.postValue(RegisterState.Success)
                 sendVerificationEmail()
-            else
+            }else {
                 _registerState.postValue(
-                    AuthState.Error(result.exceptionOrNull()?.message ?: "Error")
+                    RegisterState.Error(result.exceptionOrNull()?.message ?: "Register failed")
                 )
+            }
         }
+    }
+
+    fun resetRegisterState() {
+        _registerState.value = RegisterState.Idle
     }
 
     fun checkEmailVerification(){
@@ -140,5 +147,20 @@ class RegisterViewModel(
 
     fun resetEmailVerificationState() {
         _emailVerificationState.value = EmailVerificationState.Idle
+    }
+
+    fun deleteAccount() {
+        resetEmailVerificationState() //jadi kan kalo gajadi user bakal coba email baru, jadi state nya ulang lagi
+
+        repo.deleteCurrentUser { result ->
+            if (!result.isSuccess) {
+                _emailVerificationState.postValue(
+                    EmailVerificationState.Error(
+                        result.exceptionOrNull()?.message
+                            ?: "Failed to delete account"
+                    )
+                )
+            }
+        }
     }
 }
