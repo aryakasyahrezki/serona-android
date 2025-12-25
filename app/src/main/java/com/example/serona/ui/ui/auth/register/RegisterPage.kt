@@ -34,7 +34,6 @@ import com.example.serona.ui.theme.White
 import com.example.serona.ui.theme.figtreeFontFamily
 import com.example.serona.ui.theme.glassColor
 import com.example.serona.ui.theme.leagueSpartanFontFamily
-import com.example.serona.ui.ui.auth.AuthState
 import com.example.serona.ui.ui.auth.EmailVerificationState
 import com.example.serona.ui.ui.auth.RegisterFormState
 import com.example.serona.ui.ui.auth.RegisterState
@@ -61,7 +60,7 @@ fun RegisterPage(registerViewModel: RegisterViewModel) {
         .background(brush = AuthPageGrad)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ellips_auth_bg),
+            painter = painterResource(id = R.drawable.ellips_splash_bg),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()

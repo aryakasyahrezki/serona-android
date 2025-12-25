@@ -9,10 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.serona"
-    compileSdk {
-        version = release(36)
-    }
-//    compileSdk = 36
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.serona"
@@ -61,6 +58,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("com.google.firebase:firebase-auth")
     implementation("androidx.compose.runtime:runtime-livedata")
+    implementation(libs.androidx.navigation.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,8 +66,12 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("com.google.android.material:material:1.13.0")
+
+    implementation(platform("androidx.compose:compose-bom:2024.09.00"))
+    implementation("androidx.compose.material3:material3")
+    implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 }

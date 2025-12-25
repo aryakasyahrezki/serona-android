@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.Serona" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- warna utama app -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
 
-    <style name="Theme.Serona" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Serona.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#F6718D</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_wrapper</item>
+<!--        <item name="windowSplashScreenIconMaskEnabled">false</item>-->
+        <item name="postSplashScreenTheme">@style/Theme.Serona</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
 </resources>

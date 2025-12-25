@@ -1,6 +1,5 @@
 package com.example.serona.ui.ui.auth.login
 
-import android.widget.Button
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,8 +12,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
@@ -24,14 +21,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.serona.R
 import com.example.serona.ui.theme.AuthPageGrad
 import com.example.serona.ui.theme.ForgotPasswordBorderGrad
 import com.example.serona.ui.theme.Primary
-import com.example.serona.ui.theme.Primary20
-import com.example.serona.ui.theme.Secondary
-import com.example.serona.ui.theme.WarmLightPink
 import com.example.serona.ui.theme.White
 import com.example.serona.ui.theme.figtreeFontFamily
 import com.example.serona.ui.theme.glassColor
@@ -54,7 +47,7 @@ fun LoginPage(loginViewModel: LoginViewModel) {
         .background(brush = AuthPageGrad)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ellips_auth_bg),
+            painter = painterResource(id = R.drawable.ellips_splash_bg),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
