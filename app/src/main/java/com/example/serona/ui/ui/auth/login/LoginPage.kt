@@ -21,6 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.serona.R
 import com.example.serona.ui.theme.AuthPageGrad
 import com.example.serona.ui.theme.ForgotPasswordBorderGrad
@@ -37,9 +39,39 @@ import com.example.serona.ui.ui.component.AuthPasswordField
 import com.example.serona.ui.ui.component.AuthTextField
 
 @Composable
-fun LoginPage(loginViewModel: LoginViewModel) {
+fun LoginPage(
+    navController: NavController,
+    loginViewModel: LoginViewModel = hiltViewModel()
+) {
 
     var forgotPasswordDialogBox by remember { mutableStateOf(false) }
+    val authState by loginViewModel.loginState.observeAsState(AuthState.Idle)
+    val context = LocalContext.current
+
+    LaunchedEffect(authState) {
+        when(authState){
+            is AuthState.Authenticated-> {
+                navController.navigate("home") {
+                    popUpTo("login") { // artinya pop up to (jadi semua screen sampe login dihapus biar kalo user back lgsg ke luar, ngga login ulang lagi)
+                        inclusive = true
+                    }
+                }
+
+                loginViewModel.resetLoginState()
+            }
+
+            is AuthState.Error -> {
+                Toast.makeText(
+                    context,
+                    (authState as AuthState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+                loginViewModel.resetLoginState()
+            }
+
+            else -> Unit
+        }
+    }
 
 
     Box(modifier = Modifier
@@ -73,6 +105,7 @@ fun LoginPage(loginViewModel: LoginViewModel) {
             )
 
             LoginCard(
+                navController,
                 loginViewModel,
                 onForgotPasswordClick = {
                     forgotPasswordDialogBox = true
@@ -91,23 +124,12 @@ fun LoginPage(loginViewModel: LoginViewModel) {
 
 @Composable
 fun LoginCard(
+    navController: NavController,
     loginViewModel: LoginViewModel,
     onForgotPasswordClick: () -> Unit = {}
 ) {
 
     val form = loginViewModel.loginFormState.observeAsState(LoginFormState()).value
-    val authState = loginViewModel.loginState.observeAsState()
-    val context = LocalContext.current
-
-    LaunchedEffect(authState.value) {
-        if (authState.value is AuthState.Error) {
-            Toast.makeText(
-                context,
-                (authState.value as AuthState.Error).message,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -197,7 +219,9 @@ fun LoginCard(
                         fontSize = 13.sp,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Medium,
-                        modifier = Modifier.clickable{}
+                        modifier = Modifier.clickable{
+                            navController.navigate("register")
+                        }
                     )
                 }
             }

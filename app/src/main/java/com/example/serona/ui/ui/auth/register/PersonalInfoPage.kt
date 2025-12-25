@@ -15,9 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.serona.ui.theme.White
 import com.example.serona.ui.ui.component.GenderCard
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.serona.ui.theme.MutedLight
 import com.example.serona.ui.theme.figtreeFontFamily
 import com.example.serona.ui.ui.component.CleanLinearProgress
@@ -25,8 +27,8 @@ import com.example.serona.ui.ui.component.PersonalInfoTextField
 
 @Composable
 fun PersonalInfoPage(
-    viewModel: PersonalInfoViewModel = viewModel(),
-    onNext: () -> Unit = {}
+    navController: NavController,
+    viewModel: PersonalInfoViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -182,7 +184,13 @@ fun PersonalInfoPage(
 
             // NEXT BUTTON
             Button(
-                onClick = onNext,
+                onClick = {
+                    navController.navigate("home"){
+                        popUpTo("personalInfo"){
+                            inclusive = true
+                        }
+                    }
+                },
                 enabled = state.canContinue,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -200,11 +208,4 @@ fun PersonalInfoPage(
             }
         }
     }
-}
-
-
-@Preview
-@Composable
-private fun prev() {
-    PersonalInfoPage()
 }

@@ -8,9 +8,12 @@ import com.example.serona.ui.ui.auth.AuthState
 import com.example.serona.ui.ui.auth.EmailVerificationState
 import com.example.serona.ui.ui.auth.RegisterFormState
 import com.example.serona.ui.ui.auth.RegisterState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class RegisterViewModel(
-    private val repo: AuthRepository = AuthRepository()
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val repo: AuthRepository
 ) : ViewModel() {
 
     private val _formState = MutableLiveData(RegisterFormState())

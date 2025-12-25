@@ -8,14 +8,18 @@ import com.example.serona.ui.ui.auth.AuthState
 import com.example.serona.ui.ui.auth.ForgotPasswordFormState
 import com.example.serona.ui.ui.auth.ForgotPasswordState
 import com.example.serona.ui.ui.auth.LoginFormState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class LoginViewModel(
-    private val repo : AuthRepository = AuthRepository()
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val repo : AuthRepository
 ) : ViewModel() {
 
     private val _loginFormState = MutableLiveData(LoginFormState())
     val loginFormState : LiveData<LoginFormState> = _loginFormState
 
+    //ini state hanya untuk login aja, state untuk tau user sebelumnya uda login atau belum (session), ada di AuthViewModel
     private val _loginState = MutableLiveData<AuthState>()
     val loginState : LiveData<AuthState> = _loginState
 
@@ -60,6 +64,10 @@ class LoginViewModel(
                     AuthState.Error("Email or password is incorrect")
                 )
         }
+    }
+
+    fun resetLoginState(){
+        _loginState.value = AuthState.Idle
     }
 
     // Forgot Password Func

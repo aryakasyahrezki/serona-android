@@ -46,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.serona.R
 import com.example.serona.ui.theme.OnPrimary
 import com.example.serona.ui.theme.Primary
@@ -56,7 +57,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LandingPageCarousel() {
+fun LandingPageCarousel(
+    navController: NavController
+) {
 //    var currentPage by remember { mutableStateOf(0) }
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 3 })
@@ -129,7 +132,11 @@ fun LandingPageCarousel() {
             exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
         ) {
             Button(
-                onClick = { }, //ini nanti ke LoginPage
+                onClick = {
+                    navController.navigate("login"){
+                        popUpTo("landing") { inclusive = true }
+                    }
+                }, //ini nanti ke LoginPage
                 modifier = Modifier
                     .padding(bottom = 50.dp)
                     .width(170.dp)

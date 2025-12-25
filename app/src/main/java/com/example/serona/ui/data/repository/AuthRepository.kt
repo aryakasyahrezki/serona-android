@@ -3,9 +3,11 @@ package com.example.serona.ui.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.userProfileChangeRequest
 import java.lang.Exception
+import javax.inject.Inject
 
-class AuthRepository (
-    private val auth : FirebaseAuth = FirebaseAuth.getInstance()
+class AuthRepository @Inject constructor(
+//    private val auth : FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth : FirebaseAuth
 ){
     fun getCurrentUser() = auth.currentUser
 

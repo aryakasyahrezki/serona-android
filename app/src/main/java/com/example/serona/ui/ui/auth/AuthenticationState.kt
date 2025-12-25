@@ -1,6 +1,7 @@
 package com.example.serona.ui.ui.auth
 
 sealed class AuthState{
+    object Idle : AuthState()
     object Loading : AuthState()
     object Unauthenticated : AuthState()
     object Authenticated : AuthState()

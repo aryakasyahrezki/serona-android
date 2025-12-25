@@ -8,19 +8,36 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.serona.R
 import com.example.serona.ui.theme.LandingPageGrad
 import com.example.serona.ui.theme.leagueSpartanFontFamily
+import com.example.serona.ui.ui.auth.AuthState
+import com.example.serona.ui.ui.auth.AuthViewModel
+import com.example.serona.ui.ui.navigation.Routes
 
 @Composable
-fun SplashFullBackground() {
+fun SplashFullBackground(
+    navController: NavController,
+    viewModel: AuthViewModel = hiltViewModel()
+) {
+    
+    val authState by viewModel.authState.observeAsState(AuthState.Loading)
+
+    LaunchedEffect(Unit){
+        viewModel.checkAuthStatus()
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -57,10 +74,26 @@ fun SplashFullBackground() {
             )
         }
     }
-}
 
-@Preview
-@Composable
-private fun SplashBackgroundPreview() {
-    SplashFullBackground()
+    LaunchedEffect(authState) {
+        when (authState) {
+
+            AuthState.Loading,
+            AuthState.Idle -> {}
+
+            AuthState.Authenticated -> {
+                navController.navigate(Routes.HOME) {
+                    popUpTo(Routes.SPLASH) { inclusive = true }
+                }
+            }
+
+            AuthState.Unauthenticated -> {
+                navController.navigate(Routes.LANDING) {
+                    popUpTo(Routes.SPLASH) { inclusive = true }
+                }
+            }
+
+            else -> Unit
+        }
+    }
 }

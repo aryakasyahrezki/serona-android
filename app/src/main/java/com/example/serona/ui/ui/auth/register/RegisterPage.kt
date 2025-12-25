@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.serona.R
 import com.example.serona.ui.theme.AuthPageGrad
 import com.example.serona.ui.theme.ForgotPasswordBorderGrad
@@ -43,15 +45,40 @@ import com.example.serona.ui.ui.component.RoundedCheckbox
 import kotlinx.coroutines.delay
 
 @Composable
-fun RegisterPage(registerViewModel: RegisterViewModel) {
+fun RegisterPage(
+    navController: NavController,
+    registerViewModel: RegisterViewModel = hiltViewModel()
+) {
 
     val emailState by registerViewModel.emailVerificationState.observeAsState(EmailVerificationState.Idle)
+    val registerState by registerViewModel.registerState.observeAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(registerState) {
+        when (val state = registerState) {
+            is RegisterState.Error -> {
+                Toast.makeText(
+                    context,
+                    state.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+                registerViewModel.resetRegisterState()
+            }
+            else -> Unit
+        }
+    }
 
     LaunchedEffect(emailState) {
         if(emailState == EmailVerificationState.Verified){
             delay(1500)
+
+            navController.navigate("personalInfo"){
+                popUpTo("register"){
+                    inclusive = true
+                }
+            }
+
             registerViewModel.resetEmailVerificationState()
-            // nanti ini ganti buat lgsg ke Personal Info Page
         }
     }
 
@@ -104,22 +131,6 @@ fun RegisterPage(registerViewModel: RegisterViewModel) {
 fun RegisterCard(registerViewModel: RegisterViewModel) {
 
     val form = registerViewModel.formState.observeAsState(RegisterFormState()).value
-    val registerState = registerViewModel.registerState.observeAsState()
-    val context = LocalContext.current
-
-    LaunchedEffect(registerState.value) {
-        when (val state = registerState.value) {
-            is RegisterState.Error -> {
-                Toast.makeText(
-                    context,
-                    state.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-                registerViewModel.resetRegisterState()
-            }
-            else -> Unit
-        }
-    }
 
     Box(
         modifier = Modifier
