@@ -60,7 +60,6 @@ import kotlinx.coroutines.launch
 fun LandingPageCarousel(
     navController: NavController
 ) {
-//    var currentPage by remember { mutableStateOf(0) }
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 3 })
     val scope = rememberCoroutineScope()

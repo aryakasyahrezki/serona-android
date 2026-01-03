@@ -3,17 +3,23 @@ package com.example.serona.ui.ui.auth.login
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.serona.ui.data.repository.AuthRepository
+import com.example.serona.ui.data.repository.UserRepository
+import com.example.serona.ui.data.session.UserSession
 import com.example.serona.ui.ui.auth.AuthState
 import com.example.serona.ui.ui.auth.ForgotPasswordFormState
 import com.example.serona.ui.ui.auth.ForgotPasswordState
 import com.example.serona.ui.ui.auth.LoginFormState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val repo : AuthRepository
+    private val repo : AuthRepository,
+    private val userRepo: UserRepository,
+    private val userSession: UserSession
 ) : ViewModel() {
 
     private val _loginFormState = MutableLiveData(LoginFormState())
@@ -40,29 +46,36 @@ class LoginViewModel @Inject constructor(
     fun submit() {
         val state = _loginFormState.value ?: return
 
-        // VALIDASI PER FIELD
-        val emailErr = if (state.email.isBlank()) "Email can't be empty" else null
-        val passErr = if (state.password.isBlank()) "Password can't be empty" else null
-
-
-        if (emailErr != null || passErr != null) {
-            _loginFormState.value = state.copy(
-                emailError = emailErr,
-                passwordError = passErr
-            )
-            return
-        }
-
-        // Kalo tidak ada error
         _loginState.value = AuthState.Loading
 
         repo.login(state.email, state.password) { result ->
-            if (result.isSuccess)
-               _loginState.postValue(AuthState.Authenticated)
-            else
-               _loginState.postValue(
+            if (result.isSuccess) {
+                viewModelScope.launch {
+                    val apiResult = userRepo.getProfile() // GET /me
+
+                    if (apiResult.isSuccess) {
+                        val user = apiResult.getOrNull()
+
+                        if (user != null) {
+                            // Jika user tidak null, baru masukkan ke session
+                            userSession.setUser(user)
+                            _loginState.postValue(AuthState.Authenticated)
+                        } else {
+                            // Jika sukses tapi ternyata datanya kosong/null
+                            _loginState.postValue(AuthState.Error("User data is empty"))
+                        }
+
+                    } else {
+                        _loginState.postValue(
+                            AuthState.Error("Failed fetch user data")
+                        )
+                    }
+                }
+            } else {
+                _loginState.postValue(
                     AuthState.Error("Email or password is incorrect")
                 )
+            }
         }
     }
 

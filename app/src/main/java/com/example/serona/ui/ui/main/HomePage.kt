@@ -30,6 +30,7 @@ fun HomePage(
         ){
             Text("HomePage")
             Spacer(modifier = Modifier.height(6.dp))
+            Text("HomePage")
             Button(
                 onClick = {
                     authViewModel.logout()
@@ -46,3 +47,24 @@ fun HomePage(
     }
 
 }
+
+// home harus fetch data lagi kalo dia baru pertama login
+
+//HomeViewModel
+//@HiltViewModel
+//class HomeViewModel @Inject constructor(
+//    private val userRepository: UserRepository,
+//    private val userSession: UserSession
+//) : ViewModel() {
+//
+//    init {
+//        if (!userSession.isInitialized()) {
+//            viewModelScope.launch {
+//                val result = userRepository.getProfile()
+//                if (result.isSuccess) {
+//                    userSession.setUser(result.getOrNull()!!)
+//                }
+//            }
+//        }
+//    }
+//}

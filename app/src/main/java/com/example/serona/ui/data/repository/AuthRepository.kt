@@ -6,10 +6,18 @@ import java.lang.Exception
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
-//    private val auth : FirebaseAuth = FirebaseAuth.getInstance()
     private val auth : FirebaseAuth
 ){
     fun getCurrentUser() = auth.currentUser
+
+    fun getCurrentUserInfo(): Pair<String?, String?>? {
+        val user = auth.currentUser ?: return null
+
+        return Pair(
+            user.displayName,
+            user.email
+        )
+    }
 
     fun login(
         email : String,

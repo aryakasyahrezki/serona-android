@@ -3,17 +3,24 @@ package com.example.serona.ui.ui.auth.register
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.serona.ui.data.dto.RegisterUserRequest
 import com.example.serona.ui.data.repository.AuthRepository
+import com.example.serona.ui.data.repository.UserRepository
+import com.example.serona.ui.data.session.UserSession
 import com.example.serona.ui.ui.auth.AuthState
 import com.example.serona.ui.ui.auth.EmailVerificationState
 import com.example.serona.ui.ui.auth.RegisterFormState
 import com.example.serona.ui.ui.auth.RegisterState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val repo: AuthRepository
+    private val repo: AuthRepository,
+    private val userRepo: UserRepository,
+    private val userSession: UserSession
 ) : ViewModel() {
 
     private val _formState = MutableLiveData(RegisterFormState())
@@ -136,14 +143,36 @@ class RegisterViewModel @Inject constructor(
         _registerState.value = RegisterState.Idle
     }
 
-    fun checkEmailVerification(){
+    fun checkEmailVerification() {
         repo.reloadUser { verified ->
-            if (verified) {
-                _emailVerificationState.postValue(EmailVerificationState.Verified)
-            } else {
-                _emailVerificationState.postValue(
-                    EmailVerificationState.NotVerified
+            if (!verified) {
+                _emailVerificationState.postValue(EmailVerificationState.NotVerified)
+                return@reloadUser
+            }
+
+            val user = repo.getCurrentUser()
+                ?: return@reloadUser
+
+            val (name, email) = repo.getCurrentUserInfo()
+                ?: return@reloadUser
+
+            viewModelScope.launch {
+                val apiResult = userRepo.registerUser(
+                    RegisterUserRequest(
+                        name = name!!,
+                        email = email!!
+                    )
                 )
+
+                if (apiResult.isSuccess) {
+                    userSession.setBasicInfo(name, email)
+                    userSession.markInitialized()
+                    _emailVerificationState.postValue(EmailVerificationState.Verified)
+                } else {
+                    _emailVerificationState.postValue(
+                        EmailVerificationState.Error("Failed save user to server")
+                    )
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.serona.ui.ui.auth.register
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -10,16 +11,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.serona.ui.theme.White
 import com.example.serona.ui.ui.component.GenderCard
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.serona.ui.data.model.Gender
 import com.example.serona.ui.theme.MutedLight
 import com.example.serona.ui.theme.figtreeFontFamily
 import com.example.serona.ui.ui.component.CleanLinearProgress
@@ -31,10 +32,16 @@ fun PersonalInfoPage(
     viewModel: PersonalInfoViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-
     val progress = state.answeredCount / 3f
-
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            viewModel.clearError()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -185,9 +192,11 @@ fun PersonalInfoPage(
             // NEXT BUTTON
             Button(
                 onClick = {
-                    navController.navigate("home"){
-                        popUpTo("personalInfo"){
-                            inclusive = true
+                    viewModel.submitPersonalInfo {
+                        navController.navigate("home"){
+                            popUpTo("personalInfo"){
+                                inclusive = true
+                            }
                         }
                     }
                 },

@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+//    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
     // Add the Google services Gradle plugin
 //    id("com.google.gms.google-services")
@@ -11,12 +11,12 @@ plugins {
 
 android {
     namespace = "com.example.serona"
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.serona"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -35,6 +35,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -42,44 +43,54 @@ android {
     buildFeatures {
         compose = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
 }
 
+
 dependencies {
-    // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
-    // TODO: Add the dependencies for Firebase products you want to use
-    // When using the BoM, don't specify versions in Firebase dependencies
-    // https://firebase.google.com/docs/android/setup#available-libraries
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
     implementation("com.google.firebase:firebase-auth")
+
+    // Core & Runtime (agar setContent & Lifecycle aman)
+    implementation(libs.androidx.core.ktx)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation("androidx.activity:activity-compose:1.9.0")
+
+    // Compose & UI
+    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.runtime:runtime-livedata")
-    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation("androidx.compose.material:material-icons-extended") // ICON AMAN SEKARANG
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+
+    // UI Tools & Splash
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // Navigation & Hilt
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    kapt("com.google.dagger:hilt-compiler:2.51.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
+
+    // Retrofit & OkHttp
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    debugImplementation("androidx.compose.ui:ui-tooling")
 
-    implementation(platform("androidx.compose:compose-bom:2024.09.00"))
-    implementation("androidx.compose.material3:material3")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-
-    implementation ("com.google.dagger:hilt-android:2.57.2")
-    kapt("com.google.dagger:hilt-compiler:2.57.2")
-
-    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    // Desugaring
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
+
