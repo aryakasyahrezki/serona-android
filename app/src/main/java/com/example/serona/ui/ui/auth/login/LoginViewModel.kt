@@ -46,11 +46,33 @@ class LoginViewModel @Inject constructor(
     fun submit() {
         val state = _loginFormState.value ?: return
 
+        // VALIDASI PER FIELD
+        val emailErr =
+            when {
+                !state.email.contains("@") ->
+                    "Email must contain '@'"
+
+                !state.email.contains(".") ->
+                    "Email must contain '.'"
+
+                else -> null
+            }
+        val passErr = if (state.password.length < 6) "Minimal 6 character" else null
+
+        if (emailErr != null || passErr != null) {
+            _loginFormState.value = state.copy(
+                emailError = emailErr,
+                passwordError = passErr
+            )
+            return
+        }
+
         _loginState.value = AuthState.Loading
 
         repo.login(state.email, state.password) { result ->
             if (result.isSuccess) {
                 viewModelScope.launch {
+
                     val apiResult = userRepo.getProfile() // GET /me
 
                     if (apiResult.isSuccess) {

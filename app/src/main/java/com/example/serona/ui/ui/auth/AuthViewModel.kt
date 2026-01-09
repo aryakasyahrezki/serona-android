@@ -23,43 +23,37 @@ class AuthViewModel @Inject constructor (
     fun checkAuthStatus() {
         _authState.value = AuthState.Loading
 
-        try {
-            val user = authRepo.getCurrentUser()
+        val currentUser = authRepo.getCurrentUser()
+        if (currentUser == null) {
+            _authState.value = AuthState.Unauthenticated
+            return
+        }
 
-            if (user == null) {
-                _authState.value = AuthState.Unauthenticated
-                return
-            }
+        // Gunakan satu coroutine saja agar urutannya sinkron (top-to-bottom)
+        viewModelScope.launch {
+            try {
+                // Kita pastikan data user dimuat dulu sampai beres
+                loadUserSync()
 
-            viewModelScope.launch {
-                loadUserIfLoggedIn()
                 if (userSession.user.value != null) {
                     _authState.value = AuthState.Authenticated
                 } else {
-                    _authState.value = AuthState.Unauthenticated // ini terjadi kalo dia register tapi belom verified trs dia lgsg login
+                    _authState.value = AuthState.Unauthenticated
                 }
+            } catch (e: Exception) {
+                _authState.value = AuthState.Unauthenticated
             }
-
-        } catch (e: Exception) {
-            // PENTING: jangan crash app
-            _authState.value = AuthState.Unauthenticated
         }
     }
 
-    fun loadUserIfLoggedIn() {
-        // kalo belom login gausa ambil data
-        if (authRepo.getCurrentUser() == null) return
-
-        // kalo uda pernah login dan user session uda keisi gausa ambil ulang lagi
+    private suspend fun loadUserSync() {
         if (userSession.isInitialized.value) return
 
-        viewModelScope.launch {
-            val result = userRepo.getProfile()
-            if (result.isSuccess) {
-                userSession.setUser(result.getOrNull()!!)
-            }else{
-                userSession.markInitialized()
-            }
+        val result = userRepo.getProfile()
+        if (result.isSuccess) {
+            result.getOrNull()?.let { userSession.setUser(it) }
+        } else {
+            userSession.markInitialized()
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.serona.ui.ui.auth.register
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -70,15 +71,11 @@ fun RegisterPage(
 
     LaunchedEffect(emailState) {
         if(emailState == EmailVerificationState.Verified){
-            delay(1500)
-
             navController.navigate("personalInfo"){
                 popUpTo("register"){
                     inclusive = true
                 }
             }
-
-            registerViewModel.resetEmailVerificationState()
         }
     }
 
@@ -112,7 +109,7 @@ fun RegisterPage(
                 letterSpacing = 5.sp
             )
 
-            RegisterCard(registerViewModel)
+            RegisterCard(navController, registerViewModel)
 
             if(emailState != EmailVerificationState.Idle) {
                 EmailVerificationDialog(
@@ -128,7 +125,10 @@ fun RegisterPage(
 }
 
 @Composable
-fun RegisterCard(registerViewModel: RegisterViewModel) {
+fun RegisterCard(
+    navController: NavController,
+    registerViewModel: RegisterViewModel
+) {
 
     val form = registerViewModel.formState.observeAsState(RegisterFormState()).value
 
@@ -252,7 +252,7 @@ fun RegisterCard(registerViewModel: RegisterViewModel) {
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
-                    enabled = form.isAgree,
+                    enabled = form.isAgree && (form.name != "") && (form.email != "") && (form.password != "") && (form.confirmPassword != ""),
                     onClick = {
                         registerViewModel.submit()
                     },
@@ -267,6 +267,29 @@ fun RegisterCard(registerViewModel: RegisterViewModel) {
                         fontSize = 16.sp,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row() {
+                    Text(
+                        text = "Already have an Account ? ",
+                        color = White,
+                        fontSize = 13.sp,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Text(
+                        text = "Login",
+                        color = Primary,
+                        fontSize = 13.sp,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.clickable{
+                            navController.navigate("login")
+                        }
                     )
                 }
             }
@@ -344,6 +367,9 @@ fun EmailVerificationDialog(
                             "Email not verified yet. Please check your inbox or spam email.",
                             style = dialogText
                         )
+
+                    is EmailVerificationState.Error ->
+                        Text(state.message, style = dialogText)
 
                     else -> {}
                 }

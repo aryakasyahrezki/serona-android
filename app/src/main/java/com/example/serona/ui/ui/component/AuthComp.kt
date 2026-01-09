@@ -115,8 +115,8 @@ fun AuthPasswordField(
                 IconButton(onClick = { visible = !visible }) {
                     Icon(
                         imageVector =
-                            if (visible) Icons.Filled.VisibilityOff
-                            else Icons.Filled.Visibility,
+                            if (visible) Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff,
                         contentDescription = null,
                         tint = Color(0xFF292929)
                     )

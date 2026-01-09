@@ -1,5 +1,6 @@
 package com.example.serona.ui.ui.component
 
+import androidx.annotation.Size
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,8 +11,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -37,10 +42,16 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import com.example.serona.ui.theme.MutedLight
 import com.example.serona.ui.theme.Primary50
 import com.example.serona.ui.theme.White
@@ -105,18 +116,23 @@ fun PersonalInfoTextField(
     dropdownItems: List<String> = emptyList(),
     onDropdownItemSelected: (String) -> Unit = {},
     modifier: Modifier,
-    labelFontSize: TextUnit = 16.sp,
-    paddingValues: PaddingValues? = null
+    labelFontSize: TextUnit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    if (isDropdown) {
+    // State untuk menyimpan lebar TextField, agar Popup bisa menyesuaikan
+    var textFieldWidth by remember { mutableStateOf(0) }
+    var textFieldHeight by remember { mutableStateOf(0) }
+    val density = LocalDensity.current
 
+    if (isDropdown) {
+        // ExposedDropdownMenuBox tetap digunakan sebagai container utama
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded },
-            modifier = modifier  // weight masuk dari Row
+            modifier = modifier
         ) {
+            // TextField yang menjadi jangkar visual
             OutlinedTextField(
                 value = value,
                 onValueChange = {},
@@ -141,47 +157,70 @@ fun PersonalInfoTextField(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .menuAnchor(),     // anchor langsung di textfield
+                    .menuAnchor() // Tetap digunakan agar Box tahu posisi anchor
+                    .onSizeChanged {
+                        // Simpan lebar TextField saat ukurannya berubah
+                        textFieldWidth = it.width
+                        textFieldHeight = it.height
+                    },
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
-                    unfocusedIndicatorColor = Primary50.copy(alpha = 0.4f), // Ganti sesuai tema
-                    focusedIndicatorColor = Primary50.copy(alpha = 0.5f), // Ganti sesuai tema
+                    unfocusedIndicatorColor = Primary50.copy(alpha = 0.4f),
+                    focusedIndicatorColor = Primary50.copy(alpha = 0.5f),
                     unfocusedLabelColor = Primary50.copy(alpha = 0.8f),
                     focusedLabelColor = Primary50,
                     errorContainerColor = Color.Transparent,
                 )
             )
 
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .shadow(elevation = 12.dp, shape = RoundedCornerShape(20.dp))
-                    .background(
-                        color = White10,
-                        shape = RoundedCornerShape(15.dp)
+            if (expanded) {
+                Popup(
+                    alignment = Alignment.TopEnd,
+                    offset = IntOffset(
+                        x = 0,               // Tidak digeser secara horizontal
+                        y = textFieldHeight  // Geser ke bawah
+                    ),
+                    onDismissRequest = { expanded = false },
+                    properties = PopupProperties(
+                        focusable = true,
+                        dismissOnBackPress = true,
+                        dismissOnClickOutside = true,
+                        excludeFromSystemGesture = true
                     )
-            ) {
-                dropdownItems.forEach { item ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                item,
-                                fontSize = 16.sp,
-                                fontFamily = figtreeFontFamily,
-                                fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .width(with(density) { textFieldWidth.toDp() })
+                            .heightIn(max = 220.dp)
+                            .shadow(elevation = 8.dp, shape = RoundedCornerShape(15.dp))
+                            .background(
+                                color = White, // Warna latar belakang menu
+                                shape = RoundedCornerShape(15.dp)
                             )
-                        },
-                        onClick = {
-                            onDropdownItemSelected(item)
-                            expanded = false
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        // Isi menu dengan DropdownMenuItem
+                        dropdownItems.forEach { item ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        item,
+                                        fontSize = 16.sp,
+                                        fontFamily = figtreeFontFamily,
+                                        fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal
+                                    )
+                                },
+                                onClick = {
+                                    onDropdownItemSelected(item)
+                                    expanded = false
+                                }
+                            )
                         }
-                    )
+                    }
                 }
             }
         }
-
     } else {
         OutlinedTextField(
             value = value,

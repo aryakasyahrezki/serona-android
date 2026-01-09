@@ -157,6 +157,8 @@ class RegisterViewModel @Inject constructor(
                 ?: return@reloadUser
 
             viewModelScope.launch {
+//                repo.refreshIdToken()
+
                 val apiResult = userRepo.registerUser(
                     RegisterUserRequest(
                         name = name!!,

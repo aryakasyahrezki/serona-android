@@ -1,5 +1,6 @@
 package com.example.serona.ui.ui.auth.register
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -25,7 +26,7 @@ import com.example.serona.ui.theme.MutedLight
 import com.example.serona.ui.theme.figtreeFontFamily
 import com.example.serona.ui.ui.component.CleanLinearProgress
 import com.example.serona.ui.ui.component.PersonalInfoTextField
-
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun PersonalInfoPage(
     navController: NavController,
@@ -43,12 +44,15 @@ fun PersonalInfoPage(
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 2.dp)
             .background(color = White)
     ){
+        val fontSize = (maxWidth * 0.052f).value.sp
+        val calculatedLabelSize = (fontSize.value * 0.73f).sp
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -66,7 +70,7 @@ fun PersonalInfoPage(
 
             Text(
                 text = "Personal Information",
-                fontSize = 24.sp,
+                fontSize = fontSize,
                 fontFamily = figtreeFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
@@ -126,7 +130,8 @@ fun PersonalInfoPage(
                     "North Korea"
                 ),
                 onDropdownItemSelected = { viewModel.selectCountry(it) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                labelFontSize = calculatedLabelSize
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -146,7 +151,8 @@ fun PersonalInfoPage(
                     onDropdownItemSelected = { day ->
                         viewModel.selectDOB(day, state.month, state.year)
                     },
-                    modifier = Modifier.weight(0.95f)
+                    modifier = Modifier.weight(0.95f),
+                    labelFontSize = calculatedLabelSize
                 )
 
                 PersonalInfoTextField(
@@ -159,6 +165,7 @@ fun PersonalInfoPage(
                         "Feb",
                         "Mar",
                         "Apr",
+                        "May",
                         "Jun",
                         "Jul",
                         "Aug",
@@ -170,7 +177,8 @@ fun PersonalInfoPage(
                     onDropdownItemSelected = { month ->
                         viewModel.selectDOB(state.day, month, state.year)
                     },
-                    modifier = Modifier.weight(1.1f)
+                    modifier = Modifier.weight(1.1f),
+                    labelFontSize = calculatedLabelSize
                 )
 
                 PersonalInfoTextField(
@@ -182,7 +190,8 @@ fun PersonalInfoPage(
                     onDropdownItemSelected = { year ->
                         viewModel.selectDOB(state.day, state.month, year)
                     },
-                    modifier = Modifier.weight(0.95f)
+                    modifier = Modifier.weight(0.95f),
+                    labelFontSize = calculatedLabelSize
                 )
 
             }
@@ -193,8 +202,8 @@ fun PersonalInfoPage(
             Button(
                 onClick = {
                     viewModel.submitPersonalInfo {
-                        navController.navigate("home"){
-                            popUpTo("personalInfo"){
+                        navController.navigate("home") {
+                            popUpTo("personalInfo") {
                                 inclusive = true
                             }
                         }

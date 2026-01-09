@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.serona.ui.data.dto.PersonalInfoRequest
 import com.example.serona.ui.data.model.Gender
+import com.example.serona.ui.data.repository.AuthRepository
 import com.example.serona.ui.data.repository.UserRepository
 import com.example.serona.ui.data.session.UserSession
 import com.example.serona.ui.utils.DateUtils
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PersonalInfoViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val authRepo: AuthRepository,
+    private val userRepo: UserRepository,
     private val userSession: UserSession
 ) : ViewModel() {
 
@@ -49,12 +51,13 @@ class PersonalInfoViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
+//            authRepo.refreshIdToken()
 
             _state.value = _state.value.copy(
                 errorMessage = null
             )
 
-            val result = userRepository.submitPersonalInfo(request)
+            val result = userRepo.submitPersonalInfo(request)
             if(result.isSuccess){
                 userSession.updatePersonalInfo(
                     gender = gender,

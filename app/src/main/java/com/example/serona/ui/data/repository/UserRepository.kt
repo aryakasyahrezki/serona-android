@@ -3,7 +3,6 @@ package com.example.serona.ui.data.repository
 import com.example.serona.ui.data.api.UserApi
 import com.example.serona.ui.data.dto.PersonalInfoRequest
 import com.example.serona.ui.data.dto.RegisterUserRequest
-import com.example.serona.ui.data.dto.UserProfileResponse
 import com.example.serona.ui.data.model.Gender
 import com.example.serona.ui.data.model.User
 import javax.inject.Inject
@@ -50,15 +49,23 @@ class UserRepository @Inject constructor(
             if(response.isSuccessful){
                 val body = response.body()
                     ?: return Result.failure(Exception("Empty profile response"))
-                Result.success(
-                    User(
-                        name = body.name,
-                        email = body.email,
-                        gender = if(body.gender == "male") Gender.MALE else Gender.FEMALE,
-                        country = body.country,
-                        birthDate = body.birth_date
+
+                if (body != null && body.success) {
+                    val userData = body.data
+                    Result.success(
+                        User(
+                            name = userData.name,
+                            email = userData.email,
+                            gender = if (userData.gender == "male") Gender.MALE else Gender.FEMALE,
+                            country = userData.country,
+                            birthDate = userData.birth_date,
+                            faceShape = userData.face_shape_id,
+                            skinTone = userData.skin_tone_id
+                        )
                     )
-                )
+                } else {
+                    Result.failure(Exception("API returned success false"))
+                }
             }else{
                 Result.failure(Exception("Failed to load Profile"))
             }

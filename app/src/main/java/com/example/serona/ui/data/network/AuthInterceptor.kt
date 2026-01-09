@@ -16,6 +16,7 @@ class AuthInterceptor(
         val user = authRepo.getCurrentUser()
         if (user != null) {
             try {
+                // force = false, artinya dia langsung ngambil dari cache di firebase
                 val tokenResult = Tasks.await(user.getIdToken(false))
                 val token = tokenResult.token
 
@@ -33,3 +34,4 @@ class AuthInterceptor(
         return chain.proceed(requestBuilder.build())
     }
 }
+

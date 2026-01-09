@@ -32,7 +32,7 @@ object DateUtils{
             else -> throw IllegalArgumentException("Invalid month")
         }
 
-        "$yearInt-$monthInt-$dayInt"
+        String.format(Locale.US, "%04d-%02d-%02d", yearInt, monthInt, dayInt)
 
     }.getOrDefault("-")
 
