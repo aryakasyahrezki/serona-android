@@ -29,19 +29,16 @@ class AuthViewModel @Inject constructor (
             return
         }
 
-        // Gunakan satu coroutine saja agar urutannya sinkron (top-to-bottom)
+        // 🔥 SOLUSI: Langsung set Authenticated jika Firebase User ada
+        // Sambil jalan, kita tetap panggil loadUserSync di background
+        _authState.value = AuthState.Authenticated
+
         viewModelScope.launch {
             try {
-                // Kita pastikan data user dimuat dulu sampai beres
                 loadUserSync()
-
-                if (userSession.user.value != null) {
-                    _authState.value = AuthState.Authenticated
-                } else {
-                    _authState.value = AuthState.Unauthenticated
-                }
+                // Data profil akan terisi di userSession secara diam-diam
             } catch (e: Exception) {
-                _authState.value = AuthState.Unauthenticated
+                // Jika gagal ambil profil, bisa ditangani di halaman Home (misal: minta logout)
             }
         }
     }

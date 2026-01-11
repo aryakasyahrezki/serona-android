@@ -2,7 +2,6 @@
 
 package com.example.serona.ui.ui.landing
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -14,7 +13,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -42,12 +40,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.serona.R
+//import com.example.serona.R
 import com.example.serona.ui.theme.OnPrimary
 import com.example.serona.ui.theme.Primary
 import com.example.serona.ui.theme.Primary70
@@ -157,7 +157,6 @@ fun LandingPageCarousel(
 // Data model for labels
 data class LabelData(val text: String, val color: Color, val offsetX: Float, val offsetY: Float)
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun LandingPageTemplate(
     imageRes: Int,
@@ -165,9 +164,15 @@ fun LandingPageTemplate(
     title1: String,
     title2: String,
     subtitle: String,
-    labels: List<LabelData>,
     scaleImage: Float = 1f
 ) {
+
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+    val titleSize = (maxWidth * 0.085f).value.sp
+    val subtitleSize = (maxWidth * 0.035f).value.sp
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(imageRes),
@@ -185,19 +190,6 @@ fun LandingPageTemplate(
                 .background(gradient)
         )
 
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            labels.forEach { label ->
-                CircleLabel(
-                    text = label.text,
-                    color = label.color,
-                    modifier = Modifier.offset(
-                        x = maxWidth * label.offsetX,
-                        y = maxHeight * label.offsetY
-                    )
-                )
-            }
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxHeight(0.26f)
@@ -205,20 +197,20 @@ fun LandingPageTemplate(
                 .padding(24.dp, bottom = 30.dp)
         ) {
             Text(text = title1,
-                fontSize = 28.sp,
+                fontSize = titleSize,
                 fontFamily = montserratFontFamily,
                 fontWeight =  FontWeight.Bold,
                 color = OnPrimary
             )
             Text(text = title2,
-                fontSize = 28.sp,
+                fontSize = titleSize,
                 fontFamily = montserratFontFamily,
                 fontWeight =  FontWeight.Bold,
                 color = Primary70
             )
             Text(
                 text = subtitle,
-                fontSize = 15.sp,
+                fontSize = subtitleSize,
                 fontFamily = montserratFontFamily,
                 fontWeight =  FontWeight.Medium,
                 color = OnPrimary.copy(alpha = 0.9922f),
@@ -227,19 +219,6 @@ fun LandingPageTemplate(
 
             )
         }
-    }
-}
-
-@Composable
-fun CircleLabel(text: String, color: Color, modifier: Modifier = Modifier) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .size(50.dp)
-            .clip(CircleShape)
-            .background(color)
-    ) {
-        Text(text = text, color = Color.White, fontSize = 10.sp)
     }
 }
 
@@ -255,11 +234,6 @@ fun FirstLandingPage() {
         title1 = "Find Your",
         title2 = "Perfect Look",
         subtitle = "Discover makeup styles that match your face shape",
-        labels = listOf(
-            LabelData("Heart", Primary, 0.76f, 0.35f),
-            LabelData("Square", Primary, 0.1f, 0.51f),
-            LabelData("Oval", Primary70, 0.68f, 0.58f)
-        ),
         scaleImage = 1.12f
     )
 }
@@ -276,8 +250,7 @@ fun SecondLandingPage() {
         ),
         title1 = "Achieve Your",
         title2 = "Perfect Look ",
-        subtitle = "A personalized AI makeup guide made exclusively for you",
-        labels = emptyList()
+        subtitle = "A personalized AI makeup guide made exclusively for you"
     )
 }
 
@@ -294,7 +267,6 @@ fun ThirdLandingPage() {
         ),
         title1 = "Start Your",
         title2 = "Beauty Journey",
-        subtitle = "Scan, match, and discover your best makeup style",
-        labels = emptyList()
+        subtitle = "Scan, match, and discover your best makeup style"
     )
 }

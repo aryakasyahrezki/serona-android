@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.serona.ui.ui.auth.AuthViewModel
+import com.example.serona.ui.ui.navigation.Routes
 
 @Composable
 fun HomePage(
@@ -35,8 +36,8 @@ fun HomePage(
                 onClick = {
                     authViewModel.logout()
                     navController.navigate("login"){
-                        popUpTo("home"){
-                            inclusive
+                        popUpTo(Routes.SPLASH){
+                            inclusive = true
                         }
                     }
                 },

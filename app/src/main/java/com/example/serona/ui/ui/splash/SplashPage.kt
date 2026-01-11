@@ -1,11 +1,22 @@
 package com.example.serona.ui.ui.splash
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,19 +24,50 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.serona.R
+import com.example.serona.ui.theme.BgGrad
 import com.example.serona.ui.theme.LandingPageGrad
+import com.example.serona.ui.theme.Primary
+import com.example.serona.ui.theme.PrimaryContainer
+import com.example.serona.ui.theme.Tertiary
+import com.example.serona.ui.theme.WarmRedPinkSoft
+import com.example.serona.ui.theme.White10
+import com.example.serona.ui.theme.figtreeFontFamily
 import com.example.serona.ui.theme.leagueSpartanFontFamily
+import com.example.serona.ui.theme.montserratFontFamily
 import com.example.serona.ui.ui.auth.AuthState
 import com.example.serona.ui.ui.auth.AuthViewModel
+import com.example.serona.ui.ui.component.BottomWaveShape
 import com.example.serona.ui.ui.navigation.Routes
+import kotlinx.coroutines.delay
 
+
+@Composable
+fun screenWidthDp(): Int =
+    LocalConfiguration.current.screenWidthDp
+
+@Composable
+fun screenHeightDp(): Int =
+    LocalConfiguration.current.screenHeightDp
+
+@Composable
+fun scaleFont(base: Float): Float {
+    val width = screenWidthDp()
+    return base * (width / 360f)
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedBoxWithConstraintsScope")
 @Composable
 fun SplashFullBackground(
     navController: NavController,
@@ -38,61 +80,102 @@ fun SplashFullBackground(
         viewModel.checkAuthStatus()
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(LandingPageGrad),
-        contentAlignment = Alignment.Center
-    ) {
+    val screenHeight = screenHeightDp()
+    val screenWidth = screenWidthDp()
+
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        // IMAGE BACKGROUND
         Image(
-            painter = painterResource(id = R.drawable.ellips_splash_bg),
+            painter = painterResource(id = R.drawable.splash_page_bg),
             contentDescription = null,
-            contentScale = ContentScale.FillBounds,
-            alignment = Alignment.TopCenter,
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .fillMaxHeight(0.95f), // 👈 image hanya 75% layar
+            contentScale = ContentScale.FillWidth,
+            alignment = Alignment.TopCenter
         )
 
+        // SOFT PINK OVERLAY
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        0.0f to Color(0xFFEF4E5E).copy(0.5f),
+                        0.34f to Color(0xFFF45E70).copy(0.1f),
+                        0.50f to Color(0xFFF66779).copy(0.4f),
+                        0.79f to Color(0xFFFD7F94).copy(0.2f),
+                        0.99f to Color(0xFFFFB2BF).copy(0.2f)
+                    )
+                )
+        )
+
+        // BOTTOM WHITE SHAPE
         Column(
             modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .height((screenHeight * 0.28).dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        0f to White10,
+                        1f to Color(0xFFFFE5E5)
+                    ),
+                    shape = BottomWaveShape()
+                )
+                .padding(
+                    horizontal = (screenWidth * 0.08).dp,
+                    vertical = 24.dp
+                ),
+            horizontalAlignment = Alignment.Start
         ) {
-            Image(
-                painter = painterResource(R.drawable.serona_logo),
-                contentDescription = null,
-                alignment = Alignment.Center
-            )
+
             Text(
-                "The art of your own glow",
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                color = Color.White,
-                fontFamily = leagueSpartanFontFamily,
-                fontSize = 13.sp,
-                letterSpacing = 5.sp
+                text = "Hello,\nGorgeous !",
+                fontSize = scaleFont(32f).sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = montserratFontFamily,
+                color = Tertiary,
+                lineHeight = scaleFont(36f).sp
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "Your space to explore beauty, express yourself, and shine every day.",
+                fontSize = scaleFont(14f).sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = montserratFontFamily,
+                color = Primary,
+                lineHeight = scaleFont(20f).sp
             )
         }
     }
 
+//    Scaffold(
+//        modifier = Modifier.fillMaxSize(),
+//        containerColor = Color.Transparent
+//    ){}
+
     LaunchedEffect(authState) {
         when (authState) {
+            AuthState.Authenticated, AuthState.Unauthenticated -> {
+                delay(3000)
 
-            AuthState.Loading,
-            AuthState.Idle -> {}
-
-            AuthState.Authenticated -> {
-                navController.navigate(Routes.HOME) {
-                    popUpTo(Routes.SPLASH) { inclusive = true }
+                if (authState == AuthState.Authenticated) {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                    }
+                } else {
+                    navController.navigate(Routes.LANDING) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                    }
                 }
             }
-
-            AuthState.Unauthenticated -> {
-                navController.navigate(Routes.LANDING) {
-                    popUpTo(Routes.SPLASH) { inclusive = true }
-                }
+            AuthState.Loading, AuthState.Idle -> {
+                // Tetap di sini kalau masih loading
             }
-
             else -> Unit
         }
     }
