@@ -1,10 +1,12 @@
-package com.example.serona.ui.theme
+package com.example.serona.theme
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 val White = Color(0xFFFDFDFD)
 val White10 = Color(0xFFFFFFFF)
+val Grey10 = Color(0xFFBCA0A0)
+val Grey20 = Color(0xFFE0E0E0)
 
 // Primary Brand Color
 val Primary = Color(0xFFEF4E5E)
@@ -104,6 +106,22 @@ val LandingPageGrad = Brush.verticalGradient(
     1f to WarmLightPink
 )
 
+val AuthPageGrad = Brush.verticalGradient(
+    0.0f to WarmLightPink,
+    0.32f to WarmRedPinkSoft,
+    0.62f to Tertiary20,
+    0.79f to WarmRedOrange,
+    0.97f to WarmSoftCoral.copy(0.78f)
+)
+
+val ForgotPasswordBorderGrad = Brush.horizontalGradient(
+    0.0f to WarmSoftCoral.copy(0.78f),
+    0.32f to WarmRedOrange,
+    0.62f to Tertiary20,
+    0.79f to WarmRedPinkSoft,
+    0.97f to WarmLightPink
+)
+
 val BgGrad = Brush.verticalGradient(
     0.4f to White10,
     1f to PrimaryContainer
@@ -115,15 +133,15 @@ val GenderButtonGrad = Brush.verticalGradient(
 )
 
 // Glass Color
-val glassColor = Brush.horizontalGradient(
-    0.0f to White10,
-    0.37f to Color(0xFFFF598D),
-    0.70f to Color(0xFFFD9492),
-    1f to Color(0xFFFD9592)
+val glassColor = Brush.verticalGradient(
+    0.0f to White10.copy(0.25f),
+    0.37f to Color(0xFFFF598D).copy(0.25f),
+    0.70f to Color(0xFFFD9492).copy(0.65f),
+    1f to Color(0xFFFD9592).copy(0.76f)
 )
 
 // Text Color
-val Heading = Color(0xFF00000)
+val Heading = Color(0xFF000000)
 val BodyText = Color(0xFF5B5B5B)
 val ParagraphLight = Color(0xFF8B8B8B)
 val MutedLight = Color(0xFFC5C5C5)
