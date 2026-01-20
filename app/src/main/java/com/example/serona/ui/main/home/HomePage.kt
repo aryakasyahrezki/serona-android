@@ -116,12 +116,12 @@ fun HomePage(
         modifier = Modifier
             .fillMaxSize()
             .background(color = White)
-            .padding(vertical = 50.dp)
+            .padding(vertical = screenHeight * 0.1f)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(22.dp)
+                .padding(horizontal = 22.dp)
         ) {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState())

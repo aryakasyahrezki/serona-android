@@ -62,10 +62,18 @@ fun AppNavGraph(
         }
         composable(
             Routes.HOME,
-            enterTransition = { fadeIn(animationSpec = tween(800)) }
+            enterTransition = { fadeIn(animationSpec = tween(200)) }
         ) {
             HomePage(navController)
         }
+
+        composable(Routes.TUTORIAL){}
+
+        composable(Routes.FAVORITE){}
+
+        composable(Routes.PROFILE){}
+
+        composable(Routes.SCAN){}
     }
     
 }
