@@ -8,6 +8,10 @@ val White10 = Color(0xFFFFFFFF)
 val Grey10 = Color(0xFFBCA0A0)
 val Grey20 = Color(0xFFE0E0E0)
 
+val Grey30 = Color(0xFFEDEDED)
+val Grey40 = Color(0xFF5E5F60)
+
+
 // Primary Brand Color
 val Primary = Color(0xFFEF4E5E)
 val OnPrimary = White
@@ -26,7 +30,7 @@ val Primary80 = Color(0xFF6F132A)
 val Secondary = Color(0xFFFD9793)
 val OnSecondary = White
 val SecondaryContainer = Color(0xFFFDDDDD)
-val OnSecondaryContainer = Color(0xFF5E5F60)
+val OnSecondaryContainer = Grey40
 
 
 // Secondary Tonal Palette
@@ -76,8 +80,8 @@ val OfficeLogo = Color(0xFF3D646E)
 
 // Occasion Casual Color
 val CasualText = Color(0xFFFE9F54)
-val CasualCrc = Color(0xFFB4EFFF)
-val CasualBg = Color(0xFFFEC191)
+val CasualCrc = Color(0xFFFEC191)
+val CasualBg = Color(0xFFFEDCC1)
 val CasualLogo = Color(0xFFD88340)
 
 // Occasion Festival Color
@@ -140,9 +144,15 @@ val glassColor = Brush.verticalGradient(
     1f to Color(0xFFFD9592).copy(0.76f)
 )
 
+val backButtonGrad = Brush.verticalGradient(
+    0.08f to Primary,
+    1f to Color(0xFFF88EAA)
+)
+
 // Text Color
 val Heading = Color(0xFF000000)
 val BodyText = Color(0xFF5B5B5B)
+val ParagraphGrey = Color(0xFF555555)
 val ParagraphLight = Color(0xFF8B8B8B)
 val MutedLight = Color(0xFFC5C5C5)
 val Disabled = Color(0xFFD9D9D9)

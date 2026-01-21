@@ -1,3 +1,37 @@
 <resources>
     <string name="app_name">Serona</string>
+    <string name="face_not_detected">Face shape not detected</string>
+    <string name="face_not_detected_body">Please scan your face so we can analyze your facial structure and identify your actual face shape accurately</string>
+    <string name="skin_not_detected">Skin Tone not detected</string>
+    <string name="skin_not_detected_body">Scan your face to help us identify the skin tone that matches you most accurately</string>
+    <string name="guide_title_pre_scan">Why Do You Need to Scan Your Face?</string>
+
+    <string name="face_detected_header">Your Face Shape is \'%s\'</string>
+    <string name="skin_detected_header">Your Skin Tone is \'%s\'</string>
+    <string name="guide_title_post_scan">Prepare Your Skin Before Applying Makeup!</string>
+
+    <string name="desc_face_oval">Your oval face shape creates a naturally elegant and well-balanced look.</string>
+    <string name="desc_face_square">Your square face shape creates a bold and well-defined appearance.</string>
+    <string name="desc_face_round">Your round face shape creates a soft and youthful appearance.</string>
+    <string name="desc_face_diamond">Your diamond face shape creates a sharp and distinctive appearance.</string>
+    <string name="desc_face_rectangle">Your rectangle face shape creates a sleek and structured appearance.</string>
+    <string name="desc_face_heart">Your heart face shape creates a graceful and balanced appearance.</string>
+
+    <string name="desc_skin_light">Your fair to light skin tone creates a bright and soft natural glow.</string>
+    <string name="desc_skin_medium">Your medium tan skin tone gives a warm, balanced, and healthy appearance.</string>
+    <string name="desc_skin_deep">Your deep skin tone creates a rich and striking appearance.</string>
+
+    <string name="guide_pre_1_title">Accurate face shape detection</string>
+    <string name="guide_pre_1_body">We analyze your facial structure for more precise and effective makeup recommendations.</string>
+    <string name="guide_pre_2_title">Accurate skin tone matching</string>
+    <string name="guide_pre_2_body">Your skin tone is analyzed with precision to recommend the shades that suit you best</string>
+    <string name="guide_pre_3_title">Personalized makeup recommendations</string>
+    <string name="guide_pre_3_body">We use your face-analysis results to select the looks, colors, and makeup tutorials that fit you best</string>
+
+    <string name="guide_post_1_title">Hydrate Your Skin</string>
+    <string name="guide_post_1_body">Use a lightweight moisturizer or serum to keep your skin hydrated, helping your makeup apply more smoothly and last longer</string>
+    <string name="guide_post_2_title">Apply Primer</string>
+    <string name="guide_post_2_body">Primer helps blur pores, smooth skin texture, and make your makeup last longer</string>
+    <string name="guide_post_3_title">Protection From Sun Exposure</string>
+    <string name="guide_post_3_body">Don’t forget to apply sunscreen to protect your skin from UV exposure and keep your makeup looking flawless</string>
 </resources>

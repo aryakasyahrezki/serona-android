@@ -6,5 +6,12 @@ object Routes{
     const val LOGIN = "login"
     const val REGISTER = "register"
     const val PERSONALINFO = "personalInfo"
+
+    //main tab
     const val HOME = "home"
+    const val TUTORIAL = "tutorial"
+    const val FAVORITE = "favorite"
+    const val PROFILE = "profile"
+
+    const val SCAN = "scan"
 }
