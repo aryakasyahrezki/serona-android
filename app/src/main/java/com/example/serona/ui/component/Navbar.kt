@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -39,6 +40,7 @@ import com.example.serona.R
 import com.example.serona.theme.Grey40
 import com.example.serona.theme.Primary
 import com.example.serona.theme.White
+import com.example.serona.theme.figtreeFontFamily
 
 @Composable
 fun NavBar(
@@ -56,7 +58,7 @@ fun NavBar(
     ) {
 
         val barHeight = screenHeight * 0.1f
-        val fabSize = barHeight * 1.2f
+        val fabSize = barHeight * 0.8f
         val maxWidth = screenWidth
 
         val iconSize = barHeight * 0.3f
@@ -65,7 +67,7 @@ fun NavBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(barHeight + fabSize / 2)
+                .height(barHeight + (fabSize * 1.4f) / 2)
         ){
             Surface(
                 modifier = Modifier
@@ -131,7 +133,7 @@ fun NavBar(
                 onClick = onCenterClick,
                 containerColor = Primary,
                 modifier = Modifier
-                    .size(65.dp)
+                    .size(fabSize)
                     .align(Alignment.TopCenter),
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.elevation(8.dp)
@@ -171,6 +173,8 @@ fun NavBarItem(
         Text(
             text = label,
             fontSize = textSize,
+            fontFamily = figtreeFontFamily,
+            fontWeight = FontWeight.Medium,
             color = color
         )
     }

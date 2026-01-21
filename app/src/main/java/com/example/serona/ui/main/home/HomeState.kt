@@ -13,7 +13,9 @@ data class HomeUiState(
     val skinBody: String = "",
     val skinColor: Color = Color.Gray,
     val guideTitle: String = "",
-    val guideItems: List<GuideUiItem> = emptyList()
+    val guideItems: List<GuideUiItem> = emptyList(),
+    val showScanDialog: Boolean = false,
+    val showScanTooltip: Boolean = false
 )
 
 data class GuideUiItem(
