@@ -55,6 +55,7 @@ import com.example.serona.theme.White
 import com.example.serona.theme.backButtonGrad
 import com.example.serona.theme.figtreeFontFamily
 import com.example.serona.ui.auth.AuthViewModel
+import com.example.serona.ui.component.BackButton
 import com.example.serona.ui.navigation.Routes
 
 @Composable
@@ -89,7 +90,7 @@ fun ProfilePage(
 
         val menuWidth = maxWidth * 0.8f
         val fontSize = (maxWidth * 0.07f).value.sp
-        val buttonSize = maxWidth * 0.08f
+        val buttonSize = maxWidth * 0.07f
         val profileSize = maxWidth * 0.35f
         val space = maxHeight * 0.05f
 
@@ -101,36 +102,11 @@ fun ProfilePage(
             Spacer(modifier = Modifier.height(space * 0.15f))
 
             // Back Button
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable{ onBackClick() }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(buttonSize)
-                        .background(
-                            brush = backButtonGrad,
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = White,
-                        modifier = Modifier.size(buttonSize * 0.6f)
-                    )
-                }
-
-                Text(
-                    text = "Back",
-                    color = Primary,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = fontSize * 0.6
-                )
-            }
+            BackButton(
+                onBackClick = { onBackClick() },
+                buttonSize = buttonSize,
+                fontSize = fontSize * 0.86
+            )
 
             Spacer(modifier = Modifier.height(space))
 

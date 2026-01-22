@@ -15,7 +15,6 @@ class ProfileViewModel @Inject constructor (
 ) : ViewModel() {
 
     val user = userSession.user
-    private val name = user.value?.name
 
 
     init {
