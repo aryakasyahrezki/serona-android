@@ -1,6 +1,7 @@
 package com.example.serona.di
 
 import com.example.serona.data.api.UserApi
+import com.example.serona.data.api.FaceAnalysisApi
 import com.example.serona.data.network.AuthInterceptor
 import com.example.serona.data.repository.AuthRepository
 import dagger.Module
@@ -16,24 +17,22 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule{
+object NetworkModule {
 
     @Provides
     @Singleton
     fun provideOkHttp(
         authRepo: AuthRepository
-    ): OkHttpClient{
+    ): OkHttpClient {
         val logging = HttpLoggingInterceptor()
         logging.level = HttpLoggingInterceptor.Level.BODY
 
         return OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(authRepo))
             .addInterceptor(logging)
-            // ini untuk nyoba dlu karena database nya lama bgt
-            .connectTimeout(60, TimeUnit.SECONDS) // Waktu maksimal untuk menyambung ke server
-            .readTimeout(60, TimeUnit.SECONDS)    // Waktu maksimal untuk membaca respon
-            .writeTimeout(60, TimeUnit.SECONDS)   // Waktu maksimal untuk mengirim data
-
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 
@@ -43,7 +42,7 @@ object NetworkModule{
         client: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8000/api/")
+            .baseUrl("http://10.68.100.180:8000/")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -51,7 +50,14 @@ object NetworkModule{
 
     @Provides
     @Singleton
-    fun provideUserApi(retrofit: Retrofit): UserApi{
+    fun provideUserApi(retrofit: Retrofit): UserApi {
         return retrofit.create(UserApi::class.java)
+    }
+
+    // --- TAMBAHAN UNTUK FITUR SCAN SERONA ---
+    @Provides
+    @Singleton
+    fun provideFaceAnalysisApi(retrofit: Retrofit): FaceAnalysisApi {
+        return retrofit.create(FaceAnalysisApi::class.java)
     }
 }
