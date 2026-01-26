@@ -7,6 +7,11 @@ import java.util.Locale
 
 object DateUtils{
 
+    private val monthNames = listOf(
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    )
+
     fun formatBirthDate(
         day: String,
         month: String,
@@ -35,5 +40,25 @@ object DateUtils{
         String.format(Locale.US, "%04d-%02d-%02d", yearInt, monthInt, dayInt)
 
     }.getOrDefault("-")
+
+    fun parseBirthDate(dateStr: String?): Triple<String, String, String>? {
+        if (dateStr.isNullOrBlank() || dateStr == "-") return null
+
+        return runCatching {
+            val parts = dateStr.trim().split(" ")
+            if (parts.size != 3) return null
+
+            val day = parts[0].toInt().toString()
+
+            val fullMonth = parts[1]
+            val monthShort = if (fullMonth.length >= 3) {
+                fullMonth.substring(0, 3).lowercase().replaceFirstChar { it.uppercase() }
+            } else "Jan"
+
+            val year = parts[2]
+
+            Triple(day, monthShort, year)
+        }.getOrNull()
+    }
 
 }

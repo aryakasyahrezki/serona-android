@@ -43,8 +43,8 @@ class PersonalInfoViewModel @Inject constructor(
 
         val request = PersonalInfoRequest(
             gender = when(state.value.gender) {
-                Gender.MALE -> "male"
-                else -> "female"
+                Gender.MALE -> "Male"
+                else -> "Female"
             },
             country = state.value.country,
             birth_date = DateUtils.formatBirthDate(state.value.day, state.value.month, state.value.year)

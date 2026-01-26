@@ -1,7 +1,9 @@
 package com.example.serona.data.api
 
+import com.example.serona.data.dto.BaseResponse
 import com.example.serona.data.dto.PersonalInfoRequest
 import com.example.serona.data.dto.RegisterUserRequest
+import com.example.serona.data.dto.UpdateProfileRequest
 import com.example.serona.data.dto.UserProfileResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -27,5 +29,10 @@ interface UserApi{
     // user/profile -> ini ngambil semua data user bukan personalInfo doang
     @GET("user/profile")
     suspend fun getProfile(): Response<UserProfileResponse>
+
+    @PUT("user/update-profile") // Sesuaikan endpoint dengan BE kamu
+    suspend fun updateProfile(
+        @Body request: UpdateProfileRequest
+    ): Response<BaseResponse<UpdateProfileRequest>>
 
 }

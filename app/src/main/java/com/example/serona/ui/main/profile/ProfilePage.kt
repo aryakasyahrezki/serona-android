@@ -45,6 +45,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.serona.R
+import com.example.serona.data.model.Gender
 import com.example.serona.theme.BgGrad
 import com.example.serona.ui.component.ProfileInfoItem
 import com.example.serona.ui.component.ProfileMenuItem
@@ -93,10 +94,12 @@ fun ProfilePage(
         val buttonSize = maxWidth * 0.07f
         val profileSize = maxWidth * 0.35f
         val space = maxHeight * 0.05f
+        val horiPadding = maxWidth * 0.05f
+        val vertiPadding = maxHeight * 0.055f
 
         Column(
             modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = 50.dp)
+                .padding(horizontal = horiPadding, vertical = vertiPadding)
         ) {
 
             Spacer(modifier = Modifier.height(space * 0.15f))
@@ -129,7 +132,7 @@ fun ProfilePage(
                         .padding(3.5.dp)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.profile_pic_female),
+                        painter = painterResource(id = if(user?.gender == Gender.FEMALE) R.drawable.profile_pic_female else R.drawable.profile_pic_male),
                         contentDescription = "Profile Picture",
                         contentScale = ContentScale.Fit,
                         modifier = Modifier

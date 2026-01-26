@@ -3,6 +3,7 @@ package com.example.serona.data.repository
 import com.example.serona.data.api.UserApi
 import com.example.serona.data.dto.PersonalInfoRequest
 import com.example.serona.data.dto.RegisterUserRequest
+import com.example.serona.data.dto.UpdateProfileRequest
 import com.example.serona.data.model.Gender
 import com.example.serona.data.model.User
 import javax.inject.Inject
@@ -70,6 +71,33 @@ class UserRepository @Inject constructor(
                 Result.failure(Exception("Failed to load Profile"))
             }
         }catch (e: Exception){
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateProfile(request: UpdateProfileRequest): Result<Pair<String, User>> {
+        return try {
+            val response = userApi.updateProfile(request)
+            val body = response.body()
+
+            if (response.isSuccessful && body != null && body.data != null) {
+                val data = body.data
+                // Map dari DTO ke Model User aplikasi kamu
+                val updatedUser = User(
+                    name = data.name,
+                    email = data.email,
+                    gender = if (data.gender.lowercase() == "male") Gender.MALE else Gender.FEMALE,
+                    country = data.country,
+                    birthDate = data.birth_date,
+                    faceShape = data.face_shape,
+                    skinTone = data.skin_tone
+                )
+                Result.success(Pair(body.message, updatedUser))
+            } else {
+                val errorMsg = response.errorBody()?.string() ?: "An error occurred"
+                Result.failure(Exception(errorMsg))
+            }
+        } catch (e: Exception) {
             Result.failure(e)
         }
     }
