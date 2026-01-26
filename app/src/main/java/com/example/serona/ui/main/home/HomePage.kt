@@ -384,19 +384,6 @@ fun HomePage(
                         icon = Icons.Outlined.Church
                     )
                 }
-
-                Button(
-                    onClick = {
-                        authViewModel.logout()
-                        navController.navigate("login") {
-                            popUpTo(Routes.SPLASH) {
-                                inclusive = true
-                            }
-                        }
-                    },
-                ) {
-                    Text("Logout")
-                }
             }
         }
     }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.serona.data.dto.UpdateProfileRequest
 import com.example.serona.data.model.Gender
+import com.example.serona.data.repository.AuthRepository
 import com.example.serona.data.repository.UserRepository
 import com.example.serona.data.session.UserSession
 import com.example.serona.utils.DateUtils
@@ -18,6 +19,7 @@ import kotlin.compareTo
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
+    private val authRepo: AuthRepository,
     private val userRepo: UserRepository,
     private val userSession: UserSession
 ) : ViewModel(){
@@ -103,6 +105,8 @@ class EditProfileViewModel @Inject constructor(
 
             result.onSuccess { (msg, updatedUser) ->
                 userSession.setUser(updatedUser)
+
+                authRepo.updateFirebaseName(updatedUser.name)
 
                 _uiState.update { it.copy(
                     updateSuccess = true,

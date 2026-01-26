@@ -40,7 +40,6 @@ class PersonalInfoViewModel @Inject constructor(
     fun submitPersonalInfo(onSuccess: () -> Unit){
         val gender = state.value.gender ?: return
 
-
         val request = PersonalInfoRequest(
             gender = when(state.value.gender) {
                 Gender.MALE -> "Male"
@@ -51,24 +50,24 @@ class PersonalInfoViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-//            authRepo.refreshIdToken()
 
             _state.value = _state.value.copy(
                 errorMessage = null
             )
 
             val result = userRepo.submitPersonalInfo(request)
-            if(result.isSuccess){
+
+            result.onSuccess { dataFromBe ->
                 userSession.updatePersonalInfo(
-                    gender = gender,
-                    country = state.value.country,
-                    birthDate = DateUtils.formatBirthDate(state.value.day, state.value.month, state.value.year)
+                    gender = if (dataFromBe.gender.lowercase() == "male") Gender.MALE else Gender.FEMALE,
+                    country = dataFromBe.country,
+                    birthDate = dataFromBe.birth_date
                 )
                 onSuccess()
-            }else{
+            }.onFailure { exception ->
                 _state.value = _state.value.copy(
-                    errorMessage = result.exceptionOrNull()?.message
-                        ?: "Failed to submit personal info")
+                    errorMessage = exception.message ?: "Failed to submit personal info"
+                )
             }
         }
     }

@@ -128,4 +128,12 @@ class AuthRepository @Inject constructor(
                 }
             }
     }
+
+    fun updateFirebaseName(newName: String) {
+        val user = auth.currentUser
+        val update = userProfileChangeRequest {
+            displayName = newName
+        }
+        user?.updateProfile(update) // Update di background
+    }
 }

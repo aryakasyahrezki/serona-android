@@ -1,26 +1,46 @@
 package com.example.serona.data.repository
 
 import com.example.serona.data.api.UserApi
+import com.example.serona.data.dto.BaseResponse
 import com.example.serona.data.dto.PersonalInfoRequest
 import com.example.serona.data.dto.RegisterUserRequest
 import com.example.serona.data.dto.UpdateProfileRequest
 import com.example.serona.data.model.Gender
 import com.example.serona.data.model.User
+import com.google.gson.Gson
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
     private val userApi: UserApi
 ){
 
+    private val gson = Gson()
+
+    private fun parseError(errorBody: String?): String {
+        if (errorBody.isNullOrBlank()) return "An unknown error occurred"
+        return try {
+            // Kita pakai BaseResponse karena semua response BE punya field 'message'
+            val errorResponse = gson.fromJson(errorBody, BaseResponse::class.java)
+            errorResponse.message ?: "An error occurred"
+        } catch (e: Exception) {
+            "Internal Server Error"
+        }
+    }
+
     suspend fun registerUser(
         request: RegisterUserRequest
-    ): Result<Unit> {
+    ): Result<Pair<String, String>> {
         return try {
             val response = userApi.registerUser(request)
-            if (response.isSuccessful) {
-                Result.success(Unit)
+            val body = response.body()
+
+            if (response.isSuccessful && body != null && body.data != null) {
+                val nameBe = body.data.name
+                val emailBe = body.data.email
+                Result.success(Pair(nameBe, emailBe))
             } else {
-                Result.failure(Exception("Register user failed"))
+                val msg = parseError(response.errorBody()?.string())
+                Result.failure(Exception(msg))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -30,18 +50,20 @@ class UserRepository @Inject constructor(
     // ini func yang berbeda dengan yg di UserAPI, karena dia yang ngirim request ke API dan translate response yang direturn sama fun tersebut untuk di pake di UI nanti
     suspend fun submitPersonalInfo(
         request: PersonalInfoRequest
-    ): Result<Unit>{
+    ): Result<PersonalInfoRequest> {
         return try {
             val response = userApi.submitPersonalInfo(request)
-            if(response.isSuccessful){
-                Result.success(Unit)
-            }else{
-                Result.failure(Exception("Failed: ${response.code()}"))
+            val body = response.body()
+
+            if (response.isSuccessful && body?.data != null) {
+                Result.success(body.data)
+            } else {
+                val msg = parseError(response.errorBody()?.string())
+                Result.failure(Exception(msg))
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Result.failure(e)
         }
-
     }
 
     suspend fun getProfile(): Result<User>{
@@ -94,8 +116,8 @@ class UserRepository @Inject constructor(
                 )
                 Result.success(Pair(body.message, updatedUser))
             } else {
-                val errorMsg = response.errorBody()?.string() ?: "An error occurred"
-                Result.failure(Exception(errorMsg))
+                val msg = parseError(response.errorBody()?.string())
+                Result.failure(Exception(msg))
             }
         } catch (e: Exception) {
             Result.failure(e)

@@ -152,7 +152,7 @@ class RegisterViewModel @Inject constructor(
             val user = repo.getCurrentUser()
                 ?: return@reloadUser
 
-            val (name, email) = repo.getCurrentUserInfo()
+            val (nameFirebase, emailFirebase) = repo.getCurrentUserInfo()
                 ?: return@reloadUser
 
             viewModelScope.launch {
@@ -160,18 +160,18 @@ class RegisterViewModel @Inject constructor(
 
                 val apiResult = userRepo.registerUser(
                     RegisterUserRequest(
-                        name = name!!,
-                        email = email!!
+                        name = nameFirebase!!,
+                        email = emailFirebase!!
                     )
                 )
 
-                if (apiResult.isSuccess) {
-                    userSession.setBasicInfo(name, email)
+                apiResult.onSuccess { (nameFromBe, emailFromBe) ->
+                    userSession.setBasicInfo(nameFromBe, emailFromBe)
                     userSession.markInitialized()
                     _emailVerificationState.postValue(EmailVerificationState.Verified)
-                } else {
+                }.onFailure { error ->
                     _emailVerificationState.postValue(
-                        EmailVerificationState.Error("Failed save user to server")
+                        EmailVerificationState.Error(error.message ?: "Failed save user to server")
                     )
                 }
             }
