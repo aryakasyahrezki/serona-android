@@ -113,7 +113,7 @@ fun PersonalInfoPage(
             PersonalInfoTextField(
                 label = "Choose Your Country",
                 value = state.country,
-                onValueChange = { },               // ignored karena isDropdown = true
+                onValueChange = { },
                 isDropdown = true,
                 dropdownItems = listOf(
                     "China",

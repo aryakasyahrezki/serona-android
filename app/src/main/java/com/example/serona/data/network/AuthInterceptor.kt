@@ -13,6 +13,9 @@ class AuthInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val requestBuilder = chain.request().newBuilder()
 
+        requestBuilder.addHeader("Accept", "application/json")
+        requestBuilder.addHeader("Content-Type", "application/json")
+
         val user = authRepo.getCurrentUser()
         if (user != null) {
             try {

@@ -14,6 +14,10 @@ import com.example.serona.ui.auth.register.PersonalInfoPage
 import com.example.serona.ui.auth.register.RegisterPage
 import com.example.serona.ui.landing.LandingPageCarousel
 import com.example.serona.ui.main.home.HomePage
+import com.example.serona.ui.main.profile.DeleteAccPage
+import com.example.serona.ui.main.profile.EditProfilePage
+import com.example.serona.ui.main.profile.PrivacyPage
+import com.example.serona.ui.main.profile.ProfilePage
 import com.example.serona.ui.splash.SplashFullBackground
 
 @Composable
@@ -71,9 +75,39 @@ fun AppNavGraph(
 
         composable(Routes.FAVORITE){}
 
-        composable(Routes.PROFILE){}
+        composable(Routes.PRIVACY){
+            PrivacyPage(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.DELETE_PROFILE){
+            DeleteAccPage(
+                onDeleteConfirm = {
+                    navController.navigate(Routes.SPLASH) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onCancel = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(Routes.EDIT_PROFILE){
+            EditProfilePage(onBackClick = { navController.popBackStack() })
+        }
+
+        composable(Routes.PROFILE){
+            ProfilePage(
+                navController = navController,
+                onBackClick = { navController.popBackStack() },
+                onEditProfile = { navController.navigate(Routes.EDIT_PROFILE) },
+                onPrivacyClick = { navController.navigate(Routes.PRIVACY)},
+                onDeleteAccountClick = { navController.navigate(Routes.DELETE_PROFILE) }
+            )
+        }
 
         composable(Routes.SCAN){}
     }
-    
 }

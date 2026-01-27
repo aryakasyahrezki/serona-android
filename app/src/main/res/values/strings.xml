@@ -34,4 +34,54 @@
     <string name="guide_post_2_body">Primer helps blur pores, smooth skin texture, and make your makeup last longer</string>
     <string name="guide_post_3_title">Protection From Sun Exposure</string>
     <string name="guide_post_3_body">Don’t forget to apply sunscreen to protect your skin from UV exposure and keep your makeup looking flawless</string>
+    
+    <!--Privacy FAQ-->
+    <string name="faq_q1">Does Serona keep my personal data secure?</string>
+    <string name="faq_a1">
+    Yes, Serona takes the protection of your personal data very seriously.
+
+    Here\'s why:\n
+    </string>
+    <string-array name="privacy_points">
+        <item>We do not share or sell your data to any party for commercial purposes.</item>
+        <item>All personal information is encrypted, so only you and our authorized systems can access it.</item>
+        <item>We only collect data that is strictly necessary to operate Serona\'s features optimally.</item>
+        <item>Privacy and security are Serona\'s core foundations, and all our processes are designed to keep your data safe.</item>
+    </string-array>
+
+    <string name="faq_q2">Does Serona sell my data?</string>
+    <string name="faq_a2">
+    No. Serona does not and will never sell your data.
+
+    We do not share your personal information with any party for commercial purposes.
+    Your data is used solely to operate Serona\’s features and to enhance your experience within the app.
+        </string>
+    <string name="faq_q3">What data does Serona have about me?</string>
+    <string name="faq_a3">
+    Serona only has the data you choose to share with us.
+    Before we collect any information, you are always asked for your consent first.
+
+    The data you allow us to access is used solely to enhance your experience in the app, for example, to provide color predictions that match your skin tone more personally.
+
+    We do not collect irrelevant data and never use your data beyond the needs of Serona\’s features.
+    </string>
+    <string name="faq_q4">Is it safe to scan my face on Serona?</string>
+    <string name="faq_a4">
+    Yes, it is safe.
+    Face scanning on Serona is done only with your permission, and your facial images are processed securely.
+    We do not store your photos without consent, and facial data is used solely to operate features such as personalized color recommendations based on your skin tone.
+
+    Serona does not share, sell, or use your facial data beyond the needs of the app.
+        </string>
+    <string name="faq_q5">How can I delete my data?</string>
+    <string name="faq_a5">
+    You can delete your data at any time through the app by going to Profile > Delete Account.
+    When you choose to delete your account, all data associated with you will be permanently removed from Serona\’s system and cannot be recovered.
+        </string>
+    <string name="faq_q6">Who can access my data?</string>
+    <string name="faq_a6">
+    Only Serona\’s system and authorized internal team members can access your data—and only to the extent necessary to operate the app’s features.
+
+    We do not grant access to any third parties without your consent, and all access is monitored under strict security standards.
+        </string>
 </resources>

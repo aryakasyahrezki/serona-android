@@ -20,6 +20,16 @@ class AuthViewModel @Inject constructor (
     private val _authState = MutableLiveData<AuthState>()
     val authState : LiveData<AuthState> = _authState
 
+    init {
+        viewModelScope.launch {
+            userSession.user.collect { user ->
+                if (user == null && authRepo.getCurrentUser() == null) {
+                    _authState.value = AuthState.Unauthenticated
+                }
+            }
+        }
+    }
+
     fun checkAuthStatus() {
         _authState.value = AuthState.Loading
 
@@ -29,7 +39,7 @@ class AuthViewModel @Inject constructor (
             return
         }
 
-        // 🔥 SOLUSI: Langsung set Authenticated jika Firebase User ada
+        // Langsung set Authenticated jika Firebase User ada
         // Sambil jalan, kita tetap panggil loadUserSync di background
         _authState.value = AuthState.Authenticated
 
