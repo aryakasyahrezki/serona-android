@@ -88,6 +88,8 @@ fun PrivacyPage(
                 .fillMaxSize()
                 .padding(horizontal = horiPadding, vertical = vertiPadding)
         ) {
+            Spacer(modifier = Modifier.height(space * 0.15f))
+
             BackButton(
                 onBackClick = { onBackClick() },
                 buttonSize = buttonSize,

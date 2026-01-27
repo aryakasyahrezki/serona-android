@@ -9,6 +9,7 @@ import com.example.serona.data.dto.UpdateProfileRequest
 import com.example.serona.data.dto.UserProfileResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -32,9 +33,12 @@ interface UserApi{
     @GET("user/profile")
     suspend fun getProfile(): Response<UserProfileResponse>
 
-    @PUT("user/update-profile") // Sesuaikan endpoint dengan BE kamu
+    @PUT("user/update-profile")
     suspend fun updateProfile(
         @Body request: UpdateProfileRequest
     ): Response<BaseResponse<UpdateProfileRequest>>
+
+    @DELETE("user/delete-account")
+    suspend fun deleteAccount(): Response<BaseResponse<Unit>>
 
 }

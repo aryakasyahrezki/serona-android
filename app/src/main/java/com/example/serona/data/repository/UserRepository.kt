@@ -124,4 +124,18 @@ class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun deleteAccountFromBe(): Result<String> {
+        return try {
+            val response = userApi.deleteAccount()
+            if (response.isSuccessful) {
+                Result.success(response.body()?.message ?: "Account deleted from server")
+            } else {
+                val msg = parseError(response.errorBody()?.string())
+                Result.failure(Exception(msg))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }

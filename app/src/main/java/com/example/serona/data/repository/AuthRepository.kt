@@ -1,5 +1,6 @@
 package com.example.serona.data.repository
 
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.userProfileChangeRequest
 import kotlinx.coroutines.tasks.await
@@ -135,5 +136,21 @@ class AuthRepository @Inject constructor(
             displayName = newName
         }
         user?.updateProfile(update) // Update di background
+    }
+
+    fun reAuthenticate(password: String, callback: (Result<Unit>) -> Unit) {
+        val user = auth.currentUser
+        val email = user?.email ?: return
+
+        // Kita buat kredensial login ulang
+        val credential = EmailAuthProvider.getCredential(email, password)
+
+        user.reauthenticate(credential).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                callback(Result.success(Unit))
+            } else {
+                callback(Result.failure(task.exception ?: Exception("Password Salah")))
+            }
+        }
     }
 }

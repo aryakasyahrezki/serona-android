@@ -14,6 +14,7 @@ import com.example.serona.ui.auth.register.PersonalInfoPage
 import com.example.serona.ui.auth.register.RegisterPage
 import com.example.serona.ui.landing.LandingPageCarousel
 import com.example.serona.ui.main.home.HomePage
+import com.example.serona.ui.main.profile.DeleteAccPage
 import com.example.serona.ui.main.profile.EditProfilePage
 import com.example.serona.ui.main.profile.PrivacyPage
 import com.example.serona.ui.main.profile.ProfilePage
@@ -79,7 +80,20 @@ fun AppNavGraph(
                 onBackClick = { navController.popBackStack() }
             )
         }
-        composable(Routes.DELETE_PROFILE){}
+        composable(Routes.DELETE_PROFILE){
+            DeleteAccPage(
+                onDeleteConfirm = {
+                    navController.navigate(Routes.SPLASH) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onCancel = {
+                    navController.popBackStack()
+                }
+            )
+        }
         composable(Routes.EDIT_PROFILE){
             EditProfilePage(onBackClick = { navController.popBackStack() })
         }
