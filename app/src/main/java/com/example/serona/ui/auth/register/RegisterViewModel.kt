@@ -149,15 +149,10 @@ class RegisterViewModel @Inject constructor(
                 return@reloadUser
             }
 
-            val user = repo.getCurrentUser()
-                ?: return@reloadUser
-
             val (nameFirebase, emailFirebase) = repo.getCurrentUserInfo()
                 ?: return@reloadUser
 
             viewModelScope.launch {
-//                repo.refreshIdToken()
-
                 val apiResult = userRepo.registerUser(
                     RegisterUserRequest(
                         name = nameFirebase!!,
@@ -165,8 +160,7 @@ class RegisterViewModel @Inject constructor(
                     )
                 )
 
-                apiResult.onSuccess { (nameFromBe, emailFromBe) ->
-                    userSession.setBasicInfo(nameFromBe, emailFromBe)
+                apiResult.onSuccess {
                     userSession.markInitialized()
                     _emailVerificationState.postValue(EmailVerificationState.Verified)
                 }.onFailure { error ->
@@ -186,13 +180,12 @@ class RegisterViewModel @Inject constructor(
         resetEmailVerificationState() //jadi kan kalo gajadi user bakal coba email baru, jadi state nya ulang lagi
 
         repo.deleteCurrentUser { result ->
-            if (!result.isSuccess) {
-                _emailVerificationState.postValue(
-                    EmailVerificationState.Error(
-                        result.exceptionOrNull()?.message
-                            ?: "Failed to delete account"
-                    )
-                )
+            if (result.isSuccess) {
+                viewModelScope.launch {
+                    userRepo.clearAllLocalData()
+                }
+            } else {
+                println("Firebase account deletion failed: ${result.exceptionOrNull()?.message}")
             }
         }
     }

@@ -55,7 +55,6 @@ import com.example.serona.theme.BgGrad
 import com.example.serona.theme.Primary
 import com.example.serona.theme.Primary50
 import com.example.serona.theme.White
-import com.example.serona.theme.backButtonGrad
 import com.example.serona.theme.figtreeFontFamily
 import com.example.serona.ui.component.BackButton
 

@@ -72,31 +72,20 @@ class LoginViewModel @Inject constructor(
         repo.login(state.email, state.password) { result ->
             if (result.isSuccess) {
                 viewModelScope.launch {
-
-                    val apiResult = userRepo.getProfile() // GET /me
+                    // Ambil dari BE & Simpan ke Room dan ke UserSession
+                    val apiResult = userRepo.syncFullProfile()
 
                     if (apiResult.isSuccess) {
-                        val user = apiResult.getOrNull()
-
-                        if (user != null) {
-                            // Jika user tidak null, baru masukkan ke session
-                            userSession.setUser(user)
-                            _loginState.postValue(AuthState.Authenticated)
-                        } else {
-                            // Jika sukses tapi ternyata datanya kosong/null
-                            _loginState.postValue(AuthState.Error("User data is empty"))
-                        }
-
+                        // UI akan otomatis update via userDataFlow di Repository
+                        _loginState.postValue(AuthState.Authenticated)
                     } else {
                         _loginState.postValue(
-                            AuthState.Error("Failed fetch user data")
+                            AuthState.Error(apiResult.exceptionOrNull()?.message ?: "Failed fetch user data")
                         )
                     }
                 }
             } else {
-                _loginState.postValue(
-                    AuthState.Error("Email or password is incorrect")
-                )
+                _loginState.postValue(AuthState.Error("Email or password is incorrect"))
             }
         }
     }
@@ -106,7 +95,6 @@ class LoginViewModel @Inject constructor(
     }
 
     // Forgot Password Func
-
     private val _forgotPasswordFormState = MutableLiveData(ForgotPasswordFormState())
     val forgotPasswordFormState : LiveData<ForgotPasswordFormState> = _forgotPasswordFormState
 

@@ -14,18 +14,16 @@ class ProfileViewModel @Inject constructor (
     private val userRepo : UserRepository
 ) : ViewModel() {
 
-    val user = userSession.user
+    val user = userRepo.userDataFlow
 
 
     init {
-        checkUserData()
+        refreshProfile()
     }
 
-    private fun checkUserData(){
+    private fun refreshProfile() {
         viewModelScope.launch {
-            if(userSession.user.value == null){
-                userRepo.getProfile()
-            }
+            userRepo.syncFullProfile()
         }
     }
 }

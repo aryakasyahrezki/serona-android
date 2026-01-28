@@ -43,6 +43,8 @@ import com.example.serona.ui.auth.RegisterState
 import com.example.serona.ui.component.AuthPasswordField
 import com.example.serona.ui.component.AuthTextField
 import com.example.serona.ui.component.RoundedCheckbox
+import com.example.serona.ui.navigation.Routes
+import okhttp3.Route
 
 @Composable
 fun RegisterPage(
@@ -242,7 +244,12 @@ fun RegisterCard(
                                 .getStringAnnotations("PRIVACY_POLICY", offset, offset)
                                 .firstOrNull()
                                 ?.let {
-                                    // nanri tambahin mau kemananya
+                                    navController.navigate("privacyPolicy") {
+                                        popUpTo(Routes.REGISTER) {
+                                            inclusive = false
+                                        }
+                                        launchSingleTop = true
+                                    }
                                 }
                         }
                     )
@@ -287,7 +294,7 @@ fun RegisterCard(
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.clickable{
-                            navController.navigate("login")
+                            navController.popBackStack()
                         }
                     )
                 }
@@ -346,29 +353,33 @@ fun EmailVerificationDialog(
                     EmailVerificationState.Sending ->
                         Text(
                             "Sending Verification Email...",
-                            style = dialogText
+                            style = dialogText,
+                            fontFamily = figtreeFontFamily
                         )
 
                     EmailVerificationState.EmailSent ->
                         Text(
                             "Verification Email has been sent. Please check your inbox or spam",
-                            style = dialogText
+                            style = dialogText,
+                            fontFamily = figtreeFontFamily
                         )
 
                     EmailVerificationState.Verified ->
                         Text(
                             "Your email has been verified successfully!",
-                            style = dialogText
+                            style = dialogText,
+                            fontFamily = figtreeFontFamily
                         )
 
                     EmailVerificationState.NotVerified ->
                         Text(
                             "Email not verified yet. Please check your inbox or spam email.",
-                            style = dialogText
+                            style = dialogText,
+                            fontFamily = figtreeFontFamily
                         )
 
                     is EmailVerificationState.Error ->
-                        Text(state.message, style = dialogText)
+                        Text(state.message, fontFamily = figtreeFontFamily, style = dialogText)
 
                     else -> {}
                 }
@@ -388,7 +399,8 @@ fun EmailVerificationDialog(
                         Text(
                             "I've Verified My Email",
                             style = buttonText,
-                            color = White
+                            color = White,
+                            fontFamily = figtreeFontFamily
                         )
                     }
 
@@ -407,6 +419,30 @@ fun EmailVerificationDialog(
                             color = Primary
                         )
                     }
+                }
+
+                if (state is EmailVerificationState.Error) {
+                    Button(
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            viewModel.resetEmailVerificationState()
+                            viewModel.deleteAccount()
+                            onDismiss()
+                        }
+                    ) {
+                        Text("Back to Register", style = buttonText, color = White)
+                    }
+
+                    Text(
+                        text = "Note: This will reset your registration so you can try again.",
+                        fontSize = 14.sp,
+                        fontFamily = figtreeFontFamily,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        color = Primary.copy(alpha = 0.7f),
+                        lineHeight = 14.sp
+                    )
                 }
             }
         },

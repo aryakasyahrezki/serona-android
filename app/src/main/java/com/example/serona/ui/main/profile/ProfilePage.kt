@@ -70,7 +70,7 @@ fun ProfilePage(
     onDeleteAccountClick: () -> Unit = {}
 ) {
 
-    val user by profileViewModel.user.collectAsState()
+    val user by profileViewModel.user.collectAsState(initial = null)
     var logoutDialogBox by remember { mutableStateOf(false) }
 
     val name = user?.name ?: "Loading..."
@@ -233,9 +233,10 @@ fun ProfilePage(
             onConfirm = {
                 authViewModel.logout()
                 navController.navigate("login") {
-                    popUpTo(Routes.SPLASH) {
+                    popUpTo(0) {
                         inclusive = true
                     }
+                    launchSingleTop = true
                 }
             },
             onDismiss = { logoutDialogBox = false }

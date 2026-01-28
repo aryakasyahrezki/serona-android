@@ -37,6 +37,7 @@ import com.example.serona.ui.auth.ForgotPasswordState
 import com.example.serona.ui.auth.LoginFormState
 import com.example.serona.ui.component.AuthPasswordField
 import com.example.serona.ui.component.AuthTextField
+import com.example.serona.ui.navigation.Routes
 
 @Composable
 fun LoginPage(
@@ -221,7 +222,13 @@ fun LoginCard(
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.clickable{
-                            navController.navigate("register")
+                            navController.navigate("register") {
+                                popUpTo("login") {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
                     )
                 }

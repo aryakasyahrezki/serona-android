@@ -105,8 +105,7 @@ import com.example.serona.ui.navigation.Routes
 @Composable
 fun HomePage(
     navController: NavController,
-    homeViewModel: HomeViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     // Observasi data user
     val state by homeViewModel.uiState.collectAsState()
@@ -408,6 +407,7 @@ fun HomePage(
         modifier = Modifier
             .fillMaxSize()
             .padding(fabSize)
+            .background(Color.Transparent)
             .zIndex(2f),
         contentAlignment = Alignment.BottomCenter
     ) {

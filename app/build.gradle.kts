@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.google.services)
     // Add the Google services Gradle plugin
 //    id("com.google.gms.google-services")
+    alias(libs.plugins.google.devtools.ksp)
     kotlin("kapt")  // <-- kalau pakai Kotlin
     id ("com.google.dagger.hilt.android") // <-- ini wajib
 }
@@ -92,5 +93,11 @@ dependencies {
 
     // Desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
+    // ROOM DATABASE
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
 }
 

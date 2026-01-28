@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.serona.data.dto.UpdateProfileRequest
 import com.example.serona.data.model.Gender
+import com.example.serona.data.model.User
 import com.example.serona.data.repository.AuthRepository
 import com.example.serona.data.repository.UserRepository
 import com.example.serona.data.session.UserSession
@@ -20,28 +21,32 @@ import kotlin.compareTo
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
     private val authRepo: AuthRepository,
-    private val userRepo: UserRepository,
-    private val userSession: UserSession
+    private val userRepo: UserRepository
 ) : ViewModel(){
 
-    private val currentUser = userSession.user.value
+    private var originalUser: User? = null
 
-    private val parsedDate = DateUtils.parseBirthDate(currentUser?.birthDate)
 
     init {
-        println("DEBUG: Original BirthDate from Session: ${currentUser?.birthDate}")
+        viewModelScope.launch {
+            userRepo.userDataFlow.collect { user ->
+                if (user != null && originalUser == null) {
+                    originalUser = user
+                    val parsedDate = DateUtils.parseBirthDate(user.birthDate)
+                    _uiState.update { it.copy(
+                        name = user.name,
+                        country = user.country,
+                        gender = user.gender,
+                        day = parsedDate?.first ?: "",
+                        month = parsedDate?.second ?: "",
+                        year = parsedDate?.third ?: ""
+                    )}
+                }
+            }
+        }
     }
 
-    private val _uiState = MutableStateFlow(
-        EditProfileUiState(
-            name = currentUser?.name ?: "",
-            country = currentUser?.country ?: "",
-            gender = currentUser?.gender ?: Gender.MALE,
-            day = parsedDate?.first ?: "",
-            month = parsedDate?.second ?: "",
-            year = parsedDate?.third ?: "",
-        )
-    )
+    private val _uiState = MutableStateFlow(EditProfileUiState())
     val uiState: StateFlow<EditProfileUiState> = _uiState.asStateFlow()
 
     fun onEvent(event: EditProfileEvent) {
@@ -91,22 +96,21 @@ class EditProfileViewModel @Inject constructor(
 
         val request = UpdateProfileRequest(
             name = state.name,
-            email = currentUser?.email ?: "",
+            email = originalUser?.email ?: "",
             country = state.country,
             birth_date = fullDate,
             gender = formattedGender,
-            face_shape = currentUser?.faceShape ?: "",
-            skin_tone = currentUser?.skinTone ?: ""
+            face_shape = originalUser?.faceShape ?: "",
+            skin_tone = originalUser?.skinTone ?: ""
         )
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val result = userRepo.updateProfile(request)
 
-            result.onSuccess { (msg, updatedUser) ->
-                userSession.setUser(updatedUser)
+            result.onSuccess { msg ->
 
-                authRepo.updateFirebaseName(updatedUser.name)
+                authRepo.updateFirebaseName(state.name)
 
                 _uiState.update { it.copy(
                     updateSuccess = true,
@@ -114,6 +118,7 @@ class EditProfileViewModel @Inject constructor(
                     errorMessage = msg
                 ) }
 
+                originalUser = null
                 resetChangeStatus()
             } .onFailure {exception ->
                 _uiState.update { it.copy(
@@ -156,14 +161,18 @@ class EditProfileViewModel @Inject constructor(
 
     private fun updateChangeStatus() {
         val state = _uiState.value
+        val user = originalUser ?: return
+
+        // Parse tanggal secara dinamis dari originalUser yang ada saat ini
+        val parsedOriginalDate = DateUtils.parseBirthDate(user.birthDate)
 
         // Bandingkan setiap field dengan data asli dari session
-        val isNameChanged = state.name != (currentUser?.name ?: "")
-        val isCountryChanged = state.country != (currentUser?.country ?: "")
-        val isGenderChanged = state.gender != (currentUser?.gender ?: Gender.MALE)
-        val isDayChanged = state.day != (parsedDate?.first ?: "")
-        val isMonthChanged = state.month != (parsedDate?.second ?: "")
-        val isYearChanged = state.year != (parsedDate?.third ?: "")
+        val isNameChanged = state.name != (originalUser?.name ?: "")
+        val isCountryChanged = state.country != (originalUser?.country ?: "")
+        val isGenderChanged = state.gender != (originalUser?.gender ?: Gender.MALE)
+        val isDayChanged = state.day != (parsedOriginalDate?.first ?: "")
+        val isMonthChanged = state.month != (parsedOriginalDate?.second ?: "")
+        val isYearChanged = state.year != (parsedOriginalDate?.third ?: "")
 
         val totalChanged = isNameChanged || isCountryChanged || isGenderChanged ||
                 isDayChanged || isMonthChanged || isYearChanged
