@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -34,7 +35,6 @@ fun PersonalInfoPage(
 ) {
     val state by viewModel.state.collectAsState()
     val progress = state.answeredCount / 3f
-    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
     LaunchedEffect(state.errorMessage) {
@@ -44,29 +44,35 @@ fun PersonalInfoPage(
         }
     }
 
-    BoxWithConstraints(
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+
+    val fontSize = (maxWidth * 0.052f).value.sp
+    val calculatedLabelSize = (fontSize.value * 0.73f).sp
+    val horiPadding = maxWidth * 0.05f
+    val space = maxHeight * 0.07f
+    val buttonHeight = (fontSize * 2f).value.dp
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 2.dp)
             .background(color = White)
     ){
-        val fontSize = (maxWidth * 0.052f).value.sp
-        val calculatedLabelSize = (fontSize.value * 0.73f).sp
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = horiPadding)
         ) {
 
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(space))
 
             CleanLinearProgress(
                 progress = progress,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(space * 0.5f))
 
             Text(
                 text = "Personal Information",
@@ -76,13 +82,13 @@ fun PersonalInfoPage(
             )
             Text(
                 text = "Complete your personal information so we can tailor your beauty journey for you",
-                fontSize = 14.sp,
+                fontSize = fontSize * 0.75f,
                 fontFamily = figtreeFontFamily,
                 fontWeight = FontWeight.SemiBold,
                 color = MutedLight
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(space * 0.5f))
 
             // Gender Selection
             Row(
@@ -107,7 +113,7 @@ fun PersonalInfoPage(
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(space * 0.5f))
 
             // COUNTRY DROPDOWN
             PersonalInfoTextField(
@@ -196,7 +202,7 @@ fun PersonalInfoPage(
 
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(space * 0.5f))
 
             // NEXT BUTTON
             Button(
@@ -212,7 +218,7 @@ fun PersonalInfoPage(
                 enabled = state.canContinue,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(buttonHeight),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFE15B6F),
                     disabledContainerColor = Color(0xFFE5AEB4)
@@ -221,7 +227,8 @@ fun PersonalInfoPage(
                 Text(
                     text = "Next",
                     color = Color.White,
-                    fontSize = 16.sp
+                    fontSize = fontSize * 0.8f,
+                    fontFamily = figtreeFontFamily
                 )
             }
         }
