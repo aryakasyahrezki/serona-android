@@ -28,7 +28,7 @@ fun AppNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Routes.SPLASH,
+        startDestination = Routes.PROFILE,
         modifier = Modifier.fillMaxSize(),
 
         enterTransition = {

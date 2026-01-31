@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,7 +68,8 @@ fun PersonalInfoPage(
 
             CleanLinearProgress(
                 progress = progress,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                maxHeight = maxHeight
             )
 
             Spacer(modifier = Modifier.height(space * 0.5f))
@@ -101,7 +101,10 @@ fun PersonalInfoPage(
                     selected = state.gender == Gender.FEMALE,
                     onClick = { viewModel.selectGender(Gender.FEMALE) },
                     modifier = Modifier.weight(0.5f),
-                    iconModifier = Modifier.rotate(45f)
+                    iconModifier = Modifier.rotate(45f),
+                    maxWidth = maxWidth,
+                    maxHeight = maxHeight,
+                    fontSize = fontSize
                 )
 
                 GenderCard(
@@ -109,7 +112,10 @@ fun PersonalInfoPage(
                     icon = Icons.Filled.Male,
                     selected = state.gender == Gender.MALE,
                     onClick = { viewModel.selectGender(Gender.MALE) },
-                    modifier = Modifier.weight(0.5f)
+                    modifier = Modifier.weight(0.5f),
+                    maxWidth = maxWidth,
+                    maxHeight = maxHeight,
+                    fontSize = fontSize
                 )
             }
 
@@ -137,10 +143,13 @@ fun PersonalInfoPage(
                 ),
                 onDropdownItemSelected = { viewModel.selectCountry(it) },
                 modifier = Modifier.fillMaxWidth(),
-                labelFontSize = calculatedLabelSize
+                fontSize = fontSize,
+                labelFontSize = calculatedLabelSize,
+                maxWidth = maxWidth,
+                maxHeight = maxHeight
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(space * 0.5f))
 
             // DATE OF BIRTH
             Row(
@@ -158,7 +167,10 @@ fun PersonalInfoPage(
                         viewModel.selectDOB(day, state.month, state.year)
                     },
                     modifier = Modifier.weight(0.95f),
-                    labelFontSize = calculatedLabelSize
+                    fontSize = fontSize,
+                    labelFontSize = calculatedLabelSize,
+                    maxWidth = maxWidth,
+                    maxHeight = maxHeight
                 )
 
                 PersonalInfoTextField(
@@ -184,7 +196,10 @@ fun PersonalInfoPage(
                         viewModel.selectDOB(state.day, month, state.year)
                     },
                     modifier = Modifier.weight(1.1f),
-                    labelFontSize = calculatedLabelSize
+                    fontSize = fontSize,
+                    labelFontSize = calculatedLabelSize,
+                    maxWidth = maxWidth,
+                    maxHeight = maxHeight
                 )
 
                 PersonalInfoTextField(
@@ -197,7 +212,10 @@ fun PersonalInfoPage(
                         viewModel.selectDOB(state.day, state.month, year)
                     },
                     modifier = Modifier.weight(0.95f),
-                    labelFontSize = calculatedLabelSize
+                    fontSize = fontSize,
+                    labelFontSize = calculatedLabelSize,
+                    maxWidth = maxWidth,
+                    maxHeight = maxHeight
                 )
 
             }

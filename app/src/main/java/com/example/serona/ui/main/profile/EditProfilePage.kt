@@ -4,10 +4,8 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,35 +14,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -73,6 +61,7 @@ fun EditProfilePage(
     val fontSize = (maxWidth * 0.07f).value.sp
     val buttonSize = maxWidth * 0.07f
     val space = maxHeight * 0.05f
+    val avatarBoxSize = maxWidth * 0.35f
 
     val state by editProfileViewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -90,10 +79,8 @@ fun EditProfilePage(
             .fillMaxSize()
             .background(brush = BgGrad)
             .padding(vertical = vertiPadding, horizontal = horiPadding)
+            .verticalScroll(rememberScrollState())
     ) {
-        val configuration = LocalConfiguration.current
-        val maxWidth = configuration.screenWidthDp
-        val maxHeight = maxWidth * 0.5f
 
         Column() {
             Spacer(modifier = Modifier.height(space * 0.15f))
@@ -105,27 +92,27 @@ fun EditProfilePage(
                 fontSize = fontSize * 0.86
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(space))
 
             // Profile Section
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(horiPadding * 0.3f)
                     .fillMaxWidth()
             ) {
 
                 // Avatar
                 Box(
                     modifier = Modifier
-                        .size(125.dp)
+                        .size(avatarBoxSize)
                         .clip(CircleShape)
                         .border(
                             width = 1.dp,
                             color = Primary,
                             shape = CircleShape
                         )
-                        .padding(5.dp)
+                        .padding(avatarBoxSize * 0.03f)
                 ) {
                     Image(
                         painter = painterResource(id = if (state.gender == Gender.FEMALE) R.drawable.profile_pic_female else R.drawable.profile_pic_male),
@@ -137,13 +124,13 @@ fun EditProfilePage(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(space * 0.7f))
 
                 // Name
                 Column(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                    verticalArrangement = Arrangement.spacedBy(space * 0.5f)
                 ) {
                     EditProfileField(
                         title = "Full Name",
@@ -156,7 +143,9 @@ fun EditProfilePage(
                                 )
                             )
                         },
-                        errorText = state.nameError
+                        errorText = state.nameError,
+                        fontSize = fontSize,
+                        space = space
                     )
 
                     EditProfileField(
@@ -176,7 +165,9 @@ fun EditProfilePage(
                                 )
                             )
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = fontSize,
+                        space = space
                     )
 
                     EditProfileField(
@@ -208,12 +199,14 @@ fun EditProfilePage(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         errorText = state.countryError,
+                        fontSize = fontSize,
+                        space = space
                     )
 
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(maxWidth * 0.009f)
                         ) {
 
                             EditProfileField(
@@ -228,7 +221,9 @@ fun EditProfilePage(
                                         EditProfileEvent.DayChanged(it)
                                     )
                                 },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                fontSize = fontSize,
+                                space = space
                             )
 
                             EditProfileField(
@@ -246,7 +241,9 @@ fun EditProfilePage(
                                         EditProfileEvent.MonthChanged(it)
                                     )
                                 },
-                                modifier = Modifier.weight(1.2f)
+                                modifier = Modifier.weight(1.2f),
+                                fontSize = fontSize,
+                                space = space
                             )
 
                             EditProfileField(
@@ -261,25 +258,26 @@ fun EditProfilePage(
                                         EditProfileEvent.YearChanged(it)
                                     )
                                 },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                fontSize = fontSize,
+                                space = space
                             )
                         }
 
                         state.dobError?.let { errorMsg ->
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(space * 0.1f))
                             Text(
                                 text = errorMsg,
                                 color = Primary50,
-                                fontSize = fontSize * 0.41f,
-                                fontFamily = figtreeFontFamily,
-                                modifier = Modifier.padding(start = 5.dp)
+                                fontSize = fontSize * 0.5f,
+                                fontFamily = figtreeFontFamily
                             )
                         }
                     }
 
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(space * 0.8f))
 
                 // Edit Profile Button
                 Button(

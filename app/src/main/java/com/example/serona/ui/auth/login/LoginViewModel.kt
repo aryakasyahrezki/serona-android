@@ -18,8 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val repo : AuthRepository,
-    private val userRepo: UserRepository,
-    private val userSession: UserSession
+    private val userRepo: UserRepository
 ) : ViewModel() {
 
     private val _loginFormState = MutableLiveData(LoginFormState())

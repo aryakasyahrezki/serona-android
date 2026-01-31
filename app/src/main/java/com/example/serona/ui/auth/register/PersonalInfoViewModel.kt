@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.serona.data.dto.PersonalInfoRequest
 import com.example.serona.data.model.Gender
-import com.example.serona.data.repository.AuthRepository
 import com.example.serona.data.repository.UserRepository
-import com.example.serona.data.session.UserSession
 import com.example.serona.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

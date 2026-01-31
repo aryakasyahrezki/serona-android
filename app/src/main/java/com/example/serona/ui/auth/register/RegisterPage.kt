@@ -1,6 +1,5 @@
 package com.example.serona.ui.auth.register
 
-import android.widget.Space
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -48,7 +47,6 @@ import com.example.serona.ui.component.AuthPasswordField
 import com.example.serona.ui.component.AuthTextField
 import com.example.serona.ui.component.RoundedCheckbox
 import com.example.serona.ui.navigation.Routes
-import okhttp3.Route
 
 @Composable
 fun RegisterPage(

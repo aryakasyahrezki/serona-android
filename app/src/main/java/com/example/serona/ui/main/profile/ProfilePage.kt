@@ -4,10 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,13 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,6 +34,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -53,11 +50,9 @@ import com.example.serona.theme.Heading
 import com.example.serona.theme.OnSecondaryContainer
 import com.example.serona.theme.Primary
 import com.example.serona.theme.White
-import com.example.serona.theme.backButtonGrad
 import com.example.serona.theme.figtreeFontFamily
 import com.example.serona.ui.auth.AuthViewModel
 import com.example.serona.ui.component.BackButton
-import com.example.serona.ui.navigation.Routes
 
 @Composable
 fun ProfilePage(
@@ -69,6 +64,18 @@ fun ProfilePage(
     onPrivacyClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {}
 ) {
+
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+
+    val menuWidth = maxWidth * 0.8f
+    val fontSize = (maxWidth * 0.07f).value.sp
+    val buttonSize = maxWidth * 0.07f
+    val profileSize = maxWidth * 0.35f
+    val space = maxHeight * 0.05f
+    val horiPadding = maxWidth * 0.05f
+    val vertiPadding = maxHeight * 0.055f
 
     val user by profileViewModel.user.collectAsState(initial = null)
     var logoutDialogBox by remember { mutableStateOf(false) }
@@ -85,17 +92,6 @@ fun ProfilePage(
                 brush = BgGrad
             )
     ) {
-        val configuration = LocalConfiguration.current
-        val maxWidth = configuration.screenWidthDp.dp
-        val maxHeight = configuration.screenHeightDp.dp
-
-        val menuWidth = maxWidth * 0.8f
-        val fontSize = (maxWidth * 0.07f).value.sp
-        val buttonSize = maxWidth * 0.07f
-        val profileSize = maxWidth * 0.35f
-        val space = maxHeight * 0.05f
-        val horiPadding = maxWidth * 0.05f
-        val vertiPadding = maxHeight * 0.055f
 
         Column(
             modifier = Modifier
@@ -239,7 +235,12 @@ fun ProfilePage(
                     launchSingleTop = true
                 }
             },
-            onDismiss = { logoutDialogBox = false }
+            onDismiss = { logoutDialogBox = false },
+            fontSize = fontSize,
+            space = space,
+            horiPadding = horiPadding,
+            vertiPadding = vertiPadding,
+            imageHeight = maxHeight * 0.2f
         )
     }
 }
@@ -247,7 +248,12 @@ fun ProfilePage(
 @Composable
 fun LogoutAlertDialog(
     onConfirm: () -> Unit = {},
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
+    fontSize: TextUnit,
+    space: Dp,
+    horiPadding: Dp,
+    vertiPadding: Dp,
+    imageHeight: Dp
 ) {
     Dialog (onDismissRequest = onDismiss) {
         Card (
@@ -258,39 +264,39 @@ fun LogoutAlertDialog(
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(vertical = 30.dp, horizontal = 10.dp)
+                modifier = Modifier.padding(vertical = vertiPadding, horizontal = horiPadding)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logout_image),
                     contentDescription = null,
                     modifier = Modifier
-                        .height(140.dp)
+                        .height(imageHeight)
                         .fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(space * 0.5f))
 
                 Text(
                     text = "Are you going to log out of your account?",
-                    fontSize = 15.sp,
+                    fontSize = fontSize * 0.55f,
                     fontWeight = FontWeight.SemiBold,
                     fontFamily = figtreeFontFamily,
                     textAlign = TextAlign.Center,
                     color = Heading
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(space * 0.3f))
 
                 Text(
                     text = "You can log back in at any time. Don't worry.",
-                    fontSize = 12.sp,
+                    fontSize = fontSize * 0.45f,
                     textAlign = TextAlign.Center,
                     color = Heading,
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.Normal
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(space * 0.7f))
 
                 Button(
                     onClick = onConfirm,
@@ -299,18 +305,19 @@ fun LogoutAlertDialog(
                     ),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier
-                        .width(140.dp)
-                        .height(35.dp)
+                        .fillMaxWidth(0.5f)
+                        .height(space * 0.85f)
                 ) {
                     Text(
                         text = "Logout",
                         color = White,
                         fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = fontSize * 0.53f
                     )
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(space * 0.4f))
 
                 Text(
                     text = "Cancel",

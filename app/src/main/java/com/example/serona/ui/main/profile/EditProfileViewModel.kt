@@ -7,7 +7,6 @@ import com.example.serona.data.model.Gender
 import com.example.serona.data.model.User
 import com.example.serona.data.repository.AuthRepository
 import com.example.serona.data.repository.UserRepository
-import com.example.serona.data.session.UserSession
 import com.example.serona.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.compareTo
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
@@ -143,10 +141,18 @@ class EditProfileViewModel @Inject constructor(
             "Please select your country"
         } else null
 
-        val dobError = if (state.day.isBlank() || state.month.isBlank() || state.year.isBlank()) {
-            isValid = false
-            "Please complete your date of birth"
-        } else null
+        val dobError = when {
+            state.day.isBlank() || state.month.isBlank() || state.year.isBlank() -> {
+                isValid = false
+                "Please complete your date of birth"
+            }
+
+            !DateUtils.isValidDate(state.day, state.month, state.year) -> {
+                isValid = false
+                "The date is invalid for the selected month"
+            }
+            else -> null
+        }
 
         _uiState.update {
             it.copy(
