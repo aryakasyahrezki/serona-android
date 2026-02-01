@@ -1,34 +1,43 @@
 package com.example.serona.data.api
 
+import com.example.serona.data.dto.FavoriteResponse
+import com.example.serona.data.model.ApiDetailResponse
+import com.example.serona.data.model.ApiResponse
 import com.example.serona.data.model.Tutorial
+import com.example.serona.data.model.TutorialStep
 import okhttp3.ResponseBody
 import retrofit2.http.*
 import retrofit2.Response
 
 interface TutorialApi {
 
-    @GET("api/tutorials")
-    suspend fun getTutorialsRaw(): ResponseBody
+//    @GET("api/tutorials")
+//    suspend fun getTutorialsRaw(): ResponseBody
 
     // Get all tutorials
-    @GET("api/tutorials")
-    suspend fun getTutorials(): List<Tutorial>
+    @GET("tutorials")
+    suspend fun getTutorials(): ApiResponse
 
     // Get tutorial by ID
-    @GET("api/tutorials/{id}")
-    suspend fun getTutorial(@Path("id") id: Int): Tutorial
+    @GET("tutorials/{id}")
+    suspend fun getTutorial(@Path("id") id: Int): ApiDetailResponse
+
+//    @GET("steps")
+//    suspend fun getTutorialSteps(
+//        @Query("tutorial_id") id: Int
+//    ): List<TutorialStep>
 
     // Get user's favorite tutorials
-    @GET("api/user/favorites")
-    suspend fun getFavorites(): List<Tutorial>
+    @GET("user/favorites")
+    suspend fun getFavorites(): FavoriteResponse
 
     // Add tutorial to favorites
-    @POST("api/user/favorites")
-    suspend fun addFavorite(@Body request: FavoriteRequest): Response<Unit>
+    @POST("user/favorites")
+    suspend fun addFavorite(@Body request: FavoriteRequest): Response<Void>
 
     // Remove tutorial from favorites
-    @DELETE("api/user/favorites/{tutorialId}")
-    suspend fun removeFavorite(@Path("tutorialId") tutorialId: Int): Response<Unit>
+    @DELETE("user/favorites/{tutorialId}")
+    suspend fun removeFavorite(@Path("tutorialId") tutorialId: Int): Response<Void>
 }
 
 // Request body untuk add favorite

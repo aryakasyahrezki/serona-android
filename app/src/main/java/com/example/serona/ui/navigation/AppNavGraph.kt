@@ -33,7 +33,7 @@ fun AppNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Routes.SPLASH,
+        startDestination = Routes.TUTORIAL,
         modifier = Modifier.fillMaxSize(),
 
         enterTransition = {
@@ -84,9 +84,7 @@ fun AppNavGraph(
                 onTutorialClick = { tutorialId ->
                     navController.navigate("${Routes.DETAIL}/$tutorialId")
                 },
-                onBackClicked = {
-                    navController.popBackStack()
-                }
+                onBackClick = { navController.popBackStack() }
             )
         }
 
@@ -97,9 +95,7 @@ fun AppNavGraph(
             val tutorialId = backStackEntry.arguments?.getInt("id") ?: 0
             TutorialDetailPage(
                 tutorialId = tutorialId,
-                onBackClicked = {
-                    navController.popBackStack()
-                }
+                onBackClicked = { navController.popBackStack() }
             )
         }
 
@@ -111,11 +107,7 @@ fun AppNavGraph(
                 onTutorialClick = { tutorialId ->
                     navController.navigate("${Routes.DETAIL}/$tutorialId")
                 },
-                onBackClicked = {
-                    // Navigate back to HomePage instead of popBackStack
-                    navController.popBackStack()
-
-                }
+                onBackClick = { navController.popBackStack() }
             )
         }
 

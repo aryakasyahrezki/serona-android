@@ -78,7 +78,7 @@ class TutorialViewModel @Inject constructor(
 
                     // Match active filters (check if tutorial's subcategory is in active filters)
                     val matchFilter = filters.isEmpty() ||
-                            (!tutorial.subCategory.isNullOrEmpty() && filters.contains(tutorial.subCategory))
+                            (filters.contains(tutorial.sub_category))
 
                     matchQuery && matchFilter
                 }

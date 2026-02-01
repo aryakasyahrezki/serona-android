@@ -57,7 +57,7 @@ fun TutorialCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
             // Image Section
             Box(
@@ -83,7 +83,7 @@ fun TutorialCard(
             ) {
                 // Tag
                 Text(
-                    text = tutorial.subCategory,
+                    text = tutorial.sub_category,
                     color = White,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
@@ -194,7 +194,7 @@ fun TutorialSearchBar(
         onValueChange = onQueryChange,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 8.dp),
         placeholder = {
             Text(
                 "Search",
@@ -235,7 +235,7 @@ fun FilterRow(
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Filters button with icon

@@ -2,7 +2,11 @@ package com.example.serona.data.model
 
 import com.google.gson.annotations.SerializedName
 
-
+data class ApiResponse(
+    val success: Boolean,
+    val message: String,
+    val data: List<Tutorial>
+)
 
 data class Tutorial(
     val id: Int,
@@ -11,23 +15,30 @@ data class Tutorial(
     val image_url: String,
 
     @SerializedName("main_category")
-    val mainCategory: String,
+    val main_category: String,
 
     @SerializedName("sub_category")
-    val subCategory: String,
+    val sub_category: String,
 
     @SerializedName("is_favorite")
-    val isFavorite: Boolean
+    val is_favorite: Boolean,
+
+    val steps: List<TutorialStep>? = null
+)
+
+data class ApiDetailResponse(
+    val success: Boolean,
+    val message: String,
+    val data: Tutorial
 )
 
 data class TutorialStep(
     val id: Int,
     val tutorial_id: Int,
     val step_number: Int,
-    val type: String,
     val title: String,
     val description: String,
     val image_url: String,
-    val extra: String
+    val hex: String
 )
 

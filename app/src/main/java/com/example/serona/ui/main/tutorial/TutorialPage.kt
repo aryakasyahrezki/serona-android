@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,8 +30,20 @@ import com.example.serona.ui.main.favorite.FavoriteViewModel
 @Composable
 fun TutorialPage(
     onTutorialClick: (Int) -> Unit,
-    onBackClicked: (() -> Unit)? = null
+    onBackClick: () -> Unit = {}
 ) {
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+
+    val fontSize = (maxWidth * 0.06f).value.sp
+    val iconSize = (maxHeight * 0.03f)
+    val upperBoxHeight = maxHeight * 0.44f
+    val horiPadding = maxWidth * 0.05f
+    val vertiPadding = maxHeight * 0.055f
+    val space = maxHeight * 0.03f
+    val buttonSize = maxWidth * 0.07f
+
     val vm: TutorialViewModel = hiltViewModel()
     val favVM: FavoriteViewModel = hiltViewModel()
 
@@ -39,55 +52,37 @@ fun TutorialPage(
     val isLoading by vm.isLoading.collectAsState()
     val isFilterActive by vm.isFilterActive.collectAsState()
     val activeFilters by vm.activeFilters.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
 
+    // Filter favorites based on search query
+    val filteredTutorials = remember(tutorials, searchQuery) {
+        if (searchQuery.isBlank()) {
+            tutorials
+        } else {
+            tutorials.filter { tutorial ->
+                tutorial.title.contains(searchQuery, ignoreCase = true) ||
+                        tutorial.description.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
     Column(
         Modifier
             .fillMaxSize()
             .background(White)
+            .padding(vertical = vertiPadding, horizontal = horiPadding)
     ) {
 
-        // Back Button - Pink circular button with "Kembali" text
-        if (onBackClicked != null) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 40.dp, bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable(onClick = onBackClicked)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Primary),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        "Back",
-                        color = Primary,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
-        }
+        BackButton(
+            onBackClick = { onBackClick() },
+            buttonSize = buttonSize,
+            fontSize = fontSize
+        )
 
         // Header Section
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(horizontal = 8.dp, vertical = 16.dp)
         ) {
             Text(
                 "Tutorial",
@@ -97,18 +92,21 @@ fun TutorialPage(
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                "Ini dia kumpulan tutorial untukmu!",
+                "Here are the tutorials for you!",
                 style = MaterialTheme.typography.bodyMedium,
                 color = BodyText
             )
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(space * 0.3f))
 
         // Search Bar
-        TutorialSearchBar(query, vm::onQueryChange)
+        TutorialSearchBar(
+            query = searchQuery,
+            onQueryChange = { searchQuery = it }
+        )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(space * 0.3f))
 
         // Filter Row
         FilterRow(
@@ -120,7 +118,7 @@ fun TutorialPage(
             onClearAllFilters = vm::clearAllFilters
         )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(space * 0.3f))
         // Active Filters Section
         if (activeFilters.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))
@@ -154,7 +152,7 @@ fun TutorialPage(
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(space * 0.3f))
 
         // Content Section
         when {
@@ -163,15 +161,15 @@ fun TutorialPage(
             else -> {
                 // Group tutorials by main category
                 val faceShapeTutorials = tutorials.filter {
-                    it.mainCategory == "Face Shape"
+                    it.main_category == "Face Shape"
                 }
 
                 val occasionTutorials = tutorials.filter {
-                    it.mainCategory == "Occasion"
+                    it.main_category == "Occasion"
                 }
 
                 val skinToneTutorials = tutorials.filter {
-                    it.mainCategory == "Skin Tone"
+                    it.main_category == "Skin Tone"
                 }
 
                 LazyColumn(
