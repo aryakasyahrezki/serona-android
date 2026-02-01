@@ -9,9 +9,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.serona.data.model.FaceDetectionResponse
 import com.example.serona.data.api.FaceAnalysisApi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -40,6 +42,12 @@ class ScanViewModel @Inject constructor(
 
     private var rescanJob: Job? = null
 
+    // Versi private untuk diubah-ubah di dalam ViewModel
+    private var _isCurrentlyUploading = mutableStateOf(false)
+
+    // Versi publik untuk dibaca di ScanScreen (Warning akan hilang)
+    val isCurrentlyUploading: State<Boolean> = _isCurrentlyUploading
+
     // --- FUNGSI BARU UNTUK MENGHILANGKAN ERROR ---
     /**
      * Fungsi ini ditambahkan agar ScanScreen.kt tidak error saat mencoba memanggilnya.
@@ -67,23 +75,43 @@ class ScanViewModel @Inject constructor(
     }
 
     fun onFirstScanComplete(file: File?) {
-        viewModelScope.launch {
+        // Jika file kosong atau laptop masih sibuk memproses foto sebelumnya, skip (jangan kirim dulu)
+        if (file == null || _isCurrentlyUploading.value) return
+
+        viewModelScope.launch(Dispatchers.IO) { // Pindah ke jalur background agar kamera GAK LAG
             try {
-                if (file != null) {
-                    val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
-                    val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
-                    val response = apiService.detectFace(body)
-                    _scanResult.value = response
-                    _showRecommendationButton.value = true
+                _isCurrentlyUploading.value = true // KUNCI: Pintu ditutup sementara
+
+                val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+
+                // Tembak API
+                val response = apiService.detectFace(body)
+
+                // Balik ke Main Thread untuk update UI (karena State hanya bisa diubah di Main)
+                withContext(Dispatchers.Main) {
+                    if (response != null &&
+                        !response.shape.isNullOrBlank() &&
+                        !response.skintone.isNullOrBlank()) {
+
+                        _scanResult.value = response
+                        _showRecommendationButton.value = true
+                    }
+
+                    // Reset progress agar bar "berdetak" terus (Live Scan Feel)
+                    _progress.floatValue = 0.0f
+                    _isScanning.value = true
                 }
 
-                delay(1000) // User sempat baca hasil
-                _progress.floatValue = 0.0f // Reset bar ke nol
-                _isScanning.value = true // Nyalakan lagi
-
             } catch (e: Exception) {
-                _progress.floatValue = 0.0f
-                _isScanning.value = true
+                withContext(Dispatchers.Main) {
+                    android.util.Log.e("ScanViewModel", "Scan failed: ${e.message}")
+                    _progress.floatValue = 0.0f
+                    _isScanning.value = true
+                }
+            } finally {
+                // APAPUN yang terjadi (berhasil atau error), buka kunci agar foto selanjutnya bisa dikirim
+                _isCurrentlyUploading.value = false
             }
         }
     }
@@ -129,5 +157,11 @@ class ScanViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         rescanJob?.cancel()
+    }
+
+    fun stopScanning() {
+        _isScanning.value = false
+        _progress.floatValue = 0f
+        // Pastikan imageProxy.close() dipanggil di analyzer jika isScanning false
     }
 }
