@@ -30,8 +30,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.serona.theme.Primary
 import com.example.serona.theme.Primary50
 import com.example.serona.theme.White
@@ -44,7 +45,9 @@ fun AuthTextField(
     onValueChange: (String) -> Unit,
     label: String,
     error: String?,
-    color: Color = White
+    color: Color = White,
+    fontSize: TextUnit,
+    space: Dp
 ) {
     Column() {
         OutlinedTextField(
@@ -52,7 +55,7 @@ fun AuthTextField(
             onValueChange = onValueChange,
             label = {
                 Text(label,
-                    fontSize = 15.sp,
+                    fontSize = fontSize * 0.7f,
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.Medium
                 )
@@ -62,9 +65,9 @@ fun AuthTextField(
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent,
-                unfocusedIndicatorColor = color.copy(alpha = 0.4f),
+                unfocusedIndicatorColor = color.copy(alpha = 0.6f),
                 focusedIndicatorColor =color.copy(alpha = 0.5f),
-                unfocusedLabelColor = color.copy(alpha = 0.8f),
+                unfocusedLabelColor = color.copy(alpha = 0.9f),
                 focusedLabelColor = color,
                 errorContainerColor = Color.Transparent,
                 errorIndicatorColor = Primary50.copy(alpha = 0.7f),
@@ -80,10 +83,10 @@ fun AuthTextField(
             Text(
                 text = error,
                 color = Primary50,
-                fontSize = 12.sp,
+                fontSize = fontSize * 0.6f,
                 fontFamily = figtreeFontFamily,
                 fontWeight = FontWeight.Normal,
-                modifier = Modifier.padding(start = 5.dp)
+                modifier = Modifier.padding(start = space * 0.1f)
             )
         }
     }
@@ -94,7 +97,9 @@ fun AuthPasswordField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    error: String?
+    error: String?,
+    fontSize: TextUnit,
+    space: Dp
 ) {
     var visible by remember { mutableStateOf(false) }
 
@@ -104,7 +109,7 @@ fun AuthPasswordField(
             onValueChange = onValueChange,
             label = {
                 Text(label,
-                    fontSize = 15.sp,
+                    fontSize = fontSize * 0.7f,
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.Medium)
             },
@@ -125,9 +130,9 @@ fun AuthPasswordField(
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.White.copy(alpha = 0.4f),
+                unfocusedIndicatorColor = Color.White.copy(alpha = 0.6f),
                 focusedIndicatorColor = Color.White.copy(alpha = 0.5f),
-                unfocusedLabelColor = White10.copy(alpha = 0.8f),
+                unfocusedLabelColor = White10.copy(alpha = 0.9f),
                 focusedLabelColor = White10,
                 errorContainerColor = Color.Transparent,
                 errorIndicatorColor = Primary50.copy(alpha = 0.7f),
@@ -143,10 +148,10 @@ fun AuthPasswordField(
             Text(
                 text = error,
                 color = Primary50,
-                fontSize = 12.sp,
+                fontSize = fontSize * 0.4f,
                 fontFamily = figtreeFontFamily,
                 fontWeight = FontWeight.Normal,
-                modifier = Modifier.padding(start = 5.dp)
+                modifier = Modifier.padding(start = space * 0.08f)
             )
         }
     }
@@ -155,11 +160,15 @@ fun AuthPasswordField(
 @Composable
 fun RoundedCheckbox(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    fontSize: TextUnit
 ) {
+
+    val iconSize = (fontSize * 0.7f).value.dp
+
     Box(
         modifier = Modifier
-            .size(22.dp)
+            .size(iconSize * 1.5f)
             .clip(RoundedCornerShape(8.dp))
             .background(
                 White
@@ -177,7 +186,7 @@ fun RoundedCheckbox(
                 imageVector = Icons.Default.Check,
                 contentDescription = null,
                 tint = Primary,
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(iconSize)
             )
         }
     }

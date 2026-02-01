@@ -74,15 +74,12 @@ import com.example.serona.theme.FestBg
 import com.example.serona.theme.FestCrc
 import com.example.serona.theme.FestLogo
 import com.example.serona.theme.FestText
-import com.example.serona.theme.Grey10
-import com.example.serona.theme.Grey40
 import com.example.serona.theme.Heading
 import com.example.serona.theme.OfficeBg
 import com.example.serona.theme.OfficeCrc
 import com.example.serona.theme.OfficeLogo
 import com.example.serona.theme.OfficeText
 import com.example.serona.theme.OnPrimaryContainer
-import com.example.serona.theme.ParagraphGrey
 import com.example.serona.theme.ParagraphLight
 import com.example.serona.theme.PartyBg
 import com.example.serona.theme.PartyCrc
@@ -96,17 +93,14 @@ import com.example.serona.theme.WedLogo
 import com.example.serona.theme.WedText
 import com.example.serona.theme.White
 import com.example.serona.theme.figtreeFontFamily
-import com.example.serona.ui.auth.AuthViewModel
 import com.example.serona.ui.component.ScannedInfoCard
 import com.example.serona.ui.component.eventCard
 import com.example.serona.ui.component.guideCard
-import com.example.serona.ui.navigation.Routes
 
 @Composable
 fun HomePage(
     navController: NavController,
-    homeViewModel: HomeViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     // Observasi data user
     val state by homeViewModel.uiState.collectAsState()
@@ -115,6 +109,8 @@ fun HomePage(
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
 
+    val horiPadding = screenWidth * 0.05f
+    val vertiPadding = screenHeight * 0.08f
     val fontSize = (screenWidth * 0.052f).value.sp
     val iconSize = screenWidth * 0.05f
     val space = (screenHeight * 0.04f)
@@ -136,13 +132,13 @@ fun HomePage(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = White)
-            .padding(vertical = screenHeight * 0.1f)
+            .background(White)
+            .padding(top = vertiPadding)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 22.dp)
+                .padding(horizontal = horiPadding)
         ) {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState())
@@ -155,7 +151,7 @@ fun HomePage(
                     color = Heading
                 )
 
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(space * 0.3f))
 
                 Text(
                     text = "This is your personalized makeup preview, designed perfectly " +
@@ -170,7 +166,7 @@ fun HomePage(
                 Spacer(modifier = Modifier.height(space * 0.5f))
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(space * 0.5f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
 
@@ -181,6 +177,7 @@ fun HomePage(
                         modifier = Modifier.weight(0.5f),
                         bgColor = Primary,
                         textColor = White,
+                        screenHeight = screenHeight
                     ) {
                         Box(
                             modifier = Modifier.size(topContentSize), // Tetap seukuran lingkaran kanan
@@ -204,7 +201,8 @@ fun HomePage(
                         fontSize = fontSize * 0.55f,
                         modifier = Modifier.weight(0.5f),
                         bgColor = PrimaryContainer,
-                        textColor = OnPrimaryContainer
+                        textColor = OnPrimaryContainer,
+                        screenHeight = screenHeight
                     ) {
                         Box(
                             modifier = Modifier
@@ -303,7 +301,9 @@ fun HomePage(
                             boxColor = if (!state.hasScanned) PrimaryContainer else Color(0xFFFEDCC1),
                             icon = item.iconVector,
                             imageRes = item.imageRes,
-                            imageSize = if (!state.hasScanned) 0.6f else 1f
+                            imageSize = if (!state.hasScanned) 0.6f else 1f,
+                            screenHeight = screenHeight,
+                            screenWidth = screenWidth
                         )
                     }
                 }
@@ -318,7 +318,7 @@ fun HomePage(
                     color = Heading
                 )
 
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(space * 0.3f))
 
                 Text(
                     text = "Get the best makeup style recommendations for every occasion",
@@ -341,7 +341,9 @@ fun HomePage(
                         textColor = OfficeText,
                         crcColor = OfficeCrc,
                         bgColor = OfficeBg,
-                        icon = Icons.Outlined.Apartment
+                        icon = Icons.Outlined.Apartment,
+                        screenHeight = screenHeight,
+                        screenWidth = screenWidth
                     )
 
                     eventCard(
@@ -351,7 +353,9 @@ fun HomePage(
                         textColor = CasualText,
                         crcColor = CasualCrc,
                         bgColor = CasualBg,
-                        icon = Icons.Outlined.Groups
+                        icon = Icons.Outlined.Groups,
+                        screenHeight = screenHeight,
+                        screenWidth = screenWidth
                     )
 
                     eventCard(
@@ -361,7 +365,9 @@ fun HomePage(
                         textColor = FestText,
                         crcColor = FestCrc,
                         bgColor = FestBg,
-                        icon = Icons.Outlined.Attractions
+                        icon = Icons.Outlined.Attractions,
+                        screenHeight = screenHeight,
+                        screenWidth = screenWidth
                     )
 
                     eventCard(
@@ -371,7 +377,9 @@ fun HomePage(
                         textColor = PartyText,
                         crcColor = PartyCrc,
                         bgColor = PartyBg,
-                        icon = Icons.Outlined.Celebration
+                        icon = Icons.Outlined.Celebration,
+                        screenHeight = screenHeight,
+                        screenWidth = screenWidth
                     )
 
                     eventCard(
@@ -381,9 +389,13 @@ fun HomePage(
                         textColor = WedText,
                         crcColor = WedCrc,
                         bgColor = WedBg,
-                        icon = Icons.Outlined.Church
+                        icon = Icons.Outlined.Church,
+                        screenHeight = screenHeight,
+                        screenWidth = screenWidth
                     )
                 }
+
+                Spacer(modifier = Modifier.height(fabSize * 2f))
             }
         }
     }
@@ -408,6 +420,7 @@ fun HomePage(
         modifier = Modifier
             .fillMaxSize()
             .padding(fabSize)
+            .background(Color.Transparent)
             .zIndex(2f),
         contentAlignment = Alignment.BottomCenter
     ) {

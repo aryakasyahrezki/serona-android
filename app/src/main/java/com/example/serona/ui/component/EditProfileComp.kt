@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import com.example.serona.theme.Primary
 import com.example.serona.theme.Primary50
 import com.example.serona.theme.White
 import com.example.serona.theme.figtreeFontFamily
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +57,8 @@ fun EditProfileField(
     isDropdown: Boolean = false,
     dropdownItems: List<String> = emptyList(),
     onDropdownItemSelected: (String) -> Unit = {},
-    fontSize: TextUnit = 12.sp,
+    fontSize: TextUnit,
+    space: Dp
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -68,13 +71,13 @@ fun EditProfileField(
         // Title
         Text(
             text = title,
-            fontSize = fontSize,
+            fontSize = fontSize * 0.5f,
             fontFamily = figtreeFontFamily,
             fontWeight = FontWeight.Medium,
             color = Heading
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(space * 0.3f))
 
         ExposedDropdownMenuBox(
             expanded = expanded && isDropdown,
@@ -93,7 +96,7 @@ fun EditProfileField(
                 placeholder = {
                     Text(
                         text = placeholder,
-                        fontSize = fontSize,
+                        fontSize = fontSize * 0.5f,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Medium,
                         color = MutedLight
@@ -118,7 +121,7 @@ fun EditProfileField(
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth()
-                    .heightIn(min = 44.dp)
+                    .heightIn(min = space)
                     .onSizeChanged {
                         // Simpan lebar TextField saat ukurannya berubah
                         textFieldWidth = it.width
@@ -132,8 +135,8 @@ fun EditProfileField(
                 Popup(
                     alignment = Alignment.TopEnd,
                     offset = IntOffset(
-                        x = 0,               // Tidak digeser secara horizontal
-                        y = textFieldHeight // Geser ke bawah
+                        x = 0,
+                        y = textFieldHeight
                     ),
                     onDismissRequest = { expanded = false },
                     properties = PopupProperties(
@@ -146,7 +149,7 @@ fun EditProfileField(
                     Column(
                         modifier = Modifier
                             .width(with(density) { textFieldWidth.toDp() })
-                            .heightIn(max = 200.dp)
+                            .heightIn(max = space * 3.5f)
                             .shadow(elevation = 8.dp, shape = RoundedCornerShape(15.dp))
                             .background(
                                 color = White, // Warna latar belakang menu
@@ -160,7 +163,7 @@ fun EditProfileField(
                                 text = {
                                     Text(
                                         item,
-                                        fontSize = fontSize * 1.2f,
+                                        fontSize = fontSize * 0.5f,
                                         fontFamily = figtreeFontFamily,
                                         fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal
                                     )
@@ -177,14 +180,12 @@ fun EditProfileField(
         }
 
         if (errorText != null) {
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(space * 0.1f))
             Text(
                 text = errorText,
                 color = Primary50,
-                fontSize = fontSize,
-                fontFamily = figtreeFontFamily,
-                modifier = Modifier.padding(start = 5.dp)
-            )
+                fontSize = fontSize * 0.5f,
+                fontFamily = figtreeFontFamily,)
         }
 
     }

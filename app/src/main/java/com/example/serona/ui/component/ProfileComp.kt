@@ -40,6 +40,8 @@ fun ProfileInfoItem(
     value: String,
     fontSize: TextUnit
 ) {
+    val space = (fontSize * 0.3f).value.dp
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -52,7 +54,7 @@ fun ProfileInfoItem(
             fontFamily = figtreeFontFamily,
             fontWeight = FontWeight.Medium,
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(space))
         Text(
             text = value,
             fontSize = fontSize,
@@ -76,11 +78,13 @@ fun ProfileMenuItem(
     modifier: Modifier,
     fontSize: TextUnit
 ) {
+    val vertiPadding = (fontSize * 0.5f).value.dp
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(vertical = 10.dp),
+            .padding(vertical = vertiPadding),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -108,7 +112,7 @@ fun BackButton(
     fontSize: TextUnit
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        horizontalArrangement = Arrangement.spacedBy((fontSize * 0.3f).value.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable{ onBackClick() }
     ) {

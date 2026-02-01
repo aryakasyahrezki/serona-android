@@ -19,7 +19,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val userSession: UserSession,
     private val userRepo: UserRepository,
     private val mapper: HomeContentMapper,
     private val prefs: PreferencesManager,
@@ -27,18 +26,22 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _manualTooltipTrigger = MutableStateFlow(false)
+    private val _dialogDismissed = MutableStateFlow(false)
+
 
     val uiState: StateFlow<HomeUiState> = combine(
-        userSession.user,
-        _manualTooltipTrigger
-    ){ user, showTooltip ->
+        userRepo.userDataFlow,
+        _manualTooltipTrigger ,
+        _dialogDismissed
+    ){ user, showTooltip, dismissed->
             val scanned = !user?.faceShape.isNullOrEmpty() && !user?.skinTone.isNullOrEmpty()
+            val userEmail = user?.email ?: ""
 
-            val shouldShowDialog = !scanned && prefs.isFirstLaunch()
-            println(prefs.isFirstLaunch())
+            val shouldShowDialog = !scanned && prefs.isFirstLaunch(userEmail) && !dismissed
 
             HomeUiState(
                 userName = user?.name ?: "Guest",
+                userEmail = userEmail,
                 showScanDialog = shouldShowDialog,
                 showScanTooltip = showTooltip,
                 hasScanned = scanned,
@@ -57,38 +60,29 @@ class HomeViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HomeUiState())
 
     init {
-        checkAndRefreshSession()
+        refreshDataFromApi()
     }
 
-    private fun checkAndRefreshSession() {
+    private fun refreshDataFromApi() {
         viewModelScope.launch {
-            // 1. Cek apakah di memori sudah ada data user?
-            if (userSession.user.value == null) {
-                // 2. Jika kosong (misal baru buka app), paksa ambil dari API
-                val result = userRepo.getProfile()
-                if (result.isSuccess) {
-                    val user = result.getOrNull()
-                    if (user != null) {
-                        userSession.setUser(user)
-                    }
-                } else {
-                    // 3. Jika gagal fetch (misal internet mati), tandai initialized
-                    // agar UI tidak nunggu terus
-                    userSession.markInitialized()
-                }
-            }
+            userRepo.syncFullProfile()
         }
     }
 
     fun dismissScanDialog() {
-        prefs.setFirstLaunchCompleted()
-        checkAndRefreshSession()
+        val currentUser = uiState.value.userEmail
+        prefs.setFirstLaunchCompleted(currentUser)
+        _dialogDismissed.value = true
     }
 
     fun triggerScanTooltip() {
-        prefs.setFirstLaunchCompleted()
+        val email = uiState.value.userEmail
+        if (email.isNotEmpty()) {
+            prefs.setFirstLaunchCompleted(email)
+        }
         viewModelScope.launch {
             _manualTooltipTrigger.value = true
+            _dialogDismissed.value = true
         }
     }
 

@@ -7,21 +7,8 @@ import java.util.Locale
 
 object DateUtils{
 
-    private val monthNames = listOf(
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    )
-
-    fun formatBirthDate(
-        day: String,
-        month: String,
-        year: String
-    ): String = runCatching {
-
-        val dayInt = day.toInt()
-        val yearInt = year.toInt()
-
-        val monthInt = when (month.lowercase()) {
+    private fun getMonthInt(month: String): Int {
+        return when (month.lowercase()) {
             "jan" -> 1
             "feb" -> 2
             "mar" -> 3
@@ -36,6 +23,32 @@ object DateUtils{
             "dec" -> 12
             else -> throw IllegalArgumentException("Invalid month")
         }
+    }
+
+    fun isValidDate(day: String, month: String, year: String): Boolean {
+        return runCatching {
+            val d = day.toInt()
+            val y = year.toInt()
+            val m = getMonthInt(month)
+
+            if (m == -1) return false
+
+            // LocalDate akan melempar exception jika tanggal tidak logis (ex: 29 Feb 2023)
+            java.time.LocalDate.of(y, m, d)
+            true
+        }.getOrDefault(false)
+    }
+
+    fun formatBirthDate(
+        day: String,
+        month: String,
+        year: String
+    ): String = runCatching {
+
+        val dayInt = day.toInt()
+        val yearInt = year.toInt()
+
+        val monthInt = getMonthInt(month)
 
         String.format(Locale.US, "%04d-%02d-%02d", yearInt, monthInt, dayInt)
 

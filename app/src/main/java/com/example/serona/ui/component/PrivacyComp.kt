@@ -1,6 +1,5 @@
 package com.example.serona.ui.component
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.serona.data.model.PrivacyFaq
 import com.example.serona.theme.Grey30
 import com.example.serona.theme.Heading
@@ -83,20 +81,20 @@ fun ExpandablePrivacyItem(
         }
 
         if (expanded) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height((fontSize).value.dp))
 
             Text(
                 text = faq.answer,
                 fontSize = fontSize,
                 color = Heading,
-                lineHeight = 18.sp,
+                lineHeight = fontSize,
                 fontFamily = figtreeFontFamily,
                 fontWeight = FontWeight.Normal
             )
 
             if (extraPoints.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(modifier = Modifier.height((fontSize).value.dp))
+                Column(verticalArrangement = Arrangement.spacedBy((fontSize).value.dp)) {
                     extraPoints.forEachIndexed { index, point ->
                         NumberedBullet(
                             number = (index + 1).toString(),
@@ -109,7 +107,7 @@ fun ExpandablePrivacyItem(
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(top = 10.dp),
+            modifier = Modifier.padding((fontSize * 0.4f).value.dp),
             color = Grey30
         )
     }
@@ -158,7 +156,7 @@ fun PrivacyCard(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(4.dp)
+                .padding((fontSize * 0.2f).value.dp)
         ) {
 
             // Konten utama
@@ -195,7 +193,7 @@ fun NumberedBullet(
     number: String,
     text: String,
     fontSize: TextUnit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),

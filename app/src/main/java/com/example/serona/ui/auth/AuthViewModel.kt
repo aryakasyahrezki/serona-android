@@ -21,13 +21,7 @@ class AuthViewModel @Inject constructor (
     val authState : LiveData<AuthState> = _authState
 
     init {
-        viewModelScope.launch {
-            userSession.user.collect { user ->
-                if (user == null && authRepo.getCurrentUser() == null) {
-                    _authState.value = AuthState.Unauthenticated
-                }
-            }
-        }
+        checkAuthStatus()
     }
 
     fun checkAuthStatus() {
@@ -40,7 +34,6 @@ class AuthViewModel @Inject constructor (
         }
 
         // Langsung set Authenticated jika Firebase User ada
-        // Sambil jalan, kita tetap panggil loadUserSync di background
         _authState.value = AuthState.Authenticated
 
         viewModelScope.launch {
@@ -56,7 +49,7 @@ class AuthViewModel @Inject constructor (
     private suspend fun loadUserSync() {
         if (userSession.isInitialized.value) return
 
-        val result = userRepo.getProfile()
+        val result = userRepo.syncFullProfile()
         if (result.isSuccess) {
             result.getOrNull()?.let { userSession.setUser(it) }
         } else {
@@ -65,8 +58,10 @@ class AuthViewModel @Inject constructor (
     }
 
     fun logout(){
-        authRepo.logout()
-        _authState.value = AuthState.Unauthenticated
-        userSession.clear()
+        viewModelScope.launch {
+            authRepo.logout()
+            userRepo.clearAllLocalData()
+            _authState.value = AuthState.Unauthenticated
+        }
     }
 }

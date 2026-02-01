@@ -142,7 +142,7 @@ fun NavBar(
                     painter = painterResource(R.drawable.ar_on_you),
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(iconSize *1.25f)
+                    modifier = Modifier.size(iconSize * 1.25f)
                 )
             }
         }
@@ -179,16 +179,4 @@ fun NavBarItem(
             color = color
         )
     }
-}
-
-@Preview
-@Composable
-private fun navbarPrev() {
-    var selectedIndex = 2
-
-    NavBar(
-        selectedIndex = selectedIndex,
-        onItemSelected = { selectedIndex = it },
-        onCenterClick = { /* scan / camera */ }
-    )
 }
