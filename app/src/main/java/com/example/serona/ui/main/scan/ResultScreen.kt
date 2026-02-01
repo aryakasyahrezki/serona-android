@@ -9,10 +9,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -21,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.serona.R
@@ -31,8 +36,7 @@ import java.net.URLDecoder
 @Composable
 fun ResultScreen(
     navController: NavController,
-    shape: String,
-    tone: String
+    viewModel: ResultViewModel = hiltViewModel()
 ) {
     // 1. KONFIGURASI RESPONSIF
     val configuration = LocalConfiguration.current
@@ -46,14 +50,19 @@ fun ResultScreen(
     // Tinggi tombol yang dikunci (Min 48dp - Max 60dp) agar tidak gepeng saat miring
     val buttonHeight = (maxHeight * 0.07f).coerceIn(48.dp, 60.dp)
 
-    // 2. DECODING DATA (Biar Preview gak Unknown)
-    val decodedShape = try {
-        URLDecoder.decode(shape, "UTF-8").replace("+", " ").substringBefore(" (")
-    } catch (e: Exception) { shape }
+    val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
-    val decodedTone = try {
-        URLDecoder.decode(tone, "UTF-8").replace("+", " ")
-    } catch (e: Exception) { tone }
+    LaunchedEffect(state.saveSuccess, state.errorMessage) {
+        state.errorMessage?.let { msg ->
+            android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+            viewModel.clearError()
+        }
+    }
+
+    // Ambil data yang sudah bersih dari ViewModel
+    val decodedShape = viewModel.decodedShape
+    val decodedTone = viewModel.decodedTone
 
     Column(
         modifier = Modifier
@@ -152,7 +161,8 @@ fun ResultScreen(
 
 
             OutlinedButton(
-                onClick = { /* Save */ },
+                onClick = { viewModel.saveToProfile() },
+                enabled = !state.isSaving,
                 modifier = Modifier.fillMaxWidth().height(buttonHeight * 0.8f),
                 border = BorderStroke(1.5.dp, Primary),
                 shape = RoundedCornerShape(12.dp)
@@ -296,5 +306,5 @@ fun getSkinToneDescription(tone: String): String {
 @Preview(showBackground = true, device = Devices.PIXEL_6A)
 @Composable
 fun ResultScreenPreview() {
-    ResultScreen(navController = rememberNavController(), shape = "Round", tone = "Medium Tan")
+//    ResultScreen(navController = rememberNavController(), shape = "Round", tone = "Medium Tan")
 }

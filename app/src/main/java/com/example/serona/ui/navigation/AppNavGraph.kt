@@ -34,7 +34,7 @@ fun AppNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Routes.SPLASH,
+        startDestination = Routes.RESULT,
         modifier = Modifier.fillMaxSize(),
 
         enterTransition = {
@@ -127,23 +127,8 @@ fun AppNavGraph(
                 navArgument("shape") { type = NavType.StringType },
                 navArgument("skintone") { type = NavType.StringType }
             )
-        ) { backStackEntry ->
-            // Mengambil data yang dikirim dari ViewModel
-//            val shape = backStackEntry.arguments?.getString("shape") ?: "Unknown"
-//            val skintone = backStackEntry.arguments?.getString("skintone") ?: "Unknown"
-//
-//            // Menampilkan layar hasil
-//            ResultScreen(navController = navController, shape = shape, tone = skintone)
-            val shapeArg = backStackEntry.arguments?.getString("shape")
-            val toneArg = backStackEntry.arguments?.getString("skintone")
-
-            Log.d("NAV_CHECK", "Data diterima: shape=$shapeArg, tone=$toneArg")
-
-            ResultScreen(
-                navController = navController,
-                shape = shapeArg ?: "Unknown",
-                tone = toneArg ?: "Unknown"
-            )
+        ) {
+            ResultScreen(navController)
         }
 
     }
