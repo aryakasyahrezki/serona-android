@@ -2,13 +2,10 @@ package com.example.serona.ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,35 +15,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Attractions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.example.serona.R
-import com.example.serona.theme.BodyText
 import com.example.serona.theme.Heading
-import com.example.serona.theme.MutedLight
 import com.example.serona.theme.ParagraphLight
 import com.example.serona.theme.Primary
-import com.example.serona.theme.PrimaryContainer
 import com.example.serona.theme.figtreeFontFamily
 
 @Composable
@@ -57,11 +41,15 @@ fun ScannedInfoCard(
     modifier: Modifier = Modifier,
     bgColor: Color = Primary,
     textColor: Color,
+    screenHeight: Dp,
     topContent: @Composable () -> Unit
 ) {
+
+    val space = (screenHeight * 0.04f)
+
     Box(
         modifier = modifier
-            .height(200.dp),
+            .height(screenHeight * 0.25f),
         contentAlignment = Alignment.BottomCenter
     ) {
 
@@ -73,7 +61,7 @@ fun ScannedInfoCard(
                     color = bgColor,
                     shape = RoundedCornerShape(12.dp)
                 )
-                .padding(12.dp)
+                .padding(space * 0.35f)
         ) {
             // 2. TEKS (Column)
             Column(
@@ -124,18 +112,23 @@ fun guideCard(
     boxColor: Color,
     icon: ImageVector? = null,
     imageRes: Int? = null,
-    imageSize: Float
+    imageSize: Float,
+    screenHeight: Dp,
+    screenWidth: Dp
 ) {
+
+    val space = (screenHeight * 0.04f)
+
     Box(
         modifier = Modifier.fillMaxWidth()
     ){
         Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(screenWidth * 0.02f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .height(40.dp)
+                    .height(screenHeight * 0.05f)
                     .weight(0.11f)
                     .background(
                         color = boxColor,
@@ -197,12 +190,16 @@ fun eventCard(
     textColor: Color,
     crcColor: Color,
     bgColor: Color,
-    icon: ImageVector
+    icon: ImageVector,
+    screenHeight: Dp,
+    screenWidth: Dp
 ) {
+    val space = (screenHeight * 0.04f)
+
     Box(
         modifier = Modifier
-            .width(90.dp)
-            .height(105.dp)
+            .width(screenWidth * 0.23f)
+            .height(screenHeight * 0.13f)
             .background(
                 color = bgColor,
                 shape = RoundedCornerShape(10.dp)
@@ -213,7 +210,7 @@ fun eventCard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 10.dp),
+                .padding(vertical = space * 0.3f),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -223,11 +220,11 @@ fun eventCard(
                         color = crcColor,
                         shape = CircleShape
                     )
-                    .padding(4.dp)
+                    .padding(space * 0.1f)
             ){
                 Icon(
                     imageVector = icon,
-                    contentDescription = "Festival",
+                    contentDescription = null,
                     tint = iconTint,
                     modifier = Modifier.fillMaxSize(0.45f)
                 )

@@ -12,12 +12,12 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 1. Install Splash API
+        // Install Splash API
         val splashScreen = installSplashScreen()
 
         super.onCreate(savedInstanceState)
 
-        // 2. Set Fullscreen (Lakukan sebelum setContentView)
+        // Set Fullscreen
         window.setFlags(
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
@@ -25,7 +25,7 @@ class SplashActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_splash)
 
-        // 3. Pindah ke MainActivity
+        // Pindah ke MainActivity
         Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this, MainActivity::class.java)
 

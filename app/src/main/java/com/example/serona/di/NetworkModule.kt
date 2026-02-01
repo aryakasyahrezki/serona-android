@@ -19,7 +19,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule{
 
-    private const val BASE_URL = "https://serona.azurewebsites.net/"
     @Provides
     @Singleton
     fun provideOkHttp(
@@ -49,7 +48,7 @@ object NetworkModule{
         client: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl("https://serona.azurewebsites.net/api/")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

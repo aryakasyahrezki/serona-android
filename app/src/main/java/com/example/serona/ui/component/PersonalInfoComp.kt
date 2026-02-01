@@ -60,11 +60,17 @@ fun GenderCard(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier,
-    iconModifier: Modifier = Modifier
+    iconModifier: Modifier = Modifier,
+    maxWidth: Dp,
+    maxHeight: Dp,
+    fontSize: TextUnit
 ) {
+    val iconSize = maxWidth * 0.15f
+    val space = (maxHeight * 0.04f)
+
     Box(
         modifier = modifier   // ← weight masuk dari luar
-            .height(130.dp)
+            .height(maxHeight * 0.2f)
             .background(
                 brush = if (selected) GenderButtonGrad else Brush.linearGradient(
                     listOf(
@@ -87,12 +93,12 @@ fun GenderCard(
                 imageVector = icon,
                 contentDescription = null,
                 tint = if (selected) Color.White else Color(0xFFE15B6F),
-                modifier = iconModifier.size(50.dp)
+                modifier = iconModifier.size(iconSize)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(space * 0.4f))
             Text(
                 text = text,
-                fontSize = 20.sp,
+                fontSize = fontSize * 0.9f,
                 fontFamily = figtreeFontFamily,
                 fontWeight = FontWeight.Bold,
                 color = if (selected) Color.White else Color(0xFFE15B6F)
@@ -111,7 +117,10 @@ fun PersonalInfoTextField(
     dropdownItems: List<String> = emptyList(),
     onDropdownItemSelected: (String) -> Unit = {},
     modifier: Modifier,
+    fontSize: TextUnit,
     labelFontSize: TextUnit,
+    maxWidth: Dp,
+    maxHeight: Dp
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -141,7 +150,7 @@ fun PersonalInfoTextField(
                     )
                 },
                 textStyle = TextStyle(
-                    fontSize = 16.sp,
+                    fontSize = fontSize * 0.6f,
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     color = MutedLight
@@ -187,7 +196,7 @@ fun PersonalInfoTextField(
                     Column(
                         modifier = Modifier
                             .width(with(density) { textFieldWidth.toDp() })
-                            .heightIn(max = 220.dp)
+                            .heightIn(max = maxHeight * 0.3f)
                             .shadow(elevation = 8.dp, shape = RoundedCornerShape(15.dp))
                             .background(
                                 color = White, // Warna latar belakang menu
@@ -201,7 +210,7 @@ fun PersonalInfoTextField(
                                 text = {
                                     Text(
                                         item,
-                                        fontSize = 16.sp,
+                                        fontSize = fontSize * 0.7f,
                                         fontFamily = figtreeFontFamily,
                                         fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal
                                     )
@@ -230,12 +239,12 @@ fun PersonalInfoTextField(
 fun CleanLinearProgress(
     progress: Float,
     modifier: Modifier = Modifier,
-    height: Dp = 6.dp,
-    cornerRadius: Dp = 100.dp,
+    maxHeight: Dp,
     progressColor: Color = Color(0xFFF99E93),
     trackColor: Color = Color(0xFFECECEC)
 ) {
-    val shape = RoundedCornerShape(cornerRadius)
+    val shape = RoundedCornerShape(100.dp)
+    val height = maxHeight * 0.01f
 
     Box(
         modifier = modifier

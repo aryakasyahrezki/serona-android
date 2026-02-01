@@ -12,16 +12,12 @@ class PreferencesManager @Inject constructor(
 ) {
     private val sharedPreferences = context.getSharedPreferences("serona_prefs", Context.MODE_PRIVATE)
 
-    fun isFirstLaunch(): Boolean {
+    fun isFirstLaunch(userEmail: String): Boolean {
         // Defaultnya true, artinya dianggap pertama kali
-        return sharedPreferences.getBoolean("is_first_launch", true)
+        return sharedPreferences.getBoolean("is_first_launch$userEmail", true)
     }
 
-    fun setFirstLaunchCompleted() {
-        sharedPreferences.edit().putBoolean("is_first_launch", false).apply()
-    }
-
-    fun setFirstLaunchUncompleted() {
-        sharedPreferences.edit().putBoolean("is_first_launch", true).apply()
+    fun setFirstLaunchCompleted(userEmail: String) {
+        sharedPreferences.edit().putBoolean("is_first_launch$userEmail", false).apply()
     }
 }

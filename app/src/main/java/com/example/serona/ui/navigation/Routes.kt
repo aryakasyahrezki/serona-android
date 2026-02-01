@@ -13,6 +13,9 @@ object Routes{
     const val DETAIL = "detail"
     const val FAVORITE = "favorite"
     const val PROFILE = "profile"
+    const val PRIVACY = "privacyPolicy"
+    const val DELETE_PROFILE = "deleteProfile"
+    const val EDIT_PROFILE = "deleteProfile"
 
     const val SCAN = "scan"
 }

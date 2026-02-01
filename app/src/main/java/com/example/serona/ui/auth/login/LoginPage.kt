@@ -15,10 +15,13 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,8 +44,16 @@ import com.example.serona.ui.component.AuthTextField
 @Composable
 fun LoginPage(
     navController: NavController,
-    loginViewModel: LoginViewModel = hiltViewModel()
+    loginViewModel: LoginViewModel = hiltViewModel(),
 ) {
+
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+
+    val fontSize = (maxWidth * 0.052f).value.sp
+    val topPadding = maxWidth * 0.3f
+    val space = maxHeight * 0.07f
 
     var forgotPasswordDialogBox by remember { mutableStateOf(false) }
     val authState by loginViewModel.loginState.observeAsState(AuthState.Idle)
@@ -88,7 +99,7 @@ fun LoginPage(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 150.dp),
+                .padding(top = topPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -100,8 +111,8 @@ fun LoginPage(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 color = Color.White,
                 fontFamily = leagueSpartanFontFamily,
-                fontSize = 13.sp,
-                letterSpacing = 5.sp
+                fontSize = fontSize * 0.1f,
+                letterSpacing = (space * 0.04f).value.sp
             )
 
             LoginCard(
@@ -109,13 +120,17 @@ fun LoginPage(
                 loginViewModel,
                 onForgotPasswordClick = {
                     forgotPasswordDialogBox = true
-                }
+                },
+                fontSize = fontSize,
+                space = space
             )
 
             if (forgotPasswordDialogBox) {
                 ForgotPasswordDialog(
                     viewModel = loginViewModel,
-                    onDismiss = { forgotPasswordDialogBox = false }
+                    onDismiss = { forgotPasswordDialogBox = false },
+                    fontSize = fontSize,
+                    space = space * 0.6f
                 )
             }
         }
@@ -126,7 +141,9 @@ fun LoginPage(
 fun LoginCard(
     navController: NavController,
     loginViewModel: LoginViewModel,
-    onForgotPasswordClick: () -> Unit = {}
+    onForgotPasswordClick: () -> Unit = {},
+    fontSize: TextUnit,
+    space: Dp
 ) {
 
     val form = loginViewModel.loginFormState.observeAsState(LoginFormState()).value
@@ -143,33 +160,37 @@ fun LoginCard(
                     brush = glassColor,
                     shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
                 )
-                .padding(24.dp)
+                .padding(space* 0.5f)
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Login",
-                    fontSize = 20.sp,
+                    fontSize = fontSize,
                     color = White,
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.SemiBold
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(space * 0.5f))
 
                 AuthTextField(
                     value = form.email,
                     onValueChange = loginViewModel::onEmailChanged,
                     label = "Email",
-                    error = form.emailError
+                    error = form.emailError,
+                    fontSize = fontSize,
+                    space = space
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(space * 0.2f))
 
                 AuthPasswordField(
                     value = form.password,
                     onValueChange = loginViewModel::onPasswordChange,
                     label = "Password",
-                    error = form.passwordError
+                    error = form.passwordError,
+                    fontSize = fontSize,
+                    space = space
                 )
 
                 TextButton(
@@ -182,7 +203,7 @@ fun LoginCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(25.dp))
+                Spacer(modifier = Modifier.height(space * 0.4f))
 
                 Button(
                     enabled = (form.email != "") && (form.password != ""),
@@ -192,7 +213,7 @@ fun LoginCard(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE05757)),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(space * 0.8f)
                 ) {
                     Text(
                         text = "Login",
@@ -203,7 +224,7 @@ fun LoginCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(space * 0.1f))
 
                 Row() {
                     Text(
@@ -221,7 +242,13 @@ fun LoginCard(
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.clickable{
-                            navController.navigate("register")
+                            navController.navigate("register") {
+                                popUpTo("login") {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
                     )
                 }
@@ -233,7 +260,9 @@ fun LoginCard(
 @Composable
 fun ForgotPasswordDialog(
     viewModel: LoginViewModel,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    fontSize: TextUnit,
+    space: Dp
 ) {
     val form = viewModel.forgotPasswordFormState.observeAsState(ForgotPasswordFormState()).value
     val state by viewModel.forgotPasswordState
@@ -241,10 +270,9 @@ fun ForgotPasswordDialog(
 
     AlertDialog(
         modifier = Modifier.drawBehind {
-            // Gambar garis (stroke) di sekeliling dialog
             drawRoundRect(
                 brush = ForgotPasswordBorderGrad,
-                style = Stroke(width = 3.dp.toPx()), // Menggunakan Stroke untuk membuat garis
+                style = Stroke(width = 3.dp.toPx()),
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(28.dp.toPx())
             )
         },
@@ -278,24 +306,26 @@ fun ForgotPasswordDialog(
                         color = Primary
                     )
 
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(space * 0.08f))
 
                     AuthTextField(
                         value = form.resetEmail,
                         onValueChange = viewModel::onResetEmailChanged,
                         label = "Email",
                         error = form.resetEmailError,
-                        color = Primary
+                        color = Primary,
+                        fontSize = fontSize,
+                        space = space
                     )
                 }
 
                 if (state is ForgotPasswordState.Success) {
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(space * 0.08f))
                     Text(
                         text = "Email has been sent",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 8.dp),
+                            .padding(start = space * 0.08f),
                         color = Primary,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Normal,
