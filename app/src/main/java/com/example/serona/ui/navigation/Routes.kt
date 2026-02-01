@@ -10,6 +10,7 @@ object Routes{
     //main tab
     const val HOME = "home"
     const val TUTORIAL = "tutorial"
+    const val DETAIL = "detail"
     const val FAVORITE = "favorite"
     const val PROFILE = "profile"
 

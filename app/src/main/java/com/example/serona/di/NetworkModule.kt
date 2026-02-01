@@ -1,6 +1,7 @@
 package com.example.serona.di
 
 import com.example.serona.data.api.UserApi
+import com.example.serona.data.api.TutorialApi
 import com.example.serona.data.network.AuthInterceptor
 import com.example.serona.data.repository.AuthRepository
 import dagger.Module
@@ -18,6 +19,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule{
 
+    private const val BASE_URL = "https://serona.azurewebsites.net/"
     @Provides
     @Singleton
     fun provideOkHttp(
@@ -34,6 +36,10 @@ object NetworkModule{
             .readTimeout(60, TimeUnit.SECONDS)    // Waktu maksimal untuk membaca respon
             .writeTimeout(60, TimeUnit.SECONDS)   // Waktu maksimal untuk mengirim data
 
+//            .followRedirects(true)
+//            .followSslRedirects(true)
+//            .addInterceptor(logging)
+
             .build()
     }
 
@@ -43,7 +49,7 @@ object NetworkModule{
         client: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8000/api/")
+            .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -53,5 +59,11 @@ object NetworkModule{
     @Singleton
     fun provideUserApi(retrofit: Retrofit): UserApi{
         return retrofit.create(UserApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTutorialApi(retrofit: Retrofit): TutorialApi{
+        return retrofit.create(TutorialApi::class.java)
     }
 }

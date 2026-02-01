@@ -8,11 +8,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.serona.ui.auth.login.LoginPage
 import com.example.serona.ui.auth.register.PersonalInfoPage
 import com.example.serona.ui.auth.register.RegisterPage
 import com.example.serona.ui.landing.LandingPageCarousel
+import com.example.serona.ui.main.favorite.FavoritePage
+import com.example.serona.ui.main.tutorial.TutorialDetailPage
+import com.example.serona.ui.main.tutorial.TutorialPage
 import com.example.serona.ui.main.home.HomePage
 import com.example.serona.ui.splash.SplashFullBackground
 
@@ -24,7 +29,7 @@ fun AppNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Routes.SPLASH,
+        startDestination = Routes.TUTORIAL,
         modifier = Modifier.fillMaxSize(),
 
         enterTransition = {
@@ -39,7 +44,7 @@ fun AppNavGraph(
         popExitTransition = {
             fadeOut(animationSpec = tween(200))
         }
-    ){
+    ) {
         composable(
             Routes.SPLASH
         ) {
@@ -67,13 +72,51 @@ fun AppNavGraph(
             HomePage(navController)
         }
 
-        composable(Routes.TUTORIAL){}
+        composable(
+            Routes.TUTORIAL,
+            enterTransition = { fadeIn(animationSpec = tween(200)) }
+        ) {
+            TutorialPage(
+                onTutorialClick = { tutorialId ->
+                    navController.navigate("${Routes.DETAIL}/$tutorialId")
+                },
+                onBackClicked = {
+                    navController.popBackStack()
+                }
+            )
+        }
 
-        composable(Routes.FAVORITE){}
+        composable(
+            "${Routes.DETAIL}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val tutorialId = backStackEntry.arguments?.getInt("id") ?: 0
+            TutorialDetailPage(
+                tutorialId = tutorialId,
+                onBackClicked = {
+                    navController.popBackStack()
+                }
+            )
+        }
 
-        composable(Routes.PROFILE){}
+        composable(
+            Routes.FAVORITE,
+            enterTransition = { fadeIn(animationSpec = tween(200)) }
+        ) {
+            FavoritePage (
+                onTutorialClick = { tutorialId ->
+                    navController.navigate("${Routes.DETAIL}/$tutorialId")
+                },
+                onBackClicked = {
+                    // Navigate back to HomePage instead of popBackStack
+                    navController.popBackStack()
 
-        composable(Routes.SCAN){}
+                }
+            )
+        }
+
+        composable(Routes.PROFILE) {}
+
+        composable(Routes.SCAN) {}
     }
-    
 }
