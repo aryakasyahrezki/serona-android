@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -25,6 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +46,7 @@ import com.example.serona.ui.auth.RegisterState
 import com.example.serona.ui.component.AuthPasswordField
 import com.example.serona.ui.component.AuthTextField
 import com.example.serona.ui.component.RoundedCheckbox
+import com.example.serona.ui.navigation.Routes
 
 @Composable
 fun RegisterPage(
@@ -78,6 +82,14 @@ fun RegisterPage(
         }
     }
 
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+
+    val fontSize = (maxWidth * 0.052f).value.sp
+    val topPadding = maxWidth * 0.3f
+    val space = maxHeight * 0.07f
+
     Box(modifier = Modifier
         .fillMaxSize()
         .background(brush = AuthPageGrad)
@@ -92,7 +104,7 @@ fun RegisterPage(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 150.dp),
+                .padding(top = topPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -104,11 +116,11 @@ fun RegisterPage(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 color = Color.White,
                 fontFamily = leagueSpartanFontFamily,
-                fontSize = 13.sp,
-                letterSpacing = 5.sp
+                fontSize = fontSize * 0.8f,
+                letterSpacing = fontSize * 0.25f
             )
 
-            RegisterCard(navController, registerViewModel)
+            RegisterCard(navController, registerViewModel, fontSize, space)
 
             if(emailState != EmailVerificationState.Idle) {
                 EmailVerificationDialog(
@@ -116,7 +128,9 @@ fun RegisterPage(
                     onDismiss = {
                         registerViewModel.resetEmailVerificationState()
                     },
-                    viewModel = registerViewModel
+                    viewModel = registerViewModel,
+                    fontSize = fontSize,
+                    space = space
                 )
             }
         }
@@ -126,7 +140,9 @@ fun RegisterPage(
 @Composable
 fun RegisterCard(
     navController: NavController,
-    registerViewModel: RegisterViewModel
+    registerViewModel: RegisterViewModel,
+    fontSize: TextUnit,
+    space: Dp
 ) {
 
     val form = registerViewModel.formState.observeAsState(RegisterFormState()).value
@@ -144,70 +160,79 @@ fun RegisterCard(
                     brush = glassColor,
                     shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
                 )
-                .padding(24.dp)
+                .padding(space * 0.5f)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "Register",
-                    fontSize = 20.sp,
+                    fontSize = fontSize,
                     color = Color.White,
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.SemiBold
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(space * 0.5f))
 
                 AuthTextField(
                     value = form.name,
                     onValueChange = registerViewModel::onNameChanged,
                     label = "Full Name",
-                    error = form.nameError
+                    error = form.nameError,
+                    fontSize = fontSize,
+                    space = space
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(space * 0.2f))
 
                 AuthTextField(
                     value = form.email,
                     onValueChange = registerViewModel::onEmailChanged,
                     label = "Email",
-                    error = form.emailError
+                    error = form.emailError,
+                    fontSize = fontSize,
+                    space = space
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(space * 0.2f))
 
                 AuthPasswordField(
                     value = form.password,
                     onValueChange = registerViewModel::onPasswordChanged,
                     label = "Password",
-                    error = form.passwordError
+                    error = form.passwordError,
+                    fontSize = fontSize,
+                    space = space
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(space * 0.2f))
 
                 AuthPasswordField(
                     value = form.confirmPassword,
                     onValueChange = registerViewModel::onConfirmChanged,
                     label = "Confirmation Password",
-                    error = form.confirmPasswordError
+                    error = form.confirmPasswordError,
+                    fontSize = fontSize,
+                    space = space
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(space * 0.3f))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RoundedCheckbox(
                         checked = form.isAgree,
-                        onCheckedChange = registerViewModel::onAgreeChange
+                        onCheckedChange = registerViewModel::onAgreeChange,
+                        fontSize = fontSize
                     )
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(space * 0.1f))
 
                     val annotatedText = buildAnnotatedString {
                         withStyle(
                             style = SpanStyle(
                                 color = White,
-                                fontSize = 14.sp,
+                                fontSize = fontSize * 0.7f,
                                 fontFamily = figtreeFontFamily
                             )
                         ) {
@@ -222,7 +247,7 @@ fun RegisterCard(
                             style = SpanStyle(
                                 color = Primary,
                                 textDecoration = TextDecoration.Underline,
-                                fontSize = 14.sp,
+                                fontSize = fontSize * 0.7f,
                                 fontFamily = figtreeFontFamily
                             )
                         ) {
@@ -235,20 +260,25 @@ fun RegisterCard(
                         text = annotatedText,
                         style = TextStyle(
                             color = Color.White,
-                            fontSize = 12.sp
+                            fontSize = fontSize * 0.4f
                         ),
                         onClick = { offset ->
                             annotatedText
                                 .getStringAnnotations("PRIVACY_POLICY", offset, offset)
                                 .firstOrNull()
                                 ?.let {
-                                    // nanri tambahin mau kemananya
+                                    navController.navigate("privacyPolicy") {
+                                        popUpTo(Routes.REGISTER) {
+                                            inclusive = false
+                                        }
+                                        launchSingleTop = true
+                                    }
                                 }
                         }
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(space * 0.4f))
 
                 Button(
                     enabled = form.isAgree && (form.name != "") && (form.email != "") && (form.password != "") && (form.confirmPassword != ""),
@@ -258,24 +288,24 @@ fun RegisterCard(
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(space * 0.8f)
                 ) {
                     Text(
                         text = "Register",
                         color = Color.White,
-                        fontSize = 16.sp,
+                        fontSize = fontSize * 0.8f,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(space * 0.1f))
 
                 Row() {
                     Text(
                         text = "Already have an Account ? ",
                         color = White,
-                        fontSize = 13.sp,
+                        fontSize = fontSize * 0.6f,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Medium
                     )
@@ -283,11 +313,11 @@ fun RegisterCard(
                     Text(
                         text = "Login",
                         color = Primary,
-                        fontSize = 13.sp,
+                        fontSize = fontSize * 0.6f,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.clickable{
-                            navController.navigate("login")
+                            navController.popBackStack()
                         }
                     )
                 }
@@ -300,6 +330,8 @@ fun RegisterCard(
 fun EmailVerificationDialog(
     state: EmailVerificationState,
     viewModel: RegisterViewModel,
+    fontSize: TextUnit,
+    space: Dp,
     onDismiss: () -> Unit
 ) {
     val dialogText = TextStyle(
@@ -346,29 +378,33 @@ fun EmailVerificationDialog(
                     EmailVerificationState.Sending ->
                         Text(
                             "Sending Verification Email...",
-                            style = dialogText
+                            style = dialogText,
+                            fontFamily = figtreeFontFamily
                         )
 
                     EmailVerificationState.EmailSent ->
                         Text(
                             "Verification Email has been sent. Please check your inbox or spam",
-                            style = dialogText
+                            style = dialogText,
+                            fontFamily = figtreeFontFamily
                         )
 
                     EmailVerificationState.Verified ->
                         Text(
                             "Your email has been verified successfully!",
-                            style = dialogText
+                            style = dialogText,
+                            fontFamily = figtreeFontFamily
                         )
 
                     EmailVerificationState.NotVerified ->
                         Text(
                             "Email not verified yet. Please check your inbox or spam email.",
-                            style = dialogText
+                            style = dialogText,
+                            fontFamily = figtreeFontFamily
                         )
 
                     is EmailVerificationState.Error ->
-                        Text(state.message, style = dialogText)
+                        Text(state.message, fontFamily = figtreeFontFamily, style = dialogText)
 
                     else -> {}
                 }
@@ -388,7 +424,8 @@ fun EmailVerificationDialog(
                         Text(
                             "I've Verified My Email",
                             style = buttonText,
-                            color = White
+                            color = White,
+                            fontFamily = figtreeFontFamily
                         )
                     }
 
@@ -407,6 +444,30 @@ fun EmailVerificationDialog(
                             color = Primary
                         )
                     }
+                }
+
+                if (state is EmailVerificationState.Error) {
+                    Button(
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            viewModel.resetEmailVerificationState()
+                            viewModel.deleteAccount()
+                            onDismiss()
+                        }
+                    ) {
+                        Text("Back to Register", style = buttonText, color = White)
+                    }
+
+                    Text(
+                        text = "Note: This will reset your registration so you can try again.",
+                        fontSize = fontSize * 0.5f,
+                        fontFamily = figtreeFontFamily,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(top = space * 0.2f),
+                        color = Primary.copy(alpha = 0.7f),
+                        lineHeight = fontSize * 0.4f
+                    )
                 }
             }
         },

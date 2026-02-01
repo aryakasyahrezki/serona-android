@@ -42,7 +42,7 @@ object NetworkModule {
         client: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.68.107.245:8000/")
+            .baseUrl("https://serona.azurewebsites.net/api/")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

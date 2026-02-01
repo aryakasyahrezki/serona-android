@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 data class HomeUiState(
     val userName: String = "",
+    val userEmail: String = "",
     val hasScanned: Boolean = false,
     val faceHeader: String = "",
     val faceBody: String = "",

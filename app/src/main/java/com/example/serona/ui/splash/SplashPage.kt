@@ -140,11 +140,6 @@ fun SplashFullBackground(
         }
     }
 
-//    Scaffold(
-//        modifier = Modifier.fillMaxSize(),
-//        containerColor = Color.Transparent
-//    ){}
-
     LaunchedEffect(authState) {
         when (authState) {
             AuthState.Authenticated, AuthState.Unauthenticated -> {

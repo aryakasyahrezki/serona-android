@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.google.services)
     // Add the Google services Gradle plugin
 //    id("com.google.gms.google-services")
+    alias(libs.plugins.google.devtools.ksp)
     kotlin("kapt")  // <-- kalau pakai Kotlin
     id ("com.google.dagger.hilt.android") // <-- ini wajib
 }
@@ -106,5 +107,11 @@ dependencies {
     implementation(libs.mlkit.face.detection)
     implementation(libs.coil.compose)
     implementation(libs.accompanist.permissions)
+
+    // ROOM DATABASE
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
 }
 

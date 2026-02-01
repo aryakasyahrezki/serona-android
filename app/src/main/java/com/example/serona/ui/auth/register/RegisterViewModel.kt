@@ -89,7 +89,11 @@ class RegisterViewModel @Inject constructor(
         val state = _formState.value ?: return
 
         // VALIDASI PER FIELD
-        val nameErr = if (state.name.isBlank()) "Nama can't be empty" else null
+        val nameErr = if (state.name.isBlank()) {
+                "Name can't be empty"
+            } else if (state.name.length < 3){
+                "Name mus be at least 3 characters"
+            } else null
         val emailErr =
             when {
                 state.email.isBlank() ->
@@ -107,6 +111,7 @@ class RegisterViewModel @Inject constructor(
         val confirmErr =
             if (state.password != state.confirmPassword) "Password and Confirmation Password must be same"
             else if (state.confirmPassword.isBlank()) "Confirmation Password can't be empty"
+            else if(state.password.length < 6) "Minimal 6 character"
             else null
 
         val agreeErr = if (!state.isAgree) "You must agree with privacy policy to register"
@@ -149,29 +154,23 @@ class RegisterViewModel @Inject constructor(
                 return@reloadUser
             }
 
-            val user = repo.getCurrentUser()
-                ?: return@reloadUser
-
-            val (name, email) = repo.getCurrentUserInfo()
+            val (nameFirebase, emailFirebase) = repo.getCurrentUserInfo()
                 ?: return@reloadUser
 
             viewModelScope.launch {
-//                repo.refreshIdToken()
-
                 val apiResult = userRepo.registerUser(
                     RegisterUserRequest(
-                        name = name!!,
-                        email = email!!
+                        name = nameFirebase!!,
+                        email = emailFirebase!!
                     )
                 )
 
-                if (apiResult.isSuccess) {
-                    userSession.setBasicInfo(name, email)
+                apiResult.onSuccess {
                     userSession.markInitialized()
                     _emailVerificationState.postValue(EmailVerificationState.Verified)
-                } else {
+                }.onFailure { error ->
                     _emailVerificationState.postValue(
-                        EmailVerificationState.Error("Failed save user to server")
+                        EmailVerificationState.Error(error.message ?: "Failed save user to server")
                     )
                 }
             }
@@ -186,13 +185,12 @@ class RegisterViewModel @Inject constructor(
         resetEmailVerificationState() //jadi kan kalo gajadi user bakal coba email baru, jadi state nya ulang lagi
 
         repo.deleteCurrentUser { result ->
-            if (!result.isSuccess) {
-                _emailVerificationState.postValue(
-                    EmailVerificationState.Error(
-                        result.exceptionOrNull()?.message
-                            ?: "Failed to delete account"
-                    )
-                )
+            if (result.isSuccess) {
+                viewModelScope.launch {
+                    userRepo.clearAllLocalData()
+                }
+            } else {
+                println("Firebase account deletion failed: ${result.exceptionOrNull()?.message}")
             }
         }
     }

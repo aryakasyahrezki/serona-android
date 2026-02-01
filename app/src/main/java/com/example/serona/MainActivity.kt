@@ -1,5 +1,6 @@
 package com.example.serona
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.getValue
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
@@ -34,24 +36,28 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
         setContent {
             SeronaTheme() {
                 val navController = rememberNavController()
 
-                // 1. Ambil rute saat ini
+                // Ambil rute saat ini
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
-                // 2. Daftar rute yang menampilkan NavBar
+                // Daftar rute yang menampilkan NavBar
                 val mainRoutes = listOf(Routes.HOME, Routes.TUTORIAL, Routes.FAVORITE, Routes.PROFILE)
                 val shouldShowNavBar = currentRoute in mainRoutes
 
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .navigationBarsPadding(),
                     containerColor = Color.Transparent,
                     contentWindowInsets = WindowInsets(0, 0, 0, 0)
                 ) { padding ->
-                    // Kirim padding ke NavHost agar konten tidak tertutup NavBar
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -66,22 +72,20 @@ class MainActivity : ComponentActivity() {
                             AnimatedVisibility (
                                 visible = shouldShowNavBar,
                                 modifier = Modifier.align(Alignment.BottomCenter),
-                                // Animasi masuk: slide dari bawah + fade in
                                 enter = slideInVertically(
                                     initialOffsetY = { it },
                                     animationSpec = tween(durationMillis = 200) // Sesuaikan durasi dengan AppNavGraph
                                 ) + fadeIn(animationSpec = tween(200)),
-                                // Animasi keluar: slide ke bawah + fade out
                                 exit = slideOutVertically(
                                     targetOffsetY = { it },
                                     animationSpec = tween(durationMillis = 200)
                                 ) + fadeOut(animationSpec = tween(200))
                             ) {
-                                // 2. NavBar (melayang di depan konten)
                                 if (shouldShowNavBar) {
                                     Box(
                                         modifier = Modifier
                                             .align(Alignment.BottomCenter)
+                                            .navigationBarsPadding()
                                     ) {
                                         NavBar(
                                             selectedIndex = when (currentRoute) {
@@ -99,12 +103,17 @@ class MainActivity : ComponentActivity() {
                                                     3 -> Routes.PROFILE
                                                     else -> Routes.HOME
                                                 }
-                                                navController.navigate(targetRoute) {
-                                                    popUpTo(navController.graph.startDestinationId) {
-                                                        saveState = true
+                                                if (currentRoute != targetRoute) {
+                                                    navController.navigate(targetRoute) {
+                                                        // Memastikan Home selalu ada di dasar stack
+                                                        popUpTo(Routes.HOME) {
+                                                            saveState = true
+                                                        }
+                                                        // Menghindari duplikasi instance halaman
+                                                        launchSingleTop = true
+                                                        // Mengembalikan state (posisi scroll, dll)
+                                                        restoreState = true
                                                     }
-                                                    launchSingleTop = true
-                                                    restoreState = true
                                                 }
                                             },
                                             onCenterClick = {

@@ -151,9 +151,6 @@ fun LandingPageCarousel(
     }
 }
 
-// Data model for labels
-data class LabelData(val text: String, val color: Color, val offsetX: Float, val offsetY: Float)
-
 @Composable
 fun LandingPageTemplate(
     imageRes: Int,
@@ -166,7 +163,6 @@ fun LandingPageTemplate(
 
     val configuration = LocalConfiguration.current
     val maxWidth = configuration.screenWidthDp.dp
-    val maxHeight = configuration.screenHeightDp.dp
     val titleSize = (maxWidth * 0.085f).value.sp
     val subtitleSize = (maxWidth * 0.035f).value.sp
 
