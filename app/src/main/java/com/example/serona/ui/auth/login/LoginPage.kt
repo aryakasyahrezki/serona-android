@@ -276,7 +276,7 @@ fun ForgotPasswordDialog(
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(28.dp.toPx())
             )
         },
-        containerColor = Color(0xFFECD3D4).copy(alpha = 0.9f),
+        containerColor = Color(0xFFFFF2F2).copy(alpha = 0.9f),
         title = {
             Box(
                 modifier = Modifier.fillMaxWidth(),

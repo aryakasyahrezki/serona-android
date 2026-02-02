@@ -33,7 +33,22 @@ class PersonalInfoViewModel @Inject constructor(
         _state.value = _state.value.copy(day = day, month = month, year = year)
     }
 
+    private fun validateForm(): Boolean {
+        val currentState = _state.value
+        var isValid = true
+
+        // Cek validitas tanggal menggunakan DateUtils
+        val dobError = if (!DateUtils.isValidDate(currentState.day, currentState.month, currentState.year)) {
+            isValid = false
+            "The date is invalid for the selected month"
+        } else null
+
+        _state.value = _state.value.copy(dobError = dobError)
+        return isValid
+    }
+
     fun submitPersonalInfo(onSuccess: () -> Unit){
+        if (!validateForm()) return
         val currentState = state.value
 
         val request = PersonalInfoRequest(

@@ -23,6 +23,7 @@ import com.example.serona.ui.component.GenderCard
 import androidx.navigation.NavController
 import com.example.serona.data.model.Gender
 import com.example.serona.theme.MutedLight
+import com.example.serona.theme.Primary50
 import com.example.serona.theme.figtreeFontFamily
 import com.example.serona.ui.component.CleanLinearProgress
 import com.example.serona.ui.component.PersonalInfoTextField
@@ -218,6 +219,16 @@ fun PersonalInfoPage(
                     maxHeight = maxHeight
                 )
 
+            }
+
+            if (state.dobError != null) {
+                Text(
+                    text = state.dobError!!,
+                    color = Primary50,
+                    fontSize = fontSize * 0.6f,
+                    fontFamily = figtreeFontFamily,
+                    modifier = Modifier.padding(start = space * 0.08f)
+                )
             }
 
             Spacer(modifier = Modifier.height(space * 0.5f))
