@@ -81,13 +81,15 @@ fun FavoritePage(
                 "Favorite",
                 style = MaterialTheme.typography.headlineSmall,
                 color = Heading,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontFamily = figtreeFontFamily
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 "Here are the article you like!",
                 style = MaterialTheme.typography.bodyMedium,
-                color = BodyText
+                color = BodyText,
+                fontFamily = figtreeFontFamily
             )
         }
 
@@ -149,6 +151,7 @@ fun EmptySearchResultView() {
                 "Coba cari dengan kata kunci lain",
                 style = MaterialTheme.typography.bodyMedium,
                 color = BodyText,
+                fontFamily = figtreeFontFamily,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
         }

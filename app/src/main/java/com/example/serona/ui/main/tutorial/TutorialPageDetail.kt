@@ -264,12 +264,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.serona.theme.*
+import com.example.serona.ui.component.BackButton
 
 private fun parseColorSafely(hex: String?): Color? {
     if (hex.isNullOrEmpty() || hex == "null") return null
@@ -287,8 +289,21 @@ private fun parseColorSafely(hex: String?): Color? {
 fun TutorialDetailPage(
     tutorialId: Int,
     viewModel: TutorialDetailViewModel = hiltViewModel(),
-    onBackClicked: () -> Unit
+    onBackClick: () -> Unit
 ) {
+
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+
+    val fontSize = (maxWidth * 0.06f).value.sp
+    val iconSize = (maxHeight * 0.03f)
+    val upperBoxHeight = maxHeight * 0.44f
+    val horiPadding = maxWidth * 0.05f
+    val vertiPadding = maxHeight * 0.055f
+    val space = maxHeight * 0.03f
+    val buttonSize = maxWidth * 0.07f
+
     val tutorial by viewModel.tutorial.collectAsState()
     val steps by viewModel.steps.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -314,9 +329,16 @@ fun TutorialDetailPage(
             .background(White)
     ) {
         // Header with Back Button
-        DetailHeader(
-            tutorialTitle = tutorial?.title ?: "Tutorial",
-            onBackClicked = onBackClicked
+//        DetailHeader(
+//            tutorialTitle = tutorial?.title ?: "Tutorial",
+//            onBackClicked = onBackClicked
+//        )
+        Spacer(modifier = Modifier.height(space * 0.15f))
+
+        BackButton(
+            onBackClick = { onBackClick() },
+            buttonSize = buttonSize,
+            fontSize = fontSize
         )
 
         Divider(color = Grey20, thickness = 1.dp)
@@ -343,7 +365,8 @@ fun TutorialDetailPage(
                         text = tut.title,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Heading
+                        color = Heading,
+                        fontFamily = figtreeFontFamily
                     )
                 }
 
@@ -353,7 +376,8 @@ fun TutorialDetailPage(
                         text = tut.description,
                         style = MaterialTheme.typography.bodyLarge,
                         color = BodyText,
-                        lineHeight = 24.sp
+                        lineHeight = 24.sp,
+                        fontFamily = figtreeFontFamily
                     )
                 }
             }
@@ -366,6 +390,7 @@ fun TutorialDetailPage(
                         text = "Tutorial Steps",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
+                        fontFamily = figtreeFontFamily,
                         color = Heading
                     )
                 }
@@ -384,7 +409,8 @@ fun TutorialDetailPage(
                     Text(
                         "No steps available for this tutorial.",
                         color = BodyText,
-                        modifier = Modifier.padding(vertical = 16.dp)
+                        modifier = Modifier.padding(vertical = 16.dp),
+                        fontFamily = figtreeFontFamily
                     )
                 }
             }
@@ -421,7 +447,8 @@ private fun DetailHeader(
                 "Back",
                 color = Primary,
                 fontWeight = FontWeight.SemiBold,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                fontFamily = figtreeFontFamily
             )
         }
     }
@@ -441,7 +468,8 @@ private fun CategoryChip(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             color = if (isPrimary) Primary else Secondary,
             style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            fontFamily = figtreeFontFamily
         )
     }
 }
@@ -491,6 +519,7 @@ fun TutorialStepCard(
                             text = stepNumber.toString(),
                             color = White,
                             fontWeight = FontWeight.Bold,
+                            fontFamily = figtreeFontFamily,
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -502,7 +531,8 @@ fun TutorialStepCard(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Heading,
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        fontFamily = figtreeFontFamily
                     )
                 }
 
@@ -540,7 +570,8 @@ fun TutorialStepCard(
                     text = description,
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
-                    color = BodyText
+                    color = BodyText,
+                    fontFamily = figtreeFontFamily
                 )
             }
         }

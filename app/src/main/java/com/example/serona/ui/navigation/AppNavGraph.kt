@@ -95,7 +95,7 @@ fun AppNavGraph(
             val tutorialId = backStackEntry.arguments?.getInt("id") ?: 0
             TutorialDetailPage(
                 tutorialId = tutorialId,
-                onBackClicked = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() }
             )
         }
 

@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -71,6 +72,7 @@ fun TutorialPage(
             .background(White)
             .padding(vertical = vertiPadding, horizontal = horiPadding)
     ) {
+//        Spacer(modifier = Modifier.height(space * 0.15f))
 
         BackButton(
             onBackClick = { onBackClick() },
@@ -88,17 +90,19 @@ fun TutorialPage(
                 "Tutorial",
                 style = MaterialTheme.typography.headlineSmall,
                 color = Heading,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontFamily = figtreeFontFamily
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 "Here are the tutorials for you!",
                 style = MaterialTheme.typography.bodyMedium,
-                color = BodyText
+                color = BodyText,
+                fontFamily = figtreeFontFamily
             )
         }
 
-        Spacer(modifier = Modifier.height(space * 0.3f))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Search Bar
         TutorialSearchBar(
@@ -106,7 +110,7 @@ fun TutorialPage(
             onQueryChange = { searchQuery = it }
         )
 
-        Spacer(modifier = Modifier.height(space * 0.3f))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Filter Row
         FilterRow(
@@ -118,16 +122,16 @@ fun TutorialPage(
             onClearAllFilters = vm::clearAllFilters
         )
 
-        Spacer(modifier = Modifier.height(space * 0.3f))
+        Spacer(modifier = Modifier.height(4.dp))
         // Active Filters Section
         if (activeFilters.isNotEmpty()) {
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(6.dp))
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 activeFilters.forEach { filter ->
@@ -145,14 +149,16 @@ fun TutorialPage(
                         Text(
                             "Clear All",
                             color = Primary,
-                            fontSize = 12.sp
+                            fontSize = 12.sp,
+                            fontFamily = figtreeFontFamily
                         )
                     }
                 }
             }
+
         }
 
-        Spacer(modifier = Modifier.height(space * 0.3f))
+        Spacer(modifier = Modifier.height(4.dp))
 
         // Content Section
         when {
@@ -173,8 +179,8 @@ fun TutorialPage(
                 }
 
                 LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
 
                     // Face Shape Section
@@ -224,6 +230,9 @@ fun TutorialPage(
                 }
             }
         }
+
+
+
     }
 }
 

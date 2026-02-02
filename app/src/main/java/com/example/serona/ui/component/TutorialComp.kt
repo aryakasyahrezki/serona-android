@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -44,109 +46,131 @@ fun TutorialCard(
     onClick: () -> Unit
 ) {
     val isFavorite = favViewModel.isFavorite(tutorial.id)
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+
+    val fontSize = (maxWidth * 0.06f).value.sp
+    val iconSize = (maxHeight * 0.03f)
+    val upperBoxHeight = maxHeight * 0.44f
+    val horiPadding = maxWidth * 0.05f
+    val vertiPadding = maxHeight * 0.055f
+    val space = maxHeight * 0.03f
+    val buttonSize = maxWidth * 0.07f
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Grey30),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(6.dp)
         ) {
-            // Image Section
-            Box(
+            Row(
                 modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    model = tutorial.image_url,
-                    contentDescription = tutorial.title,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            Spacer(Modifier.width(12.dp))
-
-            // Content Section
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-            ) {
-                // Tag
-                Text(
-                    text = tutorial.sub_category,
-                    color = White,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
+                // Image Section
+                Box(
                     modifier = Modifier
-                        .background(
-                            color = Color(0xFFDC143C), // Dark red/maroon color
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                )
+//                        .size(100.dp)
+                        .width(69.dp)
+                        .height(86.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                ) {
+                    AsyncImage(
+                        model = tutorial.image_url,
+                        contentDescription = tutorial.title,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.width(16.dp))
 
-                // Title
-                Text(
-                    text = tutorial.title,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
-                    color = Color.Black,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 20.sp
-                )
+                // Content Section
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+//                    .fillMaxHeight()
+                ) {
+                    // Tag
+                    Text(
+                        text = tutorial.sub_category,
+                        color = White,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = figtreeFontFamily,
+                        modifier = Modifier
+                            .background(
+                                color = Color(0xFFDC143C), // Dark red/maroon color
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 4.dp)
+                    )
 
-                Spacer(Modifier.height(6.dp))
+                    Spacer(Modifier.height(2.dp))
 
-                // Description
-                Text(
-                    text = tutorial.description,
-                    fontSize = 12.sp,
-                    color = Color(0xFF666666),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 16.sp
-                )
+                    // Title
+                    Text(
+                        text = tutorial.title,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = Color.Black,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 16.sp,
+                        fontFamily = figtreeFontFamily
+                    )
 
-                Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(4.dp))
 
-                // "Lihat lebih lanjut" button
-                Text(
-                    text = "See More Detail",
-                    color = Primary,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp
+                    // Description
+                    Text(
+                        text = tutorial.description,
+                        fontSize = 10.sp,
+                        color = Color(0xFF666666),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 14.sp
+                    )
+
+                    Spacer(Modifier.height(2.dp))
+
+                    Text(
+                        text = "Read more",
+                        color = Color(0xFFDC143C),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 11.sp,
+                        fontFamily = figtreeFontFamily
+                    )
+                }
+
+                Spacer(Modifier.width(2.dp))
+
+                Icon(
+                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = "Favorite",
+                    tint = Color(0xFFDC143C),
+                    modifier = Modifier
+                        .align(Alignment.Top)
+                        .padding(12.dp)
+                        .size(24.dp)
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            favViewModel.toggleFavorite(tutorial)
+                        }
                 )
             }
-
-            Spacer(Modifier.width(8.dp))
-
-            // Favorite Icon
-            Icon(
-                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                contentDescription = "Favorite",
-                tint = Primary,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        favViewModel.toggleFavorite(tutorial)
-                    }
-            )
         }
     }
 }
@@ -176,7 +200,7 @@ fun SectionTitle(title: String) {
         style = MaterialTheme.typography.titleLarge,
         color = Heading,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(vertical = 8.dp)
+//        modifier = Modifier.padding(vertical = 8.dp)
     )
 }
 
@@ -404,9 +428,9 @@ fun ActiveFilterChip(
     Box(
         modifier = Modifier
             .height(32.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFFFF0F5))
-            .padding(horizontal = 10.dp, vertical = 6.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -424,7 +448,7 @@ fun ActiveFilterChip(
                 contentDescription = "Remove filter",
                 tint = Primary,
                 modifier = Modifier
-                    .size(14.dp)
+                    .size(16.dp)
                     .clickable(onClick = onRemove)
             )
         }
