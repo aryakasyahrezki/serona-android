@@ -1,5 +1,6 @@
 package com.example.serona.ui.main.favorite
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,7 +20,6 @@ class FavoriteViewModel @Inject constructor(
     val favoriteList: List<Tutorial> get() = _favoriteList
 
     init {
-        // Load favorites saat ViewModel dibuat
         loadFavorites()
     }
 
@@ -84,9 +84,13 @@ class FavoriteViewModel @Inject constructor(
      */
     fun loadFavorites() {
         viewModelScope.launch {
-            val favorites = repository.getFavorites()
-            _favoriteList.clear()
-            _favoriteList.addAll(favorites)
+            try {
+                val favorites = repository.getFavorites()
+                _favoriteList.clear()
+                _favoriteList.addAll(favorites)
+            } catch (e: Exception) {
+                Log.e("FavoriteVM", "Error loading favorites: ${e.message}")
+            }
         }
     }
 
