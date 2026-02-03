@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -17,6 +18,7 @@ import com.example.serona.ui.auth.register.PersonalInfoPage
 import com.example.serona.ui.auth.register.RegisterPage
 import com.example.serona.ui.landing.LandingPageCarousel
 import com.example.serona.ui.main.favorite.FavoritePage
+import com.example.serona.ui.main.favorite.FavoriteViewModel
 import com.example.serona.ui.main.tutorial.TutorialDetailPage
 import com.example.serona.ui.main.tutorial.TutorialPage
 import com.example.serona.ui.main.home.HomePage
@@ -120,9 +122,12 @@ fun AppNavGraph(
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) { backStackEntry ->
             val tutorialId = backStackEntry.arguments?.getInt("id") ?: 0
+
             TutorialDetailPage(
                 tutorialId = tutorialId,
-                onBackClick = { navController.popBackStack() }
+                onBackClick = {
+                    navController.popBackStack()
+                }
             )
         }
 

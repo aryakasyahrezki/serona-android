@@ -111,7 +111,7 @@ fun LoginPage(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 color = Color.White,
                 fontFamily = leagueSpartanFontFamily,
-                fontSize = fontSize * 0.1f,
+                fontSize = fontSize * 0.8f,
                 letterSpacing = (space * 0.04f).value.sp
             )
 

@@ -39,7 +39,7 @@ fun FavoritePage(
     val iconSize = (maxHeight * 0.03f)
     val upperBoxHeight = maxHeight * 0.44f
     val horiPadding = maxWidth * 0.05f
-    val vertiPadding = maxHeight * 0.055f
+    val vertiPadding = maxHeight * 0.0625f
     val space = maxHeight * 0.03f
     val buttonSize = maxWidth * 0.07f
 
@@ -58,24 +58,28 @@ fun FavoritePage(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.refreshFavorites()
+    }
+
     Column(
         Modifier
             .fillMaxSize()
             .background(White)
             .padding(vertical = vertiPadding, horizontal = horiPadding)
     ) {
-
+//
         BackButton(
             onBackClick = { onBackClick() },
             buttonSize = buttonSize,
             fontSize = fontSize
         )
-
+        Spacer(modifier = Modifier.height(space * 0.3f))
         // Header Section
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 16.dp)
+                .padding(vertical = space * 0.6f)
         ) {
             Text(
                 "Favorite",
@@ -93,16 +97,14 @@ fun FavoritePage(
             )
         }
 
-        Spacer(Modifier.height(8.dp))
-
+        Spacer(modifier = Modifier.height(space * 0.2f))
         // Search Bar
         TutorialSearchBar(
             query = searchQuery,
             onQueryChange = { searchQuery = it }
         )
 
-        Spacer(Modifier.height(8.dp))
-
+        Spacer(modifier = Modifier.height(space * 0.5f))
         // Favorites List
         if (favorites.isEmpty()) {
             EmptyView()
@@ -110,8 +112,8 @@ fun FavoritePage(
             EmptySearchResultView()
         } else {
             LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(bottom = maxHeight * 0.12f),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(filteredFavorites, key = { it.id }) { tutorial ->
                     TutorialCard(
