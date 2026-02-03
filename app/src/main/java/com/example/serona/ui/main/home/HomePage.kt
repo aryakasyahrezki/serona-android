@@ -96,6 +96,7 @@ import com.example.serona.theme.figtreeFontFamily
 import com.example.serona.ui.component.ScannedInfoCard
 import com.example.serona.ui.component.eventCard
 import com.example.serona.ui.component.guideCard
+import com.example.serona.ui.navigation.Routes
 
 @Composable
 fun HomePage(
@@ -343,7 +344,12 @@ fun HomePage(
                         bgColor = OfficeBg,
                         icon = Icons.Outlined.Apartment,
                         screenHeight = screenHeight,
-                        screenWidth = screenWidth
+                        screenWidth = screenWidth,
+                        onClick = {
+                            navController.navigate(
+                                Routes.navigateToTutorial(occasion = "Office")
+                            )
+                        }
                     )
 
                     eventCard(
@@ -355,7 +361,12 @@ fun HomePage(
                         bgColor = CasualBg,
                         icon = Icons.Outlined.Groups,
                         screenHeight = screenHeight,
-                        screenWidth = screenWidth
+                        screenWidth = screenWidth,
+                        onClick = {
+                            navController.navigate(
+                                Routes.navigateToTutorial(occasion = "Casual")
+                            )
+                        }
                     )
 
                     eventCard(
@@ -367,7 +378,12 @@ fun HomePage(
                         bgColor = FestBg,
                         icon = Icons.Outlined.Attractions,
                         screenHeight = screenHeight,
-                        screenWidth = screenWidth
+                        screenWidth = screenWidth,
+                        onClick = {
+                            navController.navigate(
+                                Routes.navigateToTutorial(occasion = "Festival")
+                            )
+                        }
                     )
 
                     eventCard(
@@ -379,7 +395,12 @@ fun HomePage(
                         bgColor = PartyBg,
                         icon = Icons.Outlined.Celebration,
                         screenHeight = screenHeight,
-                        screenWidth = screenWidth
+                        screenWidth = screenWidth,
+                        onClick = {
+                            navController.navigate(
+                                Routes.navigateToTutorial(occasion = "Party")
+                            )
+                        }
                     )
 
                     eventCard(
@@ -391,7 +412,12 @@ fun HomePage(
                         bgColor = WedBg,
                         icon = Icons.Outlined.Church,
                         screenHeight = screenHeight,
-                        screenWidth = screenWidth
+                        screenWidth = screenWidth,
+                        onClick = {
+                            navController.navigate(
+                                Routes.navigateToTutorial(occasion = "Wedding")
+                            )
+                        }
                     )
                 }
 

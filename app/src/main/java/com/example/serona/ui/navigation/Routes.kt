@@ -9,7 +9,18 @@ object Routes{
 
     //main tab
     const val HOME = "home"
-    const val TUTORIAL = "tutorial"
+
+    const val TUTORIAL = "tutorial/{faceShape}/{skinTone}/{occasion}"
+
+    // Helper untuk navigate - semua parameter nullable dengan default "none"
+    fun navigateToTutorial(
+        faceShape: String? = null,
+        skinTone: String? = null,
+        occasion: String? = null
+    ): String {
+        return "tutorial/${faceShape ?: "none"}/${skinTone ?: "none"}/${occasion ?: "none"}"
+    }
+
     const val DETAIL = "detail"
     const val FAVORITE = "favorite"
     const val PROFILE = "profile"

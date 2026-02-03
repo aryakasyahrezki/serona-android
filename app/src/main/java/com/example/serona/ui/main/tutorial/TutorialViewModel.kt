@@ -1,9 +1,11 @@
 package com.example.serona.ui.main.tutorial
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.serona.data.model.*
 import com.example.serona.data.repository.TutorialRepository
+import com.example.serona.data.session.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -11,8 +13,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TutorialViewModel @Inject constructor(
-    private val repository: TutorialRepository
+    private val repository: TutorialRepository,
+    private val userSession: UserSession,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val navFaceShape: String? = savedStateHandle.get<String>("faceShape")
+        ?.takeIf { it != "none" }
+    private val navSkinTone: String? = savedStateHandle.get<String>("skinTone")
+        ?.takeIf { it != "none" }
+    private val navOccasion: String? = savedStateHandle.get<String>("occasion")
+        ?.takeIf { it != "none" }
 
     private val _allTutorials = MutableStateFlow<List<Tutorial>>(emptyList())
     private val _isLoading = MutableStateFlow(true)
@@ -64,33 +75,53 @@ class TutorialViewModel @Inject constructor(
         )
 
     // Filtered tutorials based on search query and active filters
-    val filteredTutorials: StateFlow<List<Tutorial>> =
-        combine(_allTutorials, _query, _activeFilters) { tutorials, q, filters ->
-            if (q.isBlank() && filters.isEmpty()) {
-                // No query or filter, show all tutorials
-                tutorials
-            } else {
-                tutorials.filter { tutorial ->
-                    // Match search query
-                    val matchQuery = q.isBlank() ||
-                            tutorial.title.contains(q, ignoreCase = true) ||
-                            tutorial.description.contains(q, ignoreCase = true)
+    val filteredTutorials: StateFlow<List<Tutorial>> = combine(
+        _allTutorials,
+        _query,
+        _activeFilters
+    ) { tutorials, query, filters ->
+        var result = tutorials
 
-                    // Match active filters (check if tutorial's subcategory is in active filters)
-                    val matchFilter = filters.isEmpty() ||
-                            (filters.contains(tutorial.sub_category))
-
-                    matchQuery && matchFilter
-                }
+        if (filters.isNotEmpty()) {
+            result = result.filter { tutorial ->
+                filters.contains(tutorial.sub_category)
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
+        }
+
+        if (query.isNotBlank()) {
+            result = result.filter { tutorial ->
+                tutorial.title.contains(query, ignoreCase = true) ||
+                        tutorial.description.contains(query, ignoreCase = true)
+            }
+        }
+
+        result
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
         fetchTutorials()
+        applyInitialFilters()
+    }
+
+    private fun applyInitialFilters() {
+        viewModelScope.launch {
+            val filters = mutableSetOf<String>()
+
+            // Priority 1: Parameter dari navigation
+            navFaceShape?.let { filters.add(it) }
+            navSkinTone?.let { filters.add(it) }
+            navOccasion?.let { filters.add(it) }
+
+            // Priority 2: Data dari UserSession (jika tidak ada parameter)
+            if (navFaceShape == null && navSkinTone == null && navOccasion == null) {
+                userSession.user.first()?.let { user ->
+                    user.faceShape?.let { filters.add(it) }
+                    user.skinTone?.let { filters.add(it) }
+                }
+            }
+
+            _activeFilters.value = filters
+        }
     }
 
     /**

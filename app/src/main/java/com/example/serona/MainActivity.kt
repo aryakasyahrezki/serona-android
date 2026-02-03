@@ -45,11 +45,12 @@ class MainActivity : ComponentActivity() {
 
                 // Ambil rute saat ini
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
+                val currentDestination = navBackStackEntry?.destination
+
+                val isTutorialActive = currentDestination?.route?.startsWith("tutorial") == true
 
                 // Daftar rute yang menampilkan NavBar
-                val mainRoutes = listOf(Routes.HOME, Routes.TUTORIAL, Routes.FAVORITE, Routes.PROFILE)
-                val shouldShowNavBar = currentRoute in mainRoutes
+                val shouldShowNavBar = currentDestination?.route in listOf(Routes.HOME, Routes.FAVORITE, Routes.PROFILE) || isTutorialActive
 
                 Scaffold(
                     modifier = Modifier
@@ -88,31 +89,53 @@ class MainActivity : ComponentActivity() {
                                             .navigationBarsPadding()
                                     ) {
                                         NavBar(
-                                            selectedIndex = when (currentRoute) {
-                                                Routes.HOME -> 0
-                                                Routes.TUTORIAL -> 1
-                                                Routes.FAVORITE -> 2
-                                                Routes.PROFILE -> 3
+                                            selectedIndex = when {
+                                                currentDestination?.route == Routes.HOME -> 0
+                                                isTutorialActive -> 1
+                                                currentDestination?.route == Routes.FAVORITE -> 2
+                                                currentDestination?.route == Routes.PROFILE -> 3
                                                 else -> 0
                                             },
                                             onItemSelected = { index ->
+
+                                                val isAnyTutorialRoute = currentDestination?.route?.startsWith("tutorial") == true
+                                                val isClickingTutorial = index == 1
+
                                                 val targetRoute = when (index) {
                                                     0 -> Routes.HOME
-                                                    1 -> Routes.TUTORIAL
+                                                    1 -> Routes.navigateToTutorial()
                                                     2 -> Routes.FAVORITE
                                                     3 -> Routes.PROFILE
                                                     else -> Routes.HOME
                                                 }
-                                                if (currentRoute != targetRoute) {
+//                                                if (currentDestination?.route != targetRoute) {
+//                                                    navController.navigate(targetRoute) {
+//                                                        // Memastikan Home selalu ada di dasar stack
+//                                                        popUpTo(Routes.HOME) {
+//                                                            saveState = true
+//                                                        }
+//                                                        // Menghindari duplikasi instance halaman
+//                                                        launchSingleTop = true
+//                                                        // Mengembalikan state (posisi scroll, dll)
+//                                                        restoreState = true
+//                                                    }
+//                                                }
+
+                                                val isAlreadyOnTarget = if (isClickingTutorial) {
+                                                    isAnyTutorialRoute
+                                                } else {
+                                                    currentDestination?.route == targetRoute
+                                                }
+
+                                                if (!isAlreadyOnTarget) {
                                                     navController.navigate(targetRoute) {
-                                                        // Memastikan Home selalu ada di dasar stack
-                                                        popUpTo(Routes.HOME) {
+                                                        // Gunakan startDestinationId agar lebih fleksibel
+                                                        popUpTo(navController.graph.startDestinationId) {
                                                             saveState = true
+                                                            inclusive = false
                                                         }
-                                                        // Menghindari duplikasi instance halaman
                                                         launchSingleTop = true
-                                                        // Mengembalikan state (posisi scroll, dll)
-                                                        restoreState = true
+                                                        restoreState = false
                                                     }
                                                 }
                                             },

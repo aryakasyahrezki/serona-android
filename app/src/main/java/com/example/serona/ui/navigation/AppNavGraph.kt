@@ -77,8 +77,34 @@ fun AppNavGraph(
             HomePage(navController)
         }
 
+//        composable(
+//            Routes.TUTORIAL,
+//            enterTransition = { fadeIn(animationSpec = tween(200)) }
+//        ) {
+//            TutorialPage(
+//                onTutorialClick = { tutorialId ->
+//                    navController.navigate("${Routes.DETAIL}/$tutorialId")
+//                },
+//                onBackClick = { navController.popBackStack() }
+//            )
+//        }
+
         composable(
-            Routes.TUTORIAL,
+            route = Routes.TUTORIAL,
+            arguments = listOf(
+                navArgument("faceShape") {
+                    type = NavType.StringType
+                    defaultValue = "none"
+                },
+                navArgument("skinTone") {
+                    type = NavType.StringType
+                    defaultValue = "none"
+                },
+                navArgument("occasion") {
+                    type = NavType.StringType
+                    defaultValue = "none"
+                }
+            ),
             enterTransition = { fadeIn(animationSpec = tween(200)) }
         ) {
             TutorialPage(
