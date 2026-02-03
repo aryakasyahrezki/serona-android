@@ -326,7 +326,8 @@ fun HomePage(
                     fontSize = fontSize * 0.57,
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.Normal,
-                    color = BodyText
+                    color = BodyText,
+                    lineHeight = fontSize * 0.9f
                 )
 
                 Spacer(modifier = Modifier.height(space * 0.3f))
@@ -574,7 +575,8 @@ fun ScanDialog(
                             fontFamily = figtreeFontFamily,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = fontSize * 0.65f,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = White
                         )
                     }
                 }

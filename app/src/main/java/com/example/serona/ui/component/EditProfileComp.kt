@@ -112,6 +112,7 @@ fun EditProfileField(
                     )
                 },
 
+
                 trailingIcon = {
                     if (isDropdown) {
                         androidx.compose.material3.Icon(

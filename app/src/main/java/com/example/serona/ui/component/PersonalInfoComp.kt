@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -143,20 +145,29 @@ fun PersonalInfoTextField(
                 label = {
                     Text(
                         label,
-                        fontSize = labelFontSize,
+                        fontSize = labelFontSize * 0.9f,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 textStyle = TextStyle(
-                    fontSize = fontSize * 0.8f,
+                    fontSize = fontSize * 0.6f,
                     fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Medium,
                     color = MutedLight
                 ),
                 shape = RoundedCornerShape(15.dp),
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                    if (isDropdown) {
+                        Icon(
+                            imageVector = if (expanded)
+                                androidx.compose.material.icons.Icons.Filled.KeyboardArrowUp
+                            else
+                                androidx.compose.material.icons.Icons.Filled.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = MutedLight
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -211,7 +222,8 @@ fun PersonalInfoTextField(
                                         item,
                                         fontSize = fontSize * 0.7f,
                                         fontFamily = figtreeFontFamily,
-                                        fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal
+                                        fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal,
+                                        color = MutedLight
                                     )
                                 },
                                 onClick = {

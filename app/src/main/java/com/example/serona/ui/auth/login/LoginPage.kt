@@ -40,6 +40,7 @@ import com.example.serona.ui.auth.ForgotPasswordState
 import com.example.serona.ui.auth.LoginFormState
 import com.example.serona.ui.component.AuthPasswordField
 import com.example.serona.ui.component.AuthTextField
+import com.example.serona.ui.navigation.Routes
 
 @Composable
 fun LoginPage(
@@ -63,11 +64,18 @@ fun LoginPage(
         when(authState){
             is AuthState.Authenticated-> {
                 navController.navigate("home") {
-                    popUpTo("login") { // artinya pop up to (jadi semua screen sampe login dihapus biar kalo user back lgsg ke luar, ngga login ulang lagi)
+                    popUpTo("login") {
                         inclusive = true
                     }
                 }
 
+                loginViewModel.resetLoginState()
+            }
+
+            is AuthState.NeedPersonalInfo -> {
+                navController.navigate(Routes.PERSONALINFO) {
+                    popUpTo("login") { inclusive = true }
+                }
                 loginViewModel.resetLoginState()
             }
 
@@ -200,6 +208,7 @@ fun LoginCard(
                     Text(
                         "Forgot Password",
                         color = Primary,
+                        fontFamily = figtreeFontFamily
                     )
                 }
 

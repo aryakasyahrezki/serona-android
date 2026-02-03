@@ -80,16 +80,7 @@ class UserRepository @Inject constructor(
         return try {
             val response = userApi.submitPersonalInfo(request)
             if (response.isSuccessful) {
-                // Ambil data lama, update kolom tertentu, simpan lagi
-                val current = userDao.getUserFlow().first()
-                current?.let {
-                    val updated = it.updateWith(
-                        gender = request.gender,
-                        country = request.country,
-                        birthDate = request.birth_date
-                    )
-                    userDao.insertUser(updated)
-                }
+                syncFullProfile()
                 Result.success(Unit)
             } else {
                 Result.failure(Exception(parseError(response.errorBody()?.string())))
@@ -101,19 +92,22 @@ class UserRepository @Inject constructor(
     suspend fun syncFullProfile(): Result<User> {
         return try {
             val response = userApi.getProfile()
-            if (response.isSuccessful && response.body()?.success == true) {
-                val remote = response.body()!!.data
-                val entity = remote.toEntity() // Pakai Mapper yang kita buat tadi
+            val body = response.body()
 
-                userDao.insertUser(entity) // Update Database Lokal
+            // Cek apakah body dan data tidak null secara aman
+            if (response.isSuccessful && body?.success == true && body.data != null) {
+                val remote = body.data
+                val entity = remote.toEntity()
+                userDao.insertUser(entity)
                 val user = entity.toDomain()
-                userSession.setUser(user) // Update RAM Session
-
+                userSession.setUser(user)
                 Result.success(user)
             } else {
-                Result.failure(Exception(parseError(response.errorBody()?.string())))
+                Result.failure(Exception("Profile data is empty"))
             }
-        } catch (e: Exception) { Result.failure(Exception(mapException(e))) }
+        } catch (e: Exception) {
+            Result.failure(Exception(mapException(e)))
+        }
     }
 
     // update dari editProfile

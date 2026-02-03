@@ -142,14 +142,18 @@ fun SplashFullBackground(
 
     LaunchedEffect(authState) {
         when (authState) {
-            AuthState.Authenticated, AuthState.Unauthenticated -> {
+            AuthState.Authenticated, AuthState.Unauthenticated, AuthState.NeedPersonalInfo -> {
                 delay(3000)
 
                 if (authState == AuthState.Authenticated) {
                     navController.navigate(Routes.HOME) {
                         popUpTo(Routes.SPLASH) { inclusive = true }
                     }
-                } else {
+                } else if(authState == AuthState.NeedPersonalInfo){
+                    navController.navigate(Routes.PERSONALINFO) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                    }
+                }else {
                     navController.navigate(Routes.LANDING) {
                         popUpTo(Routes.SPLASH) { inclusive = true }
                     }
