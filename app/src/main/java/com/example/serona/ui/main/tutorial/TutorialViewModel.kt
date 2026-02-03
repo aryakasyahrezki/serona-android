@@ -53,7 +53,7 @@ class TutorialViewModel @Inject constructor(
             "Heart",
             "Round",
             "Square",
-            "Rectangle"
+            "Oblong"
         ),
         "Skin Tone" to listOf(
             "Fair-Light",
