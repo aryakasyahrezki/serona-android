@@ -143,7 +143,6 @@ class TutorialViewModel @Inject constructor(
                 val tutorials = repository.getTutorials()
                 _allTutorials.value = tutorials
             } catch (e: Exception) {
-                // Handle error - you might want to show error state to user
                 e.printStackTrace()
 //                _allTutorials.value = emptyList()
             } finally {

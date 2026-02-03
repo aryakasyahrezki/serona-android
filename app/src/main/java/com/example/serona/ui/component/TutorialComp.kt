@@ -28,9 +28,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -67,8 +70,7 @@ fun TutorialCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Grey30),
-//        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = Grey30)
     ) {
         Box(
             modifier = Modifier
@@ -103,13 +105,12 @@ fun TutorialCard(
                 Column(
                     modifier = Modifier
                         .weight(1f)
-//                    .fillMaxHeight()
                 ) {
                     // Tag
                     Text(
                         text = tutorial.sub_category,
                         color = White,
-                        fontSize = 9.sp,
+                        fontSize = fontSize * 0.4f,
                         fontWeight = FontWeight.Bold,
                         fontFamily = figtreeFontFamily,
                         lineHeight = 15.sp,
@@ -127,7 +128,7 @@ fun TutorialCard(
                     Text(
                         text = tutorial.title,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp,
+                        fontSize = fontSize * 0.6f,
                         color = Color.Black,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
@@ -140,7 +141,7 @@ fun TutorialCard(
                     // Description
                     Text(
                         text = tutorial.description,
-                        fontSize = 11.sp,
+                        fontSize = fontSize * 0.5f,
                         fontFamily = figtreeFontFamily,
                         color = Color(0xFF666666),
                         maxLines = 2,
@@ -154,7 +155,7 @@ fun TutorialCard(
                         text = "Read more",
                         color = Color(0xFFDC143C),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 11.sp,
+                        fontSize = fontSize * 0.5f,
                         fontFamily = figtreeFontFamily
                     )
                 }
@@ -207,7 +208,6 @@ fun SectionTitle(title: String) {
         color = Heading,
         fontWeight = FontWeight.SemiBold,
         fontFamily = figtreeFontFamily,
-//        modifier = Modifier.padding(vertical = 4.dp)
     )
 }
 
@@ -218,18 +218,20 @@ fun SectionTitle(title: String) {
 @Composable
 fun TutorialSearchBar(
     query: String,
-    onQueryChange: (String) -> Unit
+    onQueryChange: (String) -> Unit,
+    fontSize: TextUnit
 ) {
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,
         modifier = Modifier
             .fillMaxWidth(),
-//            .padding(horizontal = 8.dp),
         placeholder = {
             Text(
                 "Search",
-                color = ParagraphLight
+                color = ParagraphLight,
+                fontFamily = figtreeFontFamily,
+                fontSize = fontSize * 0.8f
             )
         },
         singleLine = true,
@@ -261,7 +263,7 @@ fun FilterRow(
     activeFilters: Set<String>,
     isFilterActive: Boolean,
     onFilterSelected: (String) -> Unit,
-    onClearAllFilters: () -> Unit
+    fontSize: TextUnit
 ) {
     LazyRow(
         modifier = Modifier
@@ -275,7 +277,8 @@ fun FilterRow(
                 text = "Filters",
                 isActive = isFilterActive,
                 showIcon = true,
-                onClick = { /* TODO: Show filter dialog */ }
+                onClick = { /* TODO: Show filter dialog */ },
+                fontSize = fontSize
             )
         }
 
@@ -286,7 +289,8 @@ fun FilterRow(
                 categoryName = category,
                 subOptions = subCategoryOptions[category] ?: emptyList(),
                 activeFilters = activeFilters,
-                onFilterSelected = onFilterSelected
+                onFilterSelected = onFilterSelected,
+                fontSize = fontSize
             )
         }
     }
@@ -297,7 +301,8 @@ fun FilterButton(
     text: String,
     isActive: Boolean,
     showIcon: Boolean = false,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    fontSize: TextUnit
 ) {
     Box(
         modifier = Modifier
@@ -324,15 +329,16 @@ fun FilterButton(
                     imageVector = Icons.Default.FilterList,
                     contentDescription = "Filter",
                     tint = Primary,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
             }
 
             Text(
                 text = text,
                 color = if (isActive) Primary else Color(0xFF666666),
-                fontSize = 14.sp,
-                fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal
+                fontSize = fontSize * 0.6f,
+                fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal,
+                fontFamily = figtreeFontFamily
             )
         }
     }
@@ -343,10 +349,13 @@ fun FilterDropDownButton(
     categoryName: String,
     subOptions: List<String>,
     activeFilters: Set<String>,
-    onFilterSelected: (String) -> Unit
+    onFilterSelected: (String) -> Unit,
+    fontSize: TextUnit
 ) {
 
     var expanded by remember { mutableStateOf(false) }
+    var buttonWidth by remember { mutableStateOf(0) }
+    val density = LocalDensity.current
 
     // Check if any sub-option from this category is active
     val hasActiveFilter = subOptions.any { activeFilters.contains(it) }
@@ -360,6 +369,10 @@ fun FilterDropDownButton(
                 .background(
                     if (hasActiveFilter) Color(0xFFFFF0F5) else White
                 )
+                .onSizeChanged() {
+                    // 2. Tangkap lebar tombol saat ukurannya berubah
+                    buttonWidth = it.width
+                }
                 .border(
                     width = 1.dp,
                     color = if (hasActiveFilter) Primary else Color(0xFFE0E0E0),
@@ -376,8 +389,9 @@ fun FilterDropDownButton(
                 Text(
                     text = categoryName,
                     color = if (hasActiveFilter) Primary else Color(0xFF666666),
-                    fontSize = 14.sp,
-                    fontWeight = if (hasActiveFilter) FontWeight.SemiBold else FontWeight.Normal
+                    fontSize = fontSize * 0.6f,
+                    fontWeight = if (hasActiveFilter) FontWeight.SemiBold else FontWeight.Normal,
+                    fontFamily = figtreeFontFamily
                 )
 
                 Icon(
@@ -394,6 +408,7 @@ fun FilterDropDownButton(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
+                .width(with(density) { buttonWidth.toDp() })
                 .background(White)
                 .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
         ) {
@@ -406,13 +421,14 @@ fun FilterDropDownButton(
                             text = subOption,
                             color = if (isSelected) Primary else Color(0xFF333333),
                             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                            fontSize = 14.sp,
+                            fontSize = fontSize * 0.6f,
+                            fontFamily = figtreeFontFamily,
                             modifier = Modifier.fillMaxWidth()
                         )
                     },
                     onClick = {
                         onFilterSelected(subOption) // Toggle filter
-                        expanded = false // ✅ TUTUP DROPDOWN SETELAH PILIH
+                        expanded = false
                     },
                     modifier = Modifier.background(
                         if (isSelected) Color(0xFFFFF0F5) else White
@@ -430,7 +446,8 @@ fun FilterDropDownButton(
 @Composable
 fun ActiveFilterChip(
     text: String,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    fontSize: TextUnit
 ) {
     Box(
         modifier = Modifier
@@ -447,8 +464,9 @@ fun ActiveFilterChip(
             Text(
                 text = text,
                 color = Primary,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
+                fontSize = fontSize * 0.55f,
+                fontWeight = FontWeight.Medium,
+                fontFamily = figtreeFontFamily
             )
             Icon(
                 imageVector = Icons.Default.Close,
@@ -475,13 +493,15 @@ fun EmptyView() {
             Text(
                 "No Tutorials!",
                 style = MaterialTheme.typography.bodyLarge,
-                color = BodyText
+                color = BodyText,
+                fontFamily = figtreeFontFamily
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 "Try again with other keywords",
                 style = MaterialTheme.typography.bodyMedium,
-                color = ParagraphLight
+                color = ParagraphLight,
+                fontFamily = figtreeFontFamily
             )
         }
     }
@@ -552,7 +572,6 @@ fun TutorialStepCard(
 
         Spacer(modifier = Modifier.height(space * 0.5f))
 
-        // Step Card Content
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -563,10 +582,9 @@ fun TutorialStepCard(
             Box(
                 modifier = Modifier.fillMaxWidth()
             ){
-                // 🌸 PINK GRADIENT STRIP (LEFT)
                 Box(
                     modifier = Modifier
-                        .width(14.dp)               // ketebalan pink
+                        .width(14.dp)
                         .fillMaxHeight()
                         .background(
                             brush = Brush.horizontalGradient(
@@ -583,10 +601,6 @@ fun TutorialStepCard(
                         )
                 )
 
-                //disini
-                // =========================
-                // 🔴 VERSION 1: COLOR (HORIZONTAL)
-                // =========================
                 if (parsedColor != null && imageUrl.isNullOrEmpty()) {
 
                     Row(
@@ -613,7 +627,7 @@ fun TutorialStepCard(
                         ) {
                             Text(
                                 text = title,
-                                fontSize = 16.sp,
+                                fontSize = fontSize * 0.6f,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Heading,
                                 fontFamily = figtreeFontFamily
@@ -621,8 +635,8 @@ fun TutorialStepCard(
 
                             Text(
                                 text = description,
-                                fontSize = 14.sp,
-                                lineHeight = 15.sp,
+                                fontSize = fontSize * 0.6f,
+                                lineHeight = fontSize * 0.5f,
                                 color = BodyText,
                                 fontFamily = figtreeFontFamily
                             )
@@ -630,9 +644,6 @@ fun TutorialStepCard(
                     }
                 }
 
-                // =========================
-                // 🔵 VERSION 2: IMAGE (VERTICAL)
-                // =========================
                 else if (!imageUrl.isNullOrEmpty()) {
 
                     Column(
@@ -658,7 +669,6 @@ fun TutorialStepCard(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 12.sp,
                                     fontFamily = figtreeFontFamily,
-//                                lineHeight = 13.sp
                                 )
                             }
 
@@ -683,9 +693,6 @@ fun TutorialStepCard(
                                 .width(maxWidth * 0.7f)
                                 .height(maxHeight * 0.3f)
                                 .align(Alignment.CenterHorizontally),
-//                            .fillMaxWidth()
-//                            .height(180.dp)
-//                            .clip(RoundedCornerShape(12.dp)),
                             contentScale = ContentScale.Crop
                         )
 
@@ -703,77 +710,6 @@ fun TutorialStepCard(
                 }
 
             }
-
-//            Column(modifier = Modifier.padding(16.dp)) {
-//                // Step number and title
-//                Row(verticalAlignment = Alignment.CenterVertically) {
-//                    Box(
-//                        modifier = Modifier
-//                            .size(24.dp)
-//                            .clip(CircleShape)
-//                            .background(Primary),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        Text(
-//                            text = stepNumber.toString(),
-//                            color = White,
-//                            fontWeight = FontWeight.Bold,
-//                            fontFamily = figtreeFontFamily,
-//                            style = MaterialTheme.typography.bodyLarge
-//                        )
-//                    }
-//
-//                    Spacer(Modifier.width(12.dp))
-//
-//                    Text(
-//                        text = title,
-//                        style = MaterialTheme.typography.titleMedium,
-//                        fontWeight = FontWeight.Bold,
-//                        color = Heading,
-//                        fontSize = 16.sp,
-//                        fontFamily = figtreeFontFamily
-//                    )
-//                }
-//
-//                Spacer(modifier = Modifier.height(space * 0.25f))
-//
-//                // Dynamic content: Image OR Color Circle
-//                when {
-//                    // Show image if available
-//                    !imageUrl.isNullOrEmpty() -> {
-//                        AsyncImage(
-//                            model = imageUrl,
-//                            contentDescription = title,
-//                            modifier = Modifier
-//                                .width(maxWidth * 0.7f)
-//                                .height(maxHeight * 0.3f)
-//                                .align(Alignment.CenterHorizontally)
-////                                .clip(RoundedCornerShape(12.dp)),
-////                            contentScale = ContentScale.Crop
-//                        )
-//                        Spacer(Modifier.height(12.dp))
-//                    }
-//                    // Show color circle if hex available
-//                    parsedColor != null -> {
-//                        Box(
-//                            modifier = Modifier
-//                                .size(80.dp)
-//                                .clip(CircleShape)
-//                                .background(parsedColor)
-//                        )
-//                        Spacer(Modifier.height(12.dp))
-//                    }
-//                }
-//
-//                // Description
-//                Text(
-//                    text = description,
-//                    fontSize = 14.sp,
-//                    lineHeight = 20.sp,
-//                    color = BodyText,
-//                    fontFamily = figtreeFontFamily
-//                )
-//            }
         }
     }
 }

@@ -96,7 +96,8 @@ fun TutorialPage(
         // Search Bar
         TutorialSearchBar(
             query = searchQuery,
-            onQueryChange = vm::onQueryChange
+            onQueryChange = vm::onQueryChange,
+            fontSize = fontSize
         )
 
         Spacer(modifier = Modifier.height(space * 0.5f))
@@ -108,7 +109,7 @@ fun TutorialPage(
             activeFilters = activeFilters,
             isFilterActive = isFilterActive,
             onFilterSelected = vm::onFilterSelected,
-            onClearAllFilters = vm::clearAllFilters
+            fontSize = fontSize
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -126,7 +127,8 @@ fun TutorialPage(
                 activeFilters.forEach { filter ->
                     ActiveFilterChip(
                         text = filter,
-                        onRemove = { vm.onFilterSelected(filter) }
+                        onRemove = { vm.onFilterSelected(filter) },
+                        fontSize = fontSize
                     )
                 }
 

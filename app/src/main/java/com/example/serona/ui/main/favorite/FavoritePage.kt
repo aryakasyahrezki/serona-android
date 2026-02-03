@@ -101,7 +101,8 @@ fun FavoritePage(
         // Search Bar
         TutorialSearchBar(
             query = searchQuery,
-            onQueryChange = { searchQuery = it }
+            onQueryChange = { searchQuery = it },
+            fontSize = fontSize
         )
 
         Spacer(modifier = Modifier.height(space * 0.5f))

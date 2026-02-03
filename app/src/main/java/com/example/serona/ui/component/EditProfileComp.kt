@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -93,6 +95,13 @@ fun EditProfileField(
                 readOnly = isDropdown,
                 singleLine = true,
 
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = fontSize * 0.5f,
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    color = MutedLight
+                ),
+
                 placeholder = {
                     Text(
                         text = placeholder,
@@ -105,7 +114,14 @@ fun EditProfileField(
 
                 trailingIcon = {
                     if (isDropdown) {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                        androidx.compose.material3.Icon(
+                            imageVector = if (expanded)
+                                androidx.compose.material.icons.Icons.Filled.KeyboardArrowUp
+                            else
+                                androidx.compose.material.icons.Icons.Filled.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = MutedLight
+                        )
                     }
                 },
 
@@ -149,7 +165,7 @@ fun EditProfileField(
                     Column(
                         modifier = Modifier
                             .width(with(density) { textFieldWidth.toDp() })
-                            .heightIn(max = space * 3.5f)
+                            .heightIn(max = space * 3.1f)
                             .shadow(elevation = 8.dp, shape = RoundedCornerShape(15.dp))
                             .background(
                                 color = White, // Warna latar belakang menu
@@ -165,7 +181,9 @@ fun EditProfileField(
                                         item,
                                         fontSize = fontSize * 0.5f,
                                         fontFamily = figtreeFontFamily,
-                                        fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal
+                                        fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal,
+                                        color = MutedLight
+
                                     )
                                 },
                                 onClick = {
