@@ -5,10 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.serona.data.repository.FaceRepository
-import com.example.serona.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -17,44 +15,54 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import javax.inject.Inject
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import javax.inject.Inject
 
+/**
+ * ViewModel for the Face Scan Menu, handling image uploads from the gallery.
+ * It manages the loading state, error messages, and data sanitization before navigation.
+ */
 @HiltViewModel
 class FaceScanMenuViewModel @Inject constructor(
-    private val repository: FaceRepository // Sekarang menggunakan Repository
+    private val repository: FaceRepository
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage = _errorMessage.asStateFlow()
 
+    /**
+     * Clears the current error message to reset the UI state.
+     */
     fun clearError() { _errorMessage.value = null }
 
+    /**
+     * Uploads the selected image to the server and processes the analysis results.
+     * It includes data cleaning (Regex) to ensure the result is ready for display.
+     */
     fun uploadAndAnalyzeImage(file: File, navController: NavController) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // 1. Siapkan file untuk dikirim
+                // Prepare the image file for multipart upload
                 val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
-                // 2. Panggil fungsi di repository
+                // Call the repository to handle the network request
                 val result = repository.uploadFaceImage(body)
 
-                // 3. Jika berhasil, pindah ke layar hasil
                 if (result.shape != null && result.skintone != null) {
-                    // FUNGSI PEMBERSIH:
-                    // 1. Ambil teks sebelum kurung (jika ada)
-                    // 2. Hapus semua karakter yang bukan huruf (seperti + atau %)
-                    // 3. Trim spasi
+                    /**
+                     * DATA SANITIZATION LOGIC
+                     * Cleans the server output by removing parentheses, percentages, and special characters.
+                     * Example: "Heart+(96%)" becomes "Heart".
+                     */
                     val cleanShape = result.shape
-                        .substringBefore("(")       // "Heart+(96%)" -> "Heart+"
-                        .replace(Regex("[^a-zA-Z]"), "") // "Heart+" -> "Heart"
+                        .substringBefore("(")
+                        .replace(Regex("[^a-zA-Z]"), "")
                         .trim()
 
                     val cleanTone = result.skintone
@@ -69,13 +77,13 @@ class FaceScanMenuViewModel @Inject constructor(
                         Log.d("SCAN_DEBUG", "Navigating with: $cleanShape and $cleanTone")
                         navController.navigate("result/$encodedShape/$encodedTone")
                     }
-                }else {
-                    // KONDISI: Server membalas tapi data kosong (Wajah tidak terdeteksi)
+                } else {
+                    // Handles cases where the server returns empty data (no face detected)
                     _errorMessage.value = "Face not detected. Make sure the photo is a close-up, well-lit, and not too far away."
                 }
             } catch (e: Exception) {
-                Log.e("SCAN_ERROR", "Detail Error: ${e.message}")
-                // Opsional: Kamu bisa set State baru untuk nampilin pesan error di UI
+                Log.e("SCAN_ERROR", "Error detail: ${e.message}")
+                _errorMessage.value = "Failed to connect to the server. Please check your internet connection."
             } finally {
                 _isLoading.value = false
             }

@@ -10,8 +10,6 @@ import com.example.serona.data.model.FaceDetectionResponse
 import com.example.serona.data.api.FaceAnalysisApi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -20,11 +18,17 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * ViewModel for the Live Camera Scanning interface.
+ * Coordinates real-time face detection progress and handles automated image
+ * submission once the detection threshold is met.
+ */
 @HiltViewModel
 class ScanViewModel @Inject constructor(
     private val apiService: FaceAnalysisApi
 ) : ViewModel() {
 
+    // --- UI STATES ---
     private val _showInstructionPopup = mutableStateOf(true)
     val showInstructionPopup: State<Boolean> = _showInstructionPopup
 
@@ -40,128 +44,107 @@ class ScanViewModel @Inject constructor(
     private val _scanResult = mutableStateOf<FaceDetectionResponse?>(null)
     val scanResult: State<FaceDetectionResponse?> = _scanResult
 
-    private var rescanJob: Job? = null
-
-    // Versi private untuk diubah-ubah di dalam ViewModel
     private var _isCurrentlyUploading = mutableStateOf(false)
-
-    // Versi publik untuk dibaca di ScanScreen (Warning akan hilang)
     val isCurrentlyUploading: State<Boolean> = _isCurrentlyUploading
 
-    // --- FUNGSI BARU UNTUK MENGHILANGKAN ERROR ---
     /**
-     * Fungsi ini ditambahkan agar ScanScreen.kt tidak error saat mencoba memanggilnya.
+     * Closes the initial instruction guide and activates the camera analysis.
      */
-
-
     fun dismissPopup() {
         _showInstructionPopup.value = false
         _isScanning.value = true
     }
 
+    /**
+     * Logic for incremental face detection.
+     * Increments the progress bar and triggers upload when the scan is "complete" (1.0f).
+     */
     fun onFaceDetected(currentFile: File? = null) {
-        if (!_isScanning.value) return
-        _progress.floatValue += 0.3f
-        if (_progress.floatValue >= 1.0f) {
-            _progress.floatValue = 1.0f
-            onFirstScanComplete(currentFile)
+        viewModelScope.launch(Dispatchers.Main) {
+            if (!_isScanning.value || _isCurrentlyUploading.value) return@launch
+
+            _progress.floatValue += 0.35f
+
+            if (_progress.floatValue >= 1.0f) {
+                _progress.floatValue = 1.0f
+                _isScanning.value = false
+                onFirstScanComplete(currentFile)
+            }
         }
     }
 
+    /**
+     * Resets scan progress if the subject moves out of the camera frame.
+     */
     fun onFaceLost() {
         if (_isScanning.value && !_showRecommendationButton.value) {
             _progress.floatValue = 0f
         }
     }
 
+    /**
+     * Handles the automated upload process once a stable face is captured.
+     * Implements multi-tier performance logging for thesis evaluation.
+     */
     fun onFirstScanComplete(file: File?) {
-        // Jika file kosong atau laptop masih sibuk memproses foto sebelumnya, skip (jangan kirim dulu)
         if (file == null || _isCurrentlyUploading.value) return
 
-        viewModelScope.launch(Dispatchers.IO) { // Pindah ke jalur background agar kamera GAK LAG
-            try {
-                _isCurrentlyUploading.value = true // KUNCI: Pintu ditutup sementara
+        // TIMER 3 START: Captures the timestamp before initiating the network request.
+        val startTime = System.currentTimeMillis()
+        _isCurrentlyUploading.value = true
 
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
                 val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
-                // Tembak API
                 val response = apiService.detectFace(body)
 
-                // Balik ke Main Thread untuk update UI (karena State hanya bisa diubah di Main)
                 withContext(Dispatchers.Main) {
                     if (response != null &&
                         !response.shape.isNullOrBlank() &&
                         !response.skintone.isNullOrBlank()) {
 
+                        // TIMER 3 END: Calculates the total User Experience latency.
+                        val totalTime = System.currentTimeMillis() - startTime
+
+                        /**
+                         * PERFORMANCE LOGS
+                         * Essential for analyzing the impact of network latency vs model inference.
+                         */
+                        // This log tracks the total round-trip time (End-to-End Latency)
+                        // from the moment the request is initiated until the result is received.
+                        Log.d("PERFORMANCE_TEST", ">>> Total Response Time (UX): $totalTime ms")
+
+                        // This log tracks the pure mathematical prediction time on the server,
+                        // excluding network latency and image decoding.
+                        Log.d("PERFORMANCE_TEST", ">>> Server Model Classification: ${response.serverInferenceMs} ms")
+
                         _scanResult.value = response
                         _showRecommendationButton.value = true
                     }
 
-                    // Reset progress agar bar "berdetak" terus (Live Scan Feel)
                     _progress.floatValue = 0.0f
                     _isScanning.value = true
+                    _isCurrentlyUploading.value = false
                 }
 
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    android.util.Log.e("ScanViewModel", "Scan failed: ${e.message}")
+                    Log.e("ScanViewModel", "Network Failure: ${e.message}")
                     _progress.floatValue = 0.0f
                     _isScanning.value = true
+                    _isCurrentlyUploading.value = false
                 }
-            } finally {
-                // APAPUN yang terjadi (berhasil atau error), buka kunci agar foto selanjutnya bisa dikirim
-                _isCurrentlyUploading.value = false
             }
         }
     }
 
-    fun uploadFaceImage(file: File) {
-        viewModelScope.launch {
-            try {
-                val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
-                val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
-                val response = apiService.detectFace(body)
-                _scanResult.value = response
-            } catch (e: Exception) {
-                _scanResult.value = FaceDetectionResponse(
-                    status = "failed",
-                    shape = "Error: Server Offline",
-                    skintone = null,
-                    message = e.message
-                )
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun startAutoRescan(file: File) {
-        rescanJob?.cancel()
-        rescanJob = viewModelScope.launch {
-            while (true) {
-                delay(1500)
-                uploadFaceImage(file)
-            }
-        }
-    }
-
-    fun resetScanner() {
-        rescanJob?.cancel()
-        _isScanning.value = true
-        _progress.floatValue = 0f
-        _scanResult.value = null
-        _showRecommendationButton.value = false
-        _showInstructionPopup.value = true
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        rescanJob?.cancel()
-    }
-
+    /**
+     * Stops the camera processing and resets the progress state.
+     */
     fun stopScanning() {
         _isScanning.value = false
         _progress.floatValue = 0f
-        // Pastikan imageProxy.close() dipanggil di analyzer jika isScanning false
     }
 }

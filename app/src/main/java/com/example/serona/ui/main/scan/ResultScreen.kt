@@ -1,5 +1,6 @@
 package com.example.serona.ui.main.scan
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,10 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,48 +19,46 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.serona.R
 import com.example.serona.theme.*
 import com.example.serona.ui.navigation.Routes
-import java.net.URLDecoder
 
+/**
+ * Screen that displays the final beauty analysis results.
+ * It shows the user's face shape and skin tone along with personalized descriptions.
+ */
 @Composable
 fun ResultScreen(
     navController: NavController,
     viewModel: ResultViewModel = hiltViewModel()
 ) {
-    // 1. KONFIGURASI RESPONSIF
     val configuration = LocalConfiguration.current
+    val context = LocalContext.current
+    val state by viewModel.uiState.collectAsState()
+
     val maxWidth = configuration.screenWidthDp.dp
     val maxHeight = configuration.screenHeightDp.dp
-
-    // Trik minDimension: Supaya font/jarak tidak meledak saat Landscape
     val minDimension = if (maxWidth < maxHeight) maxWidth else maxHeight
     val baseFontSize = (minDimension.value * 0.05f).sp
-
-    // Tinggi tombol yang dikunci (Min 48dp - Max 60dp) agar tidak gepeng saat miring
     val buttonHeight = (maxHeight * 0.07f).coerceIn(48.dp, 60.dp)
 
-    val state by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
+    val decodedShape = viewModel.decodedShape
+    val decodedTone = viewModel.decodedTone
 
+    /**
+     * Side effect to handle user feedback messages (Toasts) for save operations.
+     */
     LaunchedEffect(state.saveSuccess, state.errorMessage) {
         state.errorMessage?.let { msg ->
-            android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
             viewModel.clearError()
         }
     }
-
-    // Ambil data yang sudah bersih dari ViewModel
-    val decodedShape = viewModel.decodedShape
-    val decodedTone = viewModel.decodedTone
 
     Column(
         modifier = Modifier
@@ -73,21 +69,23 @@ fun ResultScreen(
             .padding(horizontal = maxWidth * 0.06f, vertical = maxHeight * 0.02f),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // HEADER
         Text(
             text = "Beauty Profile",
             fontSize = baseFontSize * 1.2f,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFFF04B63),
+            color = Primary,
             fontFamily = figtreeFontFamily
         )
 
         Spacer(modifier = Modifier.height(maxHeight * 0.02f))
 
-        // AVATAR DISPLAY
+        /** * AVATAR BOX
+         * Displays a specific vector asset based on the combination
+         * of detected face shape and skin tone.
+         */
         Box(
             modifier = Modifier
-                .size(minDimension * 0.4f) // Mengikuti sisi terpendek agar tetap bulat
+                .size(minDimension * 0.4f)
                 .background(White, RoundedCornerShape(minDimension * 0.05f))
                 .padding(minDimension * 0.025f),
             contentAlignment = Alignment.Center
@@ -101,9 +99,7 @@ fun ResultScreen(
 
         Spacer(modifier = Modifier.height(maxHeight * 0.025f))
 
-        // RESULT DETAILS CARD
         Card(
-            // Saat miring (landscape), lebar kartu dibatasi 70% agar teks enak dibaca
             modifier = Modifier.fillMaxWidth(if (maxWidth > maxHeight) 0.7f else 1f),
             colors = CardDefaults.cardColors(containerColor = White),
             shape = RoundedCornerShape(minDimension * 0.04f),
@@ -114,7 +110,7 @@ fun ResultScreen(
                     text = "Personalized Analysis",
                     fontSize = baseFontSize * 0.9f,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFFF04B63),
+                    color = Primary,
                     fontFamily = figtreeFontFamily
                 )
 
@@ -144,21 +140,18 @@ fun ResultScreen(
 
         Spacer(modifier = Modifier.height(maxHeight * 0.04f))
 
-        // ACTION BUTTONS
         Column(
             modifier = Modifier.fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Button(
-                onClick = { /* Navigasi ke Rekomendasi */ },
+                onClick = { /* Navigate to Recommendations */ },
                 modifier = Modifier.fillMaxWidth().height(buttonHeight * 0.8f),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text("See Recommendation", fontSize = baseFontSize * 0.8f, fontWeight = FontWeight.Bold, color = White)
             }
-
-
 
             OutlinedButton(
                 onClick = { viewModel.saveToProfile() },
@@ -187,13 +180,13 @@ fun ResultScreen(
             }
         }
 
-        Spacer(modifier = Modifier
-            .navigationBarsPadding() // Ini kuncinya! Ngikutin settingan HP user
-            .padding(bottom = 16.dp) // Tambahan jarak sedikit supaya nggak nempel banget
-        )
+        Spacer(modifier = Modifier.navigationBarsPadding().padding(bottom = 16.dp))
     }
 }
 
+/**
+ * Renders a specific detail block (Label, Value, and Description) for the result card.
+ */
 @Composable
 fun DetailItem(
     label: String,
@@ -224,15 +217,16 @@ fun DetailItem(
             text = description,
             fontSize = baseFontSize * 0.68f,
             color = Grey40,
-            lineHeight = baseFontSize * 1.1f, // Spasi antar baris proporsional
+            lineHeight = baseFontSize * 1.1f,
             fontFamily = figtreeFontFamily,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Justify
+            textAlign = TextAlign.Justify
         )
     }
 }
 
-// --- FUNGSI PENDUKUNG (DATA) ---
-
+/**
+ * Logic to select the correct drawable resource based on classification results.
+ */
 @Composable
 fun getAvatarByResult(shape: String, tone: String): Int {
     return when {
@@ -275,6 +269,9 @@ fun getAvatarByResult(shape: String, tone: String): Int {
     }
 }
 
+/**
+ * Returns a static description for each face shape category.
+ */
 fun getFaceDescription(shape: String): String {
     return when {
         shape.contains("Oval", ignoreCase = true) ->
@@ -291,6 +288,9 @@ fun getFaceDescription(shape: String): String {
     }
 }
 
+/**
+ * Returns a static description for each skin tone category.
+ */
 fun getSkinToneDescription(tone: String): String {
     return when {
         tone.contains("Fair", ignoreCase = true) || tone.contains("Light", ignoreCase = true) ->
@@ -301,10 +301,4 @@ fun getSkinToneDescription(tone: String): String {
             "Your skin has an elegant and rich depth of color that sharpens your facial features. This complexion appears remarkably smooth with a profound natural appeal."
         else -> "Your skin tone has a beautiful and unique radiance that enhances your natural beauty."
     }
-}
-
-@Preview(showBackground = true, device = Devices.PIXEL_6A)
-@Composable
-fun ResultScreenPreview() {
-//    ResultScreen(navController = rememberNavController(), shape = "Round", tone = "Medium Tan")
 }

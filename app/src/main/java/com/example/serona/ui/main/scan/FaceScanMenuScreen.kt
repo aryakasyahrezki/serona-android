@@ -2,7 +2,6 @@ package com.example.serona.ui.main.scan
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -29,9 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-
 import com.example.serona.R
 import com.example.serona.theme.Grey40
 import com.example.serona.theme.MutedLight
@@ -43,21 +40,25 @@ import com.example.serona.theme.White
 import com.example.serona.theme.figtreeFontFamily
 import com.example.serona.ui.navigation.Routes
 import com.example.serona.utils.FileUtils
-import com.example.serona.utils.FileUtils.uriToFile
-import com.example.serona.ui.main.scan.FaceScanMenuViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 
-
+/**
+ * Entry point for the face analysis feature.
+ * Provides options to either use the live camera or upload an image from the gallery.
+ */
 @Composable
-fun FaceScanMenuScreen(navController: NavController, viewModel: FaceScanMenuViewModel = hiltViewModel()) {
+fun FaceScanMenuScreen(
+    navController: NavController,
+    viewModel: FaceScanMenuViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
 
-    // 1. KONFIGURASI RESPONSIF (Ini yang tadi belum ada)
+    /** * RESPONSIVE CONFIGURATION
+     * Calculates UI element sizes dynamically based on screen dimensions to prevent
+     * overflow or disproportionate scaling on varied device configurations.
+     */
     val maxWidth = configuration.screenWidthDp.dp
     val maxHeight = configuration.screenHeightDp.dp
-
-    // Trik: Ambil sisi terpendek agar UI tidak meledak ukurannya saat Landscape
     val minDimension = if (maxWidth < maxHeight) maxWidth else maxHeight
 
     val titleSize = (minDimension.value * 0.06f).sp
@@ -65,17 +66,13 @@ fun FaceScanMenuScreen(navController: NavController, viewModel: FaceScanMenuView
     val buttonTextSize = (minDimension.value * 0.04f).sp
     val circleSize = minDimension * 0.55f
 
-    // 2. STATE & LAUNCHERS
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
-//    LaunchedEffect(errorMessage) {
-//        errorMessage?.let {
-//            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-//            viewModel.clearError() // Penting agar pesan tidak muncul berulang kali
-//        }
-//    }
-
+    /**
+     * CAMERA PERMISSION HANDLER
+     * Ensures mandatory hardware permissions are granted before navigating to the camera interface.
+     */
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -83,6 +80,10 @@ fun FaceScanMenuScreen(navController: NavController, viewModel: FaceScanMenuView
         else Toast.makeText(context, "Camera permission is required", Toast.LENGTH_SHORT).show()
     }
 
+    /**
+     * GALLERY SELECTION HANDLER
+     * Processes selected image URI and initiates server-side analysis via ViewModel.
+     */
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -97,14 +98,13 @@ fun FaceScanMenuScreen(navController: NavController, viewModel: FaceScanMenuView
             modifier = Modifier
                 .fillMaxSize()
                 .background(White)
-                .statusBarsPadding() // Biar gak nabrak kamera depan/poni
-                .verticalScroll(rememberScrollState()) // Sekarang pasti bisa scroll karena weight sudah dihapus
+                .statusBarsPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(maxHeight * 0.05f))
 
-            // Garis Horizontal Atas
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
@@ -112,10 +112,11 @@ fun FaceScanMenuScreen(navController: NavController, viewModel: FaceScanMenuView
                     .background(color = Secondary90, shape = RoundedCornerShape(32.dp))
             )
 
-            // Pengganti weight: Spacer dengan tinggi proporsional
             Spacer(modifier = Modifier.height(maxHeight * 0.15f))
 
-            // 3. VISUAL LINGKARAN (Responsif mengikuti minDimension)
+            /** * DECORATIVE VISUAL ELEMENTS
+             * Nested circles with Coral tones to represent focal point for scanning.
+             */
             Box(
                 modifier = Modifier
                     .size(circleSize)
@@ -168,7 +169,6 @@ fun FaceScanMenuScreen(navController: NavController, viewModel: FaceScanMenuView
 
             Spacer(modifier = Modifier.height(maxHeight * 0.035f))
 
-            // 4. TOMBOL (Dibatasi lebarnya kalau HP miring)
             Column(
                 modifier = Modifier.fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -186,7 +186,7 @@ fun FaceScanMenuScreen(navController: NavController, viewModel: FaceScanMenuView
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Scan Now", fontSize = buttonTextSize, fontWeight = FontWeight.Bold, color=White)
+                    Text("Scan Now", fontSize = buttonTextSize, fontWeight = FontWeight.Bold, color = White)
                 }
 
                 Button(
@@ -195,15 +195,17 @@ fun FaceScanMenuScreen(navController: NavController, viewModel: FaceScanMenuView
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Upload from Gallery", fontSize = buttonTextSize, fontWeight = FontWeight.Bold, color=White)
+                    Text("Upload from Gallery", fontSize = buttonTextSize, fontWeight = FontWeight.Bold, color = White)
                 }
             }
 
-            // Safety space bawah yang pintar ngikutin settingan HP
             Spacer(modifier = Modifier.navigationBarsPadding().height(24.dp))
         }
 
-        // 5. LOADING OVERLAY
+        /**
+         * LOADING OVERLAY
+         * Modal overlay displayed during image processing/uploading to prevent user interaction.
+         */
         if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)),
@@ -217,6 +219,10 @@ fun FaceScanMenuScreen(navController: NavController, viewModel: FaceScanMenuView
             }
         }
 
+        /**
+         * ERROR HANDLING DIALOG
+         * Informs the user about network or analysis failures with an option to retry.
+         */
         if (errorMessage != null) {
             AlertDialog(
                 onDismissRequest = { viewModel.clearError() },

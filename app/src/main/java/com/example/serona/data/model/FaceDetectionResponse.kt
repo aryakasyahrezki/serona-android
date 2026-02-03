@@ -2,17 +2,23 @@ package com.example.serona.data.model
 
 import com.google.gson.annotations.SerializedName
 
+/**
+ * Data model for the face analysis API response.
+ * Maps JSON keys from the Python server to Kotlin properties.
+ */
 data class FaceDetectionResponse(
     @SerializedName("status")
     val status: String,
 
-    // Kita ubah agar sesuai dengan output Python: "shape" dan "skintone"
     @SerializedName("shape")
-    val shape: String?, // Contoh: "Oval (95%)"
+    val shape: String?,             // Example: "Oval (95%)"
 
     @SerializedName("skintone")
-    val skintone: String?, // Contoh: "Medium Tan"
+    val skintone: String?,          // Example: "Medium Tan"
 
     @SerializedName("message")
-    val message: String? // Untuk menangkap pesan error jika status "failed"
+    val message: String?,           // Error message if status is "failed"
+
+    @SerializedName("server_inference_ms")
+    val serverInferenceMs: String?  // Pure ML model processing time from server
 )

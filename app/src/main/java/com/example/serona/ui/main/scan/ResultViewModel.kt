@@ -14,17 +14,26 @@ import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import javax.inject.Inject
 
+/**
+ * ViewModel for the Result Screen.
+ * It handles the retrieval of scan data from navigation arguments,
+ * data decoding, and the process of saving results to the user's profile.
+ */
 @HiltViewModel
 class ResultViewModel @Inject constructor(
     private val userRepo: UserRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    // Ambil data mentah dari navigasi
+    // Retrieve raw data passed from the navigation route
     private val rawShape: String = savedStateHandle.get<String>("shape") ?: ""
     private val rawTone: String = savedStateHandle.get<String>("skintone") ?: ""
 
-    // Proses decoding dilakukan di sini agar UI bersih
+    /**
+     * Decoded Face Shape string.
+     * Handles URL decoding and removes extra formatting (e.g., probability percentages)
+     * to provide a clean string for the UI.
+     */
     val decodedShape: String = try {
         URLDecoder.decode(rawShape, "UTF-8")
             .replace("+", " ")
@@ -32,6 +41,10 @@ class ResultViewModel @Inject constructor(
             .trim()
     } catch (e: Exception) { rawShape }
 
+    /**
+     * Decoded Skin Tone string.
+     * Standardizes the skin tone result for display and database storage.
+     */
     val decodedTone: String = try {
         URLDecoder.decode(rawTone, "UTF-8")
             .replace("+", " ")
@@ -41,12 +54,17 @@ class ResultViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ResultUiState())
     val uiState = _uiState.asStateFlow()
 
+    /**
+     * Sends the analysis results to the server to update the user's beauty profile.
+     * Uses current user session data from the local repository to build the request.
+     */
     fun saveToProfile() {
         _uiState.update { it.copy(errorMessage = null) }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
 
+            // Get current user session from the local data flow
             val currentUser = userRepo.userDataFlow.first()
             if (currentUser != null) {
                 val request = UpdateProfileRequest(
@@ -75,7 +93,6 @@ class ResultViewModel @Inject constructor(
                     ) }
                 }
             } else {
-                // Kasus jika data user di Room tiba-tiba kosong
                 _uiState.update { it.copy(
                     isSaving = false,
                     errorMessage = "User session not found. Please re-login."
@@ -84,17 +101,24 @@ class ResultViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Resets the error message state. Used by the UI to clear Toasts or Dialogs.
+     */
     fun clearError() {
         _uiState.update {
-            it.copy(
-                errorMessage = null,
-            )
+            it.copy(errorMessage = null)
         }
     }
 }
 
+/**
+ * Represents the UI state for the Result Screen.
+ * @property isSaving Controls the loading indicator during the network request.
+ * @property saveSuccess Triggers navigation or success feedback.
+ * @property errorMessage Holds the message for Toast/Snackbar notifications.
+ */
 data class ResultUiState(
-    val isSaving: Boolean = false,      // Menangani loading spinner saat klik Save
-    val saveSuccess: Boolean = false,   // Trigger navigasi balik ke Home saat sukses
-    val errorMessage: String? = null    // Menampilkan pesan jika API/Network error
+    val isSaving: Boolean = false,
+    val saveSuccess: Boolean = false,
+    val errorMessage: String? = null
 )
