@@ -34,7 +34,7 @@ fun AppNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Routes.TUTORIAL,
+        startDestination = Routes.SPLASH,
         modifier = Modifier.fillMaxSize(),
 
         enterTransition = {
@@ -147,7 +147,7 @@ fun AppNavGraph(
             DeleteAccPage(
                 onDeleteConfirm = {
                     navController.navigate(Routes.SPLASH) {
-                        popUpTo(0) {
+                        popUpTo(navController.graph.id) {
                             inclusive = true
                         }
                     }

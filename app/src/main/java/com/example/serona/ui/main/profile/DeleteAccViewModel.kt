@@ -37,7 +37,9 @@ class DeleteAccViewModel @Inject constructor(
                                     if (firebaseResult.isSuccess) {
                                         userSession.clear()
                                         _isLoading.value = false
-                                        onSuccess()
+                                        viewModelScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+                                            onSuccess()
+                                        }
                                     } else {
                                         _isLoading.value = false
                                         _errorMessage.value = firebaseResult.exceptionOrNull()?.message

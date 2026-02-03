@@ -12,7 +12,6 @@ object Routes{
 
     const val TUTORIAL = "tutorial/{faceShape}/{skinTone}/{occasion}"
 
-    // Helper untuk navigate - semua parameter nullable dengan default "none"
     fun navigateToTutorial(
         faceShape: String? = null,
         skinTone: String? = null,
@@ -26,7 +25,7 @@ object Routes{
     const val PROFILE = "profile"
     const val PRIVACY = "privacyPolicy"
     const val DELETE_PROFILE = "deleteProfile"
-    const val EDIT_PROFILE = "deleteProfile"
+    const val EDIT_PROFILE = "editProfile"
 
     const val SCAN = "scan"
 }

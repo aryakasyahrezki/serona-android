@@ -145,7 +145,9 @@ class UserRepository @Inject constructor(
 
     // cleanup saat logout
     suspend fun clearAllLocalData() {
-        userDao.clearUser()
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            userDao.clearUser()
+        }
         userSession.clear()
     }
 }
