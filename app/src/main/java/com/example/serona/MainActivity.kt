@@ -108,18 +108,6 @@ class MainActivity : ComponentActivity() {
                                                     3 -> Routes.PROFILE
                                                     else -> Routes.HOME
                                                 }
-//                                                if (currentDestination?.route != targetRoute) {
-//                                                    navController.navigate(targetRoute) {
-//                                                        // Memastikan Home selalu ada di dasar stack
-//                                                        popUpTo(Routes.HOME) {
-//                                                            saveState = true
-//                                                        }
-//                                                        // Menghindari duplikasi instance halaman
-//                                                        launchSingleTop = true
-//                                                        // Mengembalikan state (posisi scroll, dll)
-//                                                        restoreState = true
-//                                                    }
-//                                                }
 
                                                 val isAlreadyOnTarget = if (isClickingTutorial) {
                                                     isAnyTutorialRoute
@@ -129,8 +117,7 @@ class MainActivity : ComponentActivity() {
 
                                                 if (!isAlreadyOnTarget) {
                                                     navController.navigate(targetRoute) {
-                                                        // Gunakan startDestinationId agar lebih fleksibel
-                                                        popUpTo(navController.graph.startDestinationId) {
+                                                        popUpTo(Routes.HOME) {
                                                             saveState = true
                                                             inclusive = false
                                                         }
