@@ -49,6 +49,11 @@ fun ResultScreen(
     val minDimension = if (maxWidth < maxHeight) maxWidth else maxHeight
     val baseFontSize = (minDimension.value * 0.05f).sp
     val buttonHeight = (maxHeight * 0.07f).coerceIn(48.dp, 60.dp)
+    val fontSize = (maxWidth * 0.07f).value.sp
+    val horiPadding = maxWidth * 0.05f
+    val vertiPadding = maxHeight * 0.055f
+    val buttonSize = maxWidth * 0.07f
+    val space = maxHeight * 0.05f
 
     val decodedShape = viewModel.decodedShape
     val decodedTone = viewModel.decodedTone
@@ -63,35 +68,13 @@ fun ResultScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFFFF0F1))
-            .padding(maxWidth * 0.05f, maxWidth * 0.113f)
-
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            BackButton(
-                onBackClick = {
-                    navController.navigate(Routes.SCAN_MENU) {
-                        popUpTo(Routes.SCAN_MENU) {
-                            inclusive = true
-                        }
-                    }
-                },
-                buttonSize = minDimension * 0.071f,
-                fontSize = baseFontSize * 1.174
-            )
-        }
-
-
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
-                .verticalScroll(rememberScrollState()),
+                .background(Color(0xFFFFF0F1))
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = horiPadding, vertical = vertiPadding * 1.7f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -174,17 +157,10 @@ fun ResultScreen(
             ) {
                 Button(
                     onClick = {
-                        val destination = Routes.navigateToTutorial(
+                        navController.navigate(Routes.navigateToTutorial(
                             faceShape = decodedShape,
                             skinTone = decodedTone
-                        )
-
-                        navController.navigate(destination) {
-                            popUpTo(Routes.SCAN_MENU) {
-                                inclusive = false
-                            }
-                            launchSingleTop = true
-                        }
+                        ))
                     },
                     modifier = Modifier.fillMaxWidth().height(buttonHeight * 0.8f),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
@@ -234,11 +210,28 @@ fun ResultScreen(
                             fontWeight = FontWeight.Bold,
                             fontFamily = figtreeFontFamily
                         )
-                    }
+                    }11111111111111
                 }
             }
 
             Spacer(modifier = Modifier.navigationBarsPadding().padding(bottom = 16.dp))
+        }
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .padding(horizontal = horiPadding, vertical = vertiPadding * 1.13f)
+        ) {
+            BackButton(
+                onBackClick = {
+                    navController.navigate(Routes.SCAN_MENU) {
+                        popUpTo(Routes.SCAN_MENU) {
+                            inclusive = true
+                        }
+                    }
+                },
+                buttonSize = buttonSize,
+                fontSize = fontSize * 0.86
+            )
         }
     }
 
@@ -335,7 +328,7 @@ fun getAvatarByResult(shape: String, tone: String): Int {
 fun getFaceDescription(shape: String): String {
     return when {
         shape.contains("Oval", ignoreCase = true) ->
-            "Your face features a highly balanced and symmetrical structure. This harmonious proportion is widely considered a versatile canvas that elegantly complements almost any style."
+            "Your face features a highly balanced and symmetrical structure. This harmonious proportion is considered a versatile canvas that elegantly complements almost any style."
         shape.contains("Square", ignoreCase = true) ->
             "You have a strong jawline and a broad forehead, projecting a sense of confidence and authority. Your prominent bone structure gives your features an iconic and dignified look."
         shape.contains("Round", ignoreCase = true) ->

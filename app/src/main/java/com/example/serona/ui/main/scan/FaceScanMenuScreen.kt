@@ -68,6 +68,10 @@ fun FaceScanMenuScreen(
     val buttonTextSize = (minDimension.value * 0.04f).sp
     val circleSize = minDimension * 0.55f
     val fontSize = (maxWidth * 0.07f).value.sp
+    val horiPadding = maxWidth * 0.05f
+    val vertiPadding = maxHeight * 0.055f
+    val buttonSize = maxWidth * 0.07f
+    val space = maxHeight * 0.05f
 
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
@@ -103,7 +107,7 @@ fun FaceScanMenuScreen(
                 .background(brush = BgGrad)
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 30.dp),
+                .padding(horizontal = horiPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(maxHeight * 0.2f))
@@ -164,7 +168,7 @@ fun FaceScanMenuScreen(
             Spacer(modifier = Modifier.height(maxHeight * 0.035f))
 
             Column(
-                modifier = Modifier.fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f),
+                modifier = Modifier.fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f).padding(horizontal = horiPadding * 0.5f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(
@@ -196,20 +200,20 @@ fun FaceScanMenuScreen(
             Spacer(modifier = Modifier.navigationBarsPadding().height(24.dp))
         }
 
-        Box(
+        Column(
             modifier = Modifier
-                .statusBarsPadding()
-                .padding(maxWidth * 0.05f, maxWidth * 0.032f)
+                .fillMaxSize()
+                .padding(horizontal = horiPadding, vertical = vertiPadding)
         ) {
+            Spacer(modifier = Modifier.height(space * 0.15f))
+
             BackButton(
                 onBackClick = {
-                    navController.navigate("home"){
-                        popUpTo(Routes.HOME) {
-                            inclusive = true
-                        }
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = true }
                     }
                 },
-                buttonSize = minDimension * 0.07f,
+                buttonSize = buttonSize,
                 fontSize = fontSize * 0.86
             )
         }

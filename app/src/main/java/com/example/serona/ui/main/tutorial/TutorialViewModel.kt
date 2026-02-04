@@ -156,7 +156,7 @@ class TutorialViewModel @Inject constructor(
     /**
      * Fetch tutorials from repository (backend)
      */
-    private fun fetchTutorials() {
+    fun fetchTutorials() {
         viewModelScope.launch {
             _isLoading.value = true
             try {

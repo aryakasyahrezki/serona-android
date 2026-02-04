@@ -67,11 +67,7 @@
     </string>
     <string name="faq_q4">Is it safe to scan my face on Serona?</string>
     <string name="faq_a4">
-    Yes, it is safe.
-    Face scanning on Serona is done only with your permission, and your facial images are processed securely.
-    We do not store your photos without consent, and facial data is used solely to operate features such as personalized color recommendations based on your skin tone.
-
-    Serona does not share, sell, or use your facial data beyond the needs of the app.
+    Yes, it is completely safe. Serona is designed with a Privacy-by-Design approach. We do not store, save, or archive your photos on our servers. When you perform a scan, our system only captures the image temporarily to extract facial features (converting them into numerical data or \'embeddings\') for analysis. Once the feature extraction is complete and your results are generated, the image file is immediately deleted from our system\'s memory. Furthermore, Serona strictly adheres to a policy of not sharing or selling your personal data to any third parties. Your privacy is our priority, and your image data is used solely for the purpose of providing your personalized beauty analysis.
         </string>
     <string name="faq_q5">How can I delete my data?</string>
     <string name="faq_a5">
@@ -80,8 +76,9 @@
         </string>
     <string name="faq_q6">Who can access my data?</string>
     <string name="faq_a6">
-    Only Serona\’s system and authorized internal team members can access your data—and only to the extent necessary to operate the app’s features.
+    Only Serona\’s system and authorized internal team members can access your data and only to the extent necessary to operate the app’s features.
 
     We do not grant access to any third parties without your consent, and all access is monitored under strict security standards.
         </string>
+
 </resources>

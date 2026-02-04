@@ -296,7 +296,7 @@ fun ScanUIContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(maxHeight * 0.005f))
+            Spacer(modifier = Modifier.height(maxHeight * 0.02f))
 
             Text(
                 text = "Face Recognition",

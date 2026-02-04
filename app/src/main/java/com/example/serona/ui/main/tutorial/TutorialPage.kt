@@ -32,7 +32,8 @@ import com.example.serona.ui.main.favorite.FavoriteViewModel
 @Composable
 fun TutorialPage(
     onTutorialClick: (Int) -> Unit,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    tutorialViewModel: TutorialViewModel = hiltViewModel()
 ) {
     val configuration = LocalConfiguration.current
     val maxWidth = configuration.screenWidthDp.dp
@@ -49,12 +50,30 @@ fun TutorialPage(
     val vm: TutorialViewModel = hiltViewModel()
     val favVM: FavoriteViewModel = hiltViewModel()
 
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                vm.refreshTutorials()
+                favVM.refreshFavorites()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     val tutorials by vm.filteredTutorials.collectAsState()
     val searchQuery by vm.searchQuery.collectAsState()
     val isLoading by vm.isLoading.collectAsState()
     val isFilterActive by vm.isFilterActive.collectAsState()
     val activeFilters by vm.activeFilters.collectAsState()
 //    var searchQuery by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        tutorialViewModel.refreshTutorials()
+    }
 
     Column(
         Modifier
