@@ -11,11 +11,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.serona"
+    namespace = "com.serona.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.serona"
+        applicationId = "com.serona.app"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
