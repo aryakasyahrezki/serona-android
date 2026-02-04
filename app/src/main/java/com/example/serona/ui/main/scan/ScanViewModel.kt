@@ -29,6 +29,8 @@ class ScanViewModel @Inject constructor(
 ) : ViewModel() {
 
     // --- UI STATES ---
+    private val _isFaceInFrame = mutableStateOf(false)
+    val isFaceInFrame: State<Boolean> = _isFaceInFrame
     private val _showInstructionPopup = mutableStateOf(true)
     val showInstructionPopup: State<Boolean> = _showInstructionPopup
 
@@ -53,33 +55,6 @@ class ScanViewModel @Inject constructor(
     fun dismissPopup() {
         _showInstructionPopup.value = false
         _isScanning.value = true
-    }
-
-    /**
-     * Logic for incremental face detection.
-     * Increments the progress bar and triggers upload when the scan is "complete" (1.0f).
-     */
-    fun onFaceDetected(currentFile: File? = null) {
-        viewModelScope.launch(Dispatchers.Main) {
-            if (!_isScanning.value || _isCurrentlyUploading.value) return@launch
-
-            _progress.floatValue += 0.35f
-
-            if (_progress.floatValue >= 1.0f) {
-                _progress.floatValue = 1.0f
-                _isScanning.value = false
-                onFirstScanComplete(currentFile)
-            }
-        }
-    }
-
-    /**
-     * Resets scan progress if the subject moves out of the camera frame.
-     */
-    fun onFaceLost() {
-        if (_isScanning.value && !_showRecommendationButton.value) {
-            _progress.floatValue = 0f
-        }
     }
 
     /**
@@ -137,6 +112,39 @@ class ScanViewModel @Inject constructor(
                     _isCurrentlyUploading.value = false
                 }
             }
+        }
+    }
+
+    /**
+     * Logic for incremental face detection.
+     * Increments the progress bar and triggers upload when the scan is "complete" (1.0f).
+     */
+    fun onFaceDetected(currentFile: File? = null) {
+        _isFaceInFrame.value = true
+        viewModelScope.launch(Dispatchers.Main) {
+            if (!_isScanning.value || _isCurrentlyUploading.value) return@launch
+
+            // Jika belum penuh, kita jalankan animasi progres (misal +0.2f per frame)
+            if (_progress.floatValue < 1.0f) {
+                val nextProgress = _progress.floatValue + 0.35f
+                _progress.floatValue = nextProgress.coerceAtMost(1.0f)
+
+                // Jika baru saja menyentuh 1.0f, panggil upload pertama kali
+                if (_progress.floatValue >= 1.0f) {
+                    onFirstScanComplete(currentFile)
+                }
+            }
+        }
+    }
+
+        /**
+         * Resets scan progress if the subject moves out of the camera frame.
+         */
+    fun onFaceLost() {
+        _isFaceInFrame.value = false
+        if (_isScanning.value && !_showRecommendationButton.value) {
+            // LANGSUNG KOSONG: Begitu wajah hilang, bar balik ke 0
+            _progress.floatValue = 0f
         }
     }
 

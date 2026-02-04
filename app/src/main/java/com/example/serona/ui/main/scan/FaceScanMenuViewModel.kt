@@ -67,7 +67,7 @@ class FaceScanMenuViewModel @Inject constructor(
 
                     val cleanTone = result.skintone
                         .substringBefore("(")
-                        .replace(Regex("[^a-zA-Z]"), "")
+                        .replace(Regex("[^a-zA-Z\\s]"), "")
                         .trim()
 
                     val encodedShape = URLEncoder.encode(cleanShape, StandardCharsets.UTF_8.toString())

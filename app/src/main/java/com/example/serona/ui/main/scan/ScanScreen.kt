@@ -11,7 +11,13 @@ import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +33,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -222,11 +229,23 @@ fun ScanUIContent(
     minDimension: Dp,
     onSwitchCamera: () -> Unit
 ) {
+    val isFaceInFrame = viewModel.isFaceInFrame.value
     val baseFontSize = (minDimension.value * 0.05f).sp
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
-        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+        animationSpec = tween(durationMillis = 300),
         label = "ProgressAnimation"
+    )
+
+    val infiniteTransition = rememberInfiniteTransition(label = "shimmer")
+    val shimmerAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.4f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(800, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "shimmerAlpha"
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -234,7 +253,7 @@ fun ScanUIContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .statusBarsPadding()
-                .padding(horizontal = maxWidth * 0.06f)
+                .padding(horizontal = maxWidth * 0.06f, vertical = maxWidth * 0.03f)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -251,7 +270,7 @@ fun ScanUIContent(
                         }
                     },
                     modifier = Modifier
-                        .size(minDimension * 0.12f)
+                        .size(minDimension * 0.08f)
                         .background(White.copy(alpha = 0.2f), CircleShape)
                 ) {
                     Icon(
@@ -265,7 +284,7 @@ fun ScanUIContent(
                 IconButton(
                     onClick = onSwitchCamera,
                     modifier = Modifier
-                        .size(minDimension * 0.12f)
+                        .size(minDimension * 0.08f)
                         .background(White.copy(alpha = 0.2f), CircleShape)
                 ) {
                     Icon(
@@ -338,19 +357,39 @@ fun ScanUIContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = if (showResultBtn) "Live Scanning..." else "Hold still...",
+                    text = when {
+                        // Jika progres belum penuh tapi deteksi berhenti (wajah tertutup/hilang)
+                        !isFaceInFrame -> "Face Lost! Move back into frame"
+                        showResultBtn -> "Live Scanning..."
+                        else -> "Hold still, scanning your beauty..."
+                    },
+//                    text = if (showResultBtn) "Live Scanning..." else "Hold still...",
                     color = Color.White,
                     fontSize = baseFontSize * 0.8f,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
+
+
                 LinearProgressIndicator(
-                    progress = { animatedProgress },
+//                    progress = { if (isFaceInFrame) 1f else 0f },
+                    progress = {
+                        when {
+                            // 1. Jika sudah masuk fase Live Scanning (Hasil sudah pernah muncul)
+                            // Cukup tampilkan 1f jika wajah ada, 0f jika tidak ada.
+                            showResultBtn -> if (isFaceInFrame) 1f else 0f
+
+                            // 2. Jika fase Initial Scan (Belum pernah muncul hasil)
+                            // Gunakan animasi progress yang berjalan pelan dari 0 ke 1.
+                            else -> animatedProgress
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                         .height(minDimension * 0.025f)
-                        .clip(RoundedCornerShape(minDimension * 0.01f)),
-                    color = Color(0xFFADFF2F),
+                        .clip(RoundedCornerShape(minDimension * 0.01f))
+                        .alpha(if (isFaceInFrame) shimmerAlpha else 1f),
+                    color = SuccessScan,
                     trackColor = Color.White.copy(alpha = 0.3f)
                 )
 
