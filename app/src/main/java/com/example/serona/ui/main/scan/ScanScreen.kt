@@ -62,6 +62,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.Executors
 
+
 /**
  * Main screen for the real-time face scanning feature.
  * Coordinates CameraX for previewing, ML Kit for on-device face detection,
@@ -470,13 +471,13 @@ fun InstructionDialog(onDismiss: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Face Scanning Guide", fontSize = baseFontSize, fontFamily = figtreeFontFamily, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-                Spacer(modifier = Modifier.height(minDimension * 0.02f))
-                Text(text = "Follow ini to get the most accurate results", fontSize = baseFontSize * 0.65f, textAlign = TextAlign.Center, color = Grey40)
+                Spacer(modifier = Modifier.height(minDimension * 0.01f))
+                Text(text = "Follow these steps below while scanning to get the most accurate results", fontSize = baseFontSize * 0.65f, textAlign = TextAlign.Center, color = Grey40.copy(alpha = 0.8f), lineHeight = baseFontSize * 0.8f)
                 Spacer(modifier = Modifier.height(minDimension * 0.03f))
-                InstructionItem("Don't make excessive expressions", "Keep your face relaxed", R.drawable.scan_guide1)
-                InstructionItem("Don't cover your face", "Avoid glasses or masks", R.drawable.scan_guide2)
-                InstructionItem("Avoid poor lighting", "Avoid shadows or dim light", R.drawable.scan_guide3)
-                InstructionItem("Don't tilt your head", "Keep your head straight", R.drawable.scan_guide4)
+                InstructionItem( "Don't make excessive expressions","Keep your face relaxed and natural", R.drawable.scan_guide1)
+                InstructionItem( "Don't cover your face","Avoid glasses, masks, hats, or hair covering your face", R.drawable.scan_guide2)
+                InstructionItem( "Avoid poor lighting","Avoid shadows or dim light on your face", R.drawable.scan_guide3)
+                InstructionItem( "Don't tilt your head","Keep your head straight, don't tilt it", R.drawable.scan_guide4)
                 Spacer(modifier = Modifier.height(minDimension * 0.05f))
                 Button(onClick = onDismiss, modifier = Modifier.width(minDimension * 0.4f).height(minDimension * 0.12f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF04B63)), shape = RoundedCornerShape(8.dp)) {
                     Text("Start", fontSize = baseFontSize * 0.7f, fontWeight = FontWeight.Bold, color = White)
@@ -495,18 +496,18 @@ fun InstructionItem(title: String, description: String, imageRes: Int) {
 
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = minDimension * 0.025f), verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.size(imgSize)) {
-            Card(shape = RoundedCornerShape(10.dp), modifier = Modifier.size(imgSize).align(Alignment.BottomStart)) {
+            Card(shape = RoundedCornerShape(10.dp), modifier = Modifier.size(imgSize * 0.95f).align(Alignment.BottomStart)) {
                 Image(painter = painterResource(id = imageRes), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
             }
             Surface(shape = RoundedCornerShape(4.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(0.5.dp, Grey40), modifier = Modifier.size(imgSize * 0.3f).align(Alignment.TopEnd)) {
                 Icon(imageVector = Icons.Default.Close, contentDescription = null, tint = Primary, modifier = Modifier.padding(2.dp))
             }
         }
-        Spacer(modifier = Modifier.width(minDimension * 0.04f))
+        Spacer(modifier = Modifier.width(minDimension * 0.025f))
         Column {
-            Text(text = title, fontFamily = figtreeFontFamily, fontWeight = FontWeight.Medium, fontSize = fontSize * 0.65f)
-            Spacer(modifier = Modifier.height(5.dp))
-            Text(text = description, fontSize = fontSize * 0.6f, color = Grey40)
+            Text(text = title, color = Black10, fontFamily = figtreeFontFamily, fontWeight = FontWeight.Medium, fontSize = fontSize * 0.65f, lineHeight = fontSize * 0.8f,  letterSpacing = fontSize * 0.02f, modifier = Modifier.padding(start=0.4.dp))
+            Spacer(modifier =  Modifier.width(minDimension * 0.04f))
+            Text(text = description, fontSize = fontSize * 0.6f, color = Grey40.copy(alpha = 0.9f), lineHeight = fontSize * 0.7f, modifier = Modifier.padding(start=1.dp))
         }
     }
 }
