@@ -1,13 +1,11 @@
 package com.example.serona.ui.navigation
 
-import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -18,15 +16,17 @@ import com.example.serona.ui.auth.register.PersonalInfoPage
 import com.example.serona.ui.auth.register.RegisterPage
 import com.example.serona.ui.landing.LandingPageCarousel
 import com.example.serona.ui.main.favorite.FavoritePage
-import com.example.serona.ui.main.favorite.FavoriteViewModel
 import com.example.serona.ui.main.tutorial.TutorialDetailPage
 import com.example.serona.ui.main.tutorial.TutorialPage
 import com.example.serona.ui.main.home.HomePage
+import com.example.serona.ui.main.scan.FaceScanMenuScreen
+import com.example.serona.ui.main.scan.ScanScreen
 import com.example.serona.ui.main.profile.DeleteAccPage
 import com.example.serona.ui.main.profile.EditProfilePage
 import com.example.serona.ui.main.profile.PrivacyPage
 import com.example.serona.ui.main.profile.ProfilePage
 import com.example.serona.ui.splash.SplashFullBackground
+import com.example.serona.ui.main.scan.ResultScreen
 
 @Composable
 fun AppNavGraph(
@@ -36,8 +36,7 @@ fun AppNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Routes.TUTORIAL
-        ,
+        startDestination = Routes.SPLASH,
         modifier = Modifier.fillMaxSize(),
 
         enterTransition = {
@@ -79,18 +78,6 @@ fun AppNavGraph(
         ) {
             HomePage(navController)
         }
-
-//        composable(
-//            Routes.TUTORIAL,
-//            enterTransition = { fadeIn(animationSpec = tween(200)) }
-//        ) {
-//            TutorialPage(
-//                onTutorialClick = { tutorialId ->
-//                    navController.navigate("${Routes.DETAIL}/$tutorialId")
-//                },
-//                onBackClick = { navController.popBackStack() }
-//            )
-//        }
 
         composable(
             route = Routes.TUTORIAL,
@@ -177,7 +164,22 @@ fun AppNavGraph(
             )
         }
 
-        composable(Routes.SCAN) {}
+        composable(Routes.SCAN_MENU){
+            FaceScanMenuScreen(navController)
+        }
+        composable(Routes.SCAN){
+            ScanScreen(navController = navController)
+        }
+
+        composable(
+            route = Routes.RESULT,
+            arguments = listOf(
+                navArgument("shape") { type = NavType.StringType },
+                navArgument("skintone") { type = NavType.StringType }
+            )
+        ) {
+            ResultScreen(navController)
+        }
+
     }
-    
 }

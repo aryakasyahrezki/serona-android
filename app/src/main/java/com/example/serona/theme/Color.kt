@@ -7,9 +7,9 @@ val White = Color(0xFFFDFDFD)
 val White10 = Color(0xFFFFFFFF)
 val Grey10 = Color(0xFFBCA0A0)
 val Grey20 = Color(0xFFE0E0E0)
-
 val Grey30 = Color(0xFFEDEDED)
 val Grey40 = Color(0xFF5E5F60)
+val Black10 = Color(0xFF252525)
 
 
 // Primary Brand Color
@@ -42,6 +42,7 @@ val Secondary50 = Color(0xFFFDA1BA)
 val Secondary60 = Color(0xFFFDA9C0)
 val Secondary70 = Color(0xFFFD8EAE)
 val Secondary80 = Color(0xFFFD90AD)
+val Secondary90 = Color(0xFFF99E93)
 
 
 // Tertiary Colors

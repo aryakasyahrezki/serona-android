@@ -26,6 +26,7 @@ android {
 
     buildTypes {
         release {
+            // isMinifyEnabled tetap false untuk debugging, ubah ke true saat sudah rilis final
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -45,6 +46,7 @@ android {
         compose = true
     }
     composeOptions {
+        // Pastikan versi Kotlin di proyekmu adalah 1.9.24 agar cocok dengan 1.5.14 ini
         kotlinCompilerExtensionVersion = "1.5.14"
     }
 }
@@ -114,6 +116,18 @@ dependencies {
 
     // Desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
+    // Face Detection
+    // CameraX
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+    // ML Kit & Tools
+    implementation(libs.mlkit.face.detection)
+    implementation(libs.coil.compose)
+    implementation(libs.accompanist.permissions)
 
     // ROOM DATABASE
     val roomVersion = "2.6.1"
