@@ -64,7 +64,7 @@ fun LoginPage(
         when(authState){
             is AuthState.Authenticated-> {
                 navController.navigate("home") {
-                    popUpTo("login") {
+                    popUpTo(Routes.LOGIN) {
                         inclusive = true
                     }
                 }
@@ -74,7 +74,7 @@ fun LoginPage(
 
             is AuthState.NeedPersonalInfo -> {
                 navController.navigate(Routes.PERSONALINFO) {
-                    popUpTo("login") { inclusive = true }
+                    popUpTo(Routes.LOGIN) { inclusive = true }
                 }
                 loginViewModel.resetLoginState()
             }
@@ -120,7 +120,7 @@ fun LoginPage(
                 color = Color.White,
                 fontFamily = leagueSpartanFontFamily,
                 fontSize = fontSize * 0.8f,
-                letterSpacing = (space * 0.04f).value.sp
+                letterSpacing = fontSize * 0.25f
             )
 
             LoginCard(

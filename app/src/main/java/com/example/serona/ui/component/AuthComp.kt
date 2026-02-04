@@ -63,10 +63,10 @@ fun AuthTextField(
             },
             singleLine = true,
             textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = fontSize * 0.5f,
+                fontSize = fontSize * 0.7f,
                 fontFamily = figtreeFontFamily,
                 fontWeight = FontWeight.Medium,
-                color = MutedLight
+                color = White
             ),
             shape = RoundedCornerShape(15.dp),
             colors = TextFieldDefaults.colors(
@@ -121,10 +121,10 @@ fun AuthPasswordField(
                     fontWeight = FontWeight.Medium)
             },
             textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = fontSize * 0.5f,
+                fontSize = fontSize * 0.7f,
                 fontFamily = figtreeFontFamily,
                 fontWeight = FontWeight.Medium,
-                color = MutedLight
+                color = White
             ),
             singleLine = true,
             shape = RoundedCornerShape(15.dp),

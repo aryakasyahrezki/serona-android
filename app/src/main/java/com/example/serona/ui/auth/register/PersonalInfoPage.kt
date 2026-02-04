@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Male
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
@@ -35,7 +34,6 @@ import com.example.serona.ui.auth.login.LoginViewModel
 import com.example.serona.ui.component.CleanLinearProgress
 import com.example.serona.ui.component.PersonalInfoTextField
 import com.example.serona.ui.navigation.Routes
-import okhttp3.Route
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
@@ -101,7 +99,17 @@ fun PersonalInfoPage(
                 color = MutedLight
             )
 
-            Spacer(modifier = Modifier.height(space * 0.5f))
+            Spacer(modifier = Modifier.height(space * 0.4f))
+
+            Text(
+                text = "Gender",
+                fontSize = fontSize * 0.75f,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                color = Heading
+            )
+
+            Spacer(modifier = Modifier.height(space * 0.1f))
 
             // Gender Selection
             Row(
@@ -134,6 +142,16 @@ fun PersonalInfoPage(
 
             Spacer(modifier = Modifier.height(space * 0.5f))
 
+            Text(
+                text = "Country",
+                fontSize = fontSize * 0.75f,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                color = Heading
+            )
+
+            Spacer(modifier = Modifier.height(space * 0.1f))
+
             // COUNTRY DROPDOWN
             PersonalInfoTextField(
                 label = "Choose Your Country",
@@ -163,6 +181,16 @@ fun PersonalInfoPage(
             )
 
             Spacer(modifier = Modifier.height(space * 0.5f))
+
+            Text(
+                text = "Date of Birth",
+                fontSize = fontSize * 0.75f,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                color = Heading
+            )
+
+            Spacer(modifier = Modifier.height(space * 0.008f))
 
             // DATE OF BIRTH
             Row(
@@ -243,7 +271,7 @@ fun PersonalInfoPage(
                 )
             }
 
-            Spacer(modifier = Modifier.height(space * 0.5f))
+            Spacer(modifier = Modifier.height(space * 0.8f))
 
             // NEXT BUTTON
             Button(
@@ -252,7 +280,7 @@ fun PersonalInfoPage(
                         authViewModel.checkAuthStatus()
 
                         navController.navigate("home") {
-                            popUpTo("personalInfo") {
+                            popUpTo(Routes.PERSONALINFO) {
                                 inclusive = true
                             }
                         }
@@ -274,6 +302,8 @@ fun PersonalInfoPage(
                     fontFamily = figtreeFontFamily
                 )
             }
+
+            Spacer(modifier = Modifier.height(space * 0.5f))
 
             Row(
                 modifier = Modifier
