@@ -210,7 +210,7 @@ fun ResultScreen(
                             fontWeight = FontWeight.Bold,
                             fontFamily = figtreeFontFamily
                         )
-                    }11111111111111
+                    }
                 }
             }
 
