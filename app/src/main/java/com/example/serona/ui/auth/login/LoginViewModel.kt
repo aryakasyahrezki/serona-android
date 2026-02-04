@@ -24,7 +24,6 @@ class LoginViewModel @Inject constructor(
     private val _loginFormState = MutableLiveData(LoginFormState())
     val loginFormState : LiveData<LoginFormState> = _loginFormState
 
-    //ini state hanya untuk login aja, state untuk tau user sebelumnya uda login atau belum (session), ada di AuthViewModel
     private val _loginState = MutableLiveData<AuthState>()
     val loginState : LiveData<AuthState> = _loginState
 

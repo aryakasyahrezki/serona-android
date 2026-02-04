@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,7 +15,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -36,16 +34,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.example.serona.theme.Grey40
 import com.example.serona.theme.Heading
 import com.example.serona.theme.MutedLight
 import com.example.serona.theme.Primary
 import com.example.serona.theme.Primary50
 import com.example.serona.theme.White
 import com.example.serona.theme.figtreeFontFamily
-import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,7 +96,7 @@ fun EditProfileField(
                     fontSize = fontSize * 0.5f,
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.Medium,
-                    color = MutedLight
+                    color = Grey40
                 ),
 
                 placeholder = {
@@ -121,7 +118,7 @@ fun EditProfileField(
                             else
                                 androidx.compose.material.icons.Icons.Filled.KeyboardArrowDown,
                             contentDescription = null,
-                            tint = MutedLight
+                            tint = Grey40
                         )
                     }
                 },
@@ -183,7 +180,7 @@ fun EditProfileField(
                                         fontSize = fontSize * 0.5f,
                                         fontFamily = figtreeFontFamily,
                                         fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal,
-                                        color = MutedLight
+                                        color = Grey40
 
                                     )
                                 },

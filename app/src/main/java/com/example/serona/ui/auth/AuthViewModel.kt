@@ -24,28 +24,6 @@ class AuthViewModel @Inject constructor (
         checkAuthStatus()
     }
 
-//    fun checkAuthStatus() {
-//        _authState.value = AuthState.Loading
-//
-//        val currentUser = authRepo.getCurrentUser()
-//        if (currentUser == null) {
-//            _authState.value = AuthState.Unauthenticated
-//            return
-//        }
-//
-//        // Langsung set Authenticated jika Firebase User ada
-//        _authState.value = AuthState.Authenticated
-//
-//        viewModelScope.launch {
-//            try {
-//                loadUserSync()
-//                // Data profil akan terisi di userSession secara diam-diam
-//            } catch (e: Exception) {
-//                // Jika gagal ambil profil, bisa ditangani di halaman Home (misal: minta logout)
-//            }
-//        }
-//    }
-
     fun checkAuthStatus() {
         val currentUser = authRepo.getCurrentUser()
 
@@ -58,37 +36,22 @@ class AuthViewModel @Inject constructor (
 
         viewModelScope.launch {
             try {
-                // Kita coba ambil profil dari Backend Azure
                 val result = userRepo.syncFullProfile()
 
                 if (result.isSuccess) {
                     val user = result.getOrNull()
 
-                    // Cek apakah data wajib (Personal Info) sudah diisi
-                    // Gunakan properti yang paling mencerminkan profile sudah lengkap
                     if (user?.gender == null || user?.country.isNullOrBlank()) {
                         _authState.value = AuthState.NeedPersonalInfo
                     } else {
                         _authState.value = AuthState.Authenticated
                     }
                 } else {
-                    // Jika API Azure gagal (misal user belum terdaftar di DB Azure)
                     _authState.value = AuthState.NeedPersonalInfo
                 }
             } catch (e: Exception) {
                 _authState.value = AuthState.Error("Connection failed: ${e.message}")
             }
-        }
-    }
-
-    private suspend fun loadUserSync() {
-        if (userSession.isInitialized.value) return
-
-        val result = userRepo.syncFullProfile()
-        if (result.isSuccess) {
-            result.getOrNull()?.let { userSession.setUser(it) }
-        } else {
-            userSession.markInitialized()
         }
     }
 

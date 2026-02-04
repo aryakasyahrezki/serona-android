@@ -236,10 +236,10 @@ fun TutorialSearchBar(
         },
 
         textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = fontSize * 0.5f,
+            fontSize = fontSize * 0.6f,
             fontFamily = figtreeFontFamily,
             fontWeight = FontWeight.Medium,
-            color = MutedLight
+            color = ParagraphLight
         ),
 
         singleLine = true,
