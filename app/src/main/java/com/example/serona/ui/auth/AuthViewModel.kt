@@ -28,7 +28,10 @@ class AuthViewModel @Inject constructor (
         val currentUser = authRepo.getCurrentUser()
 
         if (currentUser == null) {
-            _authState.value = AuthState.Unauthenticated
+            viewModelScope.launch {
+                userRepo.clearAllLocalData()
+                _authState.value = AuthState.Unauthenticated
+            }
             return
         }
 
@@ -47,7 +50,8 @@ class AuthViewModel @Inject constructor (
                         _authState.value = AuthState.Authenticated
                     }
                 } else {
-                    _authState.value = AuthState.NeedPersonalInfo
+                    userRepo.clearAllLocalData()
+                    _authState.value = AuthState.Unauthenticated
                 }
             } catch (e: Exception) {
                 _authState.value = AuthState.Error("Connection failed: ${e.message}")

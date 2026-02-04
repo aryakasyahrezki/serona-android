@@ -31,26 +31,25 @@ import com.example.serona.ui.main.scan.ResultScreen
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
 ) {
 
     NavHost(
         navController = navController,
         startDestination = Routes.SPLASH,
         modifier = Modifier.fillMaxSize(),
-
-        enterTransition = {
-            fadeIn(animationSpec = tween(200))
-        },
-        exitTransition = {
-            fadeOut(animationSpec = tween(200))
-        },
-        popEnterTransition = {
-            fadeIn(animationSpec = tween(200))
-        },
-        popExitTransition = {
-            fadeOut(animationSpec = tween(200))
-        }
+//
+//        enterTransition = {
+//            fadeIn(animationSpec = tween(200))
+//        },
+//        exitTransition = {
+//            fadeOut(animationSpec = tween(200))
+//        },
+//        popEnterTransition = {
+//            fadeIn(animationSpec = tween(200))
+//        },
+//        popExitTransition = {
+//            fadeOut(animationSpec = tween(200))
+//        }
     ) {
         composable(
             Routes.SPLASH
@@ -59,7 +58,7 @@ fun AppNavGraph(
         }
         composable(
             Routes.LANDING,
-            enterTransition = { fadeIn(animationSpec = tween(800)) }
+//            enterTransition = { fadeIn(animationSpec = tween(800)) }
         ) {
             LandingPageCarousel(navController)
         }
@@ -95,7 +94,7 @@ fun AppNavGraph(
                     defaultValue = "none"
                 }
             ),
-            enterTransition = { fadeIn(animationSpec = tween(200)) }
+//            enterTransition = { fadeIn(animationSpec = tween(200)) }
         ) {
             TutorialPage(
                 onTutorialClick = { tutorialId ->
@@ -121,7 +120,7 @@ fun AppNavGraph(
 
         composable(
             Routes.FAVORITE,
-            enterTransition = { fadeIn(animationSpec = tween(200)) }
+//            enterTransition = { fadeIn(animationSpec = tween(200)) }
         ) {
             FavoritePage (
                 onTutorialClick = { tutorialId ->

@@ -112,24 +112,44 @@ class TutorialViewModel @Inject constructor(
         applyInitialFilters()
     }
 
+    private fun normalizeSkinTone(tone: String?): String? {
+        return tone?.trim()?.replace(" ", "-")?.split("-")?.joinToString("-") {
+            it.lowercase().replaceFirstChar { char -> char.uppercase() }
+        }
+    }
+
     private fun applyInitialFilters() {
         viewModelScope.launch {
             val filters = mutableSetOf<String>()
 
-            // Priority 1: Parameter dari navigation
-            navFaceShape?.let { filters.add(it) }
-            navSkinTone?.let { filters.add(it) }
-            navOccasion?.let { filters.add(it) }
+            val user = userSession.user.first()
+            android.util.Log.d("TutorialVM", "Nav Params -> Shape: $navFaceShape, Tone: $navSkinTone, Event: $navOccasion")
+            android.util.Log.d("TutorialVM", "HASIL SIMPENAN -> Face Shape: ${user?.faceShape}, Skin Tone: ${user?.skinTone}")
 
-            // Priority 2: Data dari UserSession (jika tidak ada parameter)
-            if (navFaceShape == null && navSkinTone == null && navOccasion == null) {
-                userSession.user.first()?.let { user ->
-                    user.faceShape?.let { filters.add(it) }
-                    user.skinTone?.let { filters.add(it) }
+            val faceShapeResult = navFaceShape ?: user?.faceShape
+            faceShapeResult?.takeIf { it.isNotBlank() }?.let {
+                filters.add(it)
+                android.util.Log.d("TutorialVM", "Face Shape Filter Active: $it")
+            }
+
+            // 3. Logika Skin Tone: Prioritas Navigasi, fallback ke Profil (dengan Normalisasi)
+            val skinToneResult = navSkinTone ?: user?.skinTone
+            skinToneResult?.takeIf { it.isNotBlank() }?.let { rawTone ->
+                normalizeSkinTone(rawTone)?.let { normalized ->
+                    filters.add(normalized)
+                    android.util.Log.d("TutorialVM", "Skin Tone Filter Active: $normalized")
                 }
             }
 
+            // 4. Logika Occasion: Hanya dari Navigasi (karena profil tidak menyimpan event)
+            navOccasion?.takeIf { it.isNotBlank() }?.let {
+                filters.add(it)
+                android.util.Log.d("TutorialVM", "Occasion Filter Active: $it")
+            }
+
+            // Update state filter
             _activeFilters.value = filters
+            android.util.Log.d("TutorialVM", "FINAL FILTERS: $filters")
         }
     }
 

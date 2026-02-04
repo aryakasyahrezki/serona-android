@@ -14,8 +14,8 @@ fun UserDataResponse.toEntity(): UserEntity {
         gender = this.gender ?: "",
         country = this.country ?: "",
         birthDate = this.birth_date ?: "",
-        faceShape = this.face_shape_id,
-        skinTone = this.skin_tone_id
+        faceShape = this.face_shape,
+        skinTone = this.skin_tone
     )
 }
 
