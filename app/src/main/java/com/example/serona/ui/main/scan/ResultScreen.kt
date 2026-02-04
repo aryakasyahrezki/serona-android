@@ -198,36 +198,43 @@ fun ResultScreen(
                     )
                 }
 
-                OutlinedButton(
-                    onClick = { viewModel.saveToProfile() },
-                    enabled = !state.isSaving,
-                    modifier = Modifier.fillMaxWidth().height(buttonHeight * 0.8f),
-                    border = BorderStroke(1.5.dp, Primary),
-                    shape = RoundedCornerShape(12.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(maxWidth * 0.03f)
                 ) {
-                    Text(
-                        "Save to Profile",
-                        fontSize = baseFontSize * 0.8f,
-                        fontWeight = FontWeight.Bold,
-                        color = Primary
-                    )
-                }
+                    OutlinedButton(
+                        onClick = { viewModel.saveToProfile() },
+                        enabled = !state.isSaving,
+                        modifier = Modifier.weight(0.5f).height(buttonHeight * 0.8f),
+                        border = BorderStroke(1.5.dp, Primary),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            "Save to Profile",
+                            fontSize = baseFontSize * 0.8f,
+                            fontWeight = FontWeight.Bold,
+                            color = Primary
+                        )
+                    }
 
-                TextButton(
-                    onClick = {
-                        navController.navigate(Routes.HOME) {
-                            popUpTo(Routes.HOME) { inclusive = true }
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                        .height(buttonHeight * 0.8f),
-                ) {
-                    Text(
-                        text = "Back To Home Page",
-                        fontSize = baseFontSize * 0.7f,
-                        color = Grey40,
-                        fontFamily = figtreeFontFamily
-                    )
+                    OutlinedButton(
+                        onClick = {
+                            navController.navigate(Routes.HOME) {
+                                popUpTo(Routes.HOME) { inclusive = true }
+                            }
+                        },
+                        modifier = Modifier.weight(0.5f).height(buttonHeight * 0.8f),
+                        border = BorderStroke(1.5.dp, Primary),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "Back to Home",
+                            fontSize = baseFontSize * 0.8f,
+                            color = Primary,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = figtreeFontFamily
+                        )
+                    }
                 }
             }
 
