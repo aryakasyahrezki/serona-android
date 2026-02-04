@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.serona.R
+import com.example.serona.theme.BgGrad
 import com.example.serona.theme.Grey40
 import com.example.serona.theme.MutedLight
 import com.example.serona.theme.Primary
@@ -38,6 +39,7 @@ import com.example.serona.theme.Secondary90
 import com.example.serona.theme.WarmSoftCoral
 import com.example.serona.theme.White
 import com.example.serona.theme.figtreeFontFamily
+import com.example.serona.ui.component.BackButton
 import com.example.serona.ui.navigation.Routes
 import com.example.serona.utils.FileUtils
 
@@ -65,6 +67,7 @@ fun FaceScanMenuScreen(
     val descSize = (minDimension.value * 0.035f).sp
     val buttonTextSize = (minDimension.value * 0.04f).sp
     val circleSize = minDimension * 0.55f
+    val fontSize = (maxWidth * 0.07f).value.sp
 
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
@@ -97,22 +100,13 @@ fun FaceScanMenuScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(White)
+                .background(brush = BgGrad)
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(maxHeight * 0.05f))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .height(4.dp)
-                    .background(color = Secondary90, shape = RoundedCornerShape(32.dp))
-            )
-
-            Spacer(modifier = Modifier.height(maxHeight * 0.15f))
+            Spacer(modifier = Modifier.height(maxHeight * 0.2f))
 
             /** * DECORATIVE VISUAL ELEMENTS
              * Nested circles with Coral tones to represent focal point for scanning.
@@ -200,6 +194,19 @@ fun FaceScanMenuScreen(
             }
 
             Spacer(modifier = Modifier.navigationBarsPadding().height(24.dp))
+        }
+
+        Box(
+            modifier = Modifier
+                .statusBarsPadding()
+                .padding(maxWidth * 0.05f, maxWidth * 0.032f)
+        ) {
+            BackButton(
+                onBackClick = { navController.navigate("home") },
+                // Gunakan rasio agar konsisten
+                buttonSize = minDimension * 0.07f,
+                fontSize = fontSize * 0.86
+            )
         }
 
         /**
