@@ -30,6 +30,7 @@ import com.example.serona.theme.MutedLight
 import com.example.serona.theme.Primary
 import com.example.serona.theme.Primary50
 import com.example.serona.theme.figtreeFontFamily
+import com.example.serona.ui.auth.AuthViewModel
 import com.example.serona.ui.auth.login.LoginViewModel
 import com.example.serona.ui.component.CleanLinearProgress
 import com.example.serona.ui.component.PersonalInfoTextField
@@ -42,7 +43,7 @@ fun PersonalInfoPage(
     navController: NavController,
     viewModel: PersonalInfoViewModel = hiltViewModel(),
     loginViewModel : LoginViewModel = hiltViewModel(),
-    authViewModel : Authentication
+    authViewModel : AuthViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val progress = state.answeredCount / 3f

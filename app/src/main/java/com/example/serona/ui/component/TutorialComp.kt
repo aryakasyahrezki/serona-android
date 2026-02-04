@@ -113,13 +113,13 @@ fun TutorialCard(
                         fontSize = fontSize * 0.4f,
                         fontWeight = FontWeight.Bold,
                         fontFamily = figtreeFontFamily,
-                        lineHeight = 15.sp,
+                        lineHeight = fontSize * 0.5f,
                         modifier = Modifier
                             .background(
                                 color = Color(0xFFDC143C), // Dark red/maroon color
                                 shape = RoundedCornerShape(12.dp)
                             )
-                            .padding(horizontal = 8.dp)
+                            .padding(horizontal = space * 0.3f)
                     )
 
                     Spacer(Modifier.height(space * 0.2f))
@@ -132,11 +132,11 @@ fun TutorialCard(
                         color = Color.Black,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        lineHeight = 16.sp,
+                        lineHeight = fontSize * 0.6f,
                         fontFamily = figtreeFontFamily
                     )
 
-                    Spacer(Modifier.height(space * 0.2f))
+                    Spacer(Modifier.height(space * 0.1f))
 
                     // Description
                     Text(
@@ -146,7 +146,7 @@ fun TutorialCard(
                         color = Color(0xFF666666),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        lineHeight = 13.sp
+                        lineHeight = fontSize * 0.6f
                     )
 
                     Spacer(Modifier.height(space * 0.1f))
@@ -234,6 +234,14 @@ fun TutorialSearchBar(
                 fontSize = fontSize * 0.8f
             )
         },
+
+        textStyle = androidx.compose.ui.text.TextStyle(
+            fontSize = fontSize * 0.5f,
+            fontFamily = figtreeFontFamily,
+            fontWeight = FontWeight.Medium,
+            color = MutedLight
+        ),
+
         singleLine = true,
         leadingIcon = {
             Icon(
