@@ -105,6 +105,7 @@ fun TutorialCard(
                 Column(
                     modifier = Modifier
                         .weight(1f)
+//                    .fillMaxHeight()
                 ) {
                     // Tag
                     Text(
@@ -208,6 +209,7 @@ fun SectionTitle(title: String) {
         color = Heading,
         fontWeight = FontWeight.SemiBold,
         fontFamily = figtreeFontFamily,
+//        modifier = Modifier.padding(vertical = 4.dp)
     )
 }
 
@@ -226,20 +228,21 @@ fun TutorialSearchBar(
         onValueChange = onQueryChange,
         modifier = Modifier
             .fillMaxWidth(),
+//            .padding(horizontal = 8.dp),
         placeholder = {
             Text(
                 "Search",
                 color = ParagraphLight,
                 fontFamily = figtreeFontFamily,
-                fontSize = fontSize * 0.8f
+                fontSize = fontSize * 0.6f
             )
         },
 
         textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = fontSize * 0.5f,
+            fontSize = fontSize * 0.6f,
             fontFamily = figtreeFontFamily,
             fontWeight = FontWeight.Medium,
-            color = MutedLight
+            color = ParagraphLight
         ),
 
         singleLine = true,
@@ -273,11 +276,16 @@ fun FilterRow(
     onFilterSelected: (String) -> Unit,
     fontSize: TextUnit
 ) {
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+
+    val space = maxHeight * 0.03f
     LazyRow(
         modifier = Modifier
             .fillMaxWidth(),
 //            .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(space * 0.2f)
     ) {
         // Filters button with icon
         item {
@@ -312,9 +320,16 @@ fun FilterButton(
     onClick: () -> Unit,
     fontSize: TextUnit
 ) {
+
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+    val iconSize = (maxHeight * 0.03f)
+    val buttonSize = maxWidth * 0.07f
+    val space = maxHeight * 0.03f
+
     Box(
         modifier = Modifier
-            .height(40.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(
                 if (isActive) Color(0xFFFFF0F5) else White
@@ -325,19 +340,19 @@ fun FilterButton(
                 shape = RoundedCornerShape(12.dp)
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(horizontal = space * 0.5f, vertical = space * 0.3f),
         contentAlignment = Alignment.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(space * 0.2f)
         ) {
             if (text == "Filters" && showIcon) {
                 Icon(
                     imageVector = Icons.Default.FilterList,
                     contentDescription = "Filter",
                     tint = Primary,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(iconSize * 0.8f)
                 )
             }
 
@@ -360,6 +375,12 @@ fun FilterDropDownButton(
     onFilterSelected: (String) -> Unit,
     fontSize: TextUnit
 ) {
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+    val iconSize = (maxHeight * 0.03f)
+    val buttonSize = maxWidth * 0.07f
+    val space = maxHeight * 0.03f
 
     var expanded by remember { mutableStateOf(false) }
     var buttonWidth by remember { mutableStateOf(0) }
@@ -372,7 +393,6 @@ fun FilterDropDownButton(
         // Main category button
         Box(
             modifier = Modifier
-                .height(40.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(
                     if (hasActiveFilter) Color(0xFFFFF0F5) else White
@@ -387,12 +407,11 @@ fun FilterDropDownButton(
                     shape = RoundedCornerShape(12.dp)
                 )
                 .clickable { expanded = true }
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = space * 0.5f, vertical = space * 0.3f),
             contentAlignment = Alignment.Center
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
                     text = categoryName,
@@ -406,7 +425,7 @@ fun FilterDropDownButton(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = "Dropdown",
                     tint = if (hasActiveFilter) Primary else Color(0xFF666666),
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(iconSize * 0.8f)
                 )
             }
         }
@@ -457,22 +476,29 @@ fun ActiveFilterChip(
     onRemove: () -> Unit,
     fontSize: TextUnit
 ) {
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+    val iconSize = (maxHeight * 0.03f)
+    val buttonSize = maxWidth * 0.07f
+    val space = maxHeight * 0.03f
+
     Box(
         modifier = Modifier
-            .height(32.dp)
+//            .height(32.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFFFF0F5))
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(horizontal = space * 0.4f, vertical = space * 0.3f),
         contentAlignment = Alignment.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(space * 0.2f)
         ) {
             Text(
                 text = text,
                 color = Primary,
-                fontSize = fontSize * 0.55f,
+                fontSize = fontSize * 0.5f,
                 fontWeight = FontWeight.Medium,
                 fontFamily = figtreeFontFamily
             )
@@ -481,7 +507,7 @@ fun ActiveFilterChip(
                 contentDescription = "Remove filter",
                 tint = Primary,
                 modifier = Modifier
-                    .size(16.dp)
+                    .size(iconSize * 0.5f)
                     .clickable(onClick = onRemove)
             )
         }
@@ -490,6 +516,14 @@ fun ActiveFilterChip(
 
 @Composable
 fun EmptyView() {
+
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+    val iconSize = (maxHeight * 0.03f)
+    val buttonSize = maxWidth * 0.07f
+    val space = maxHeight * 0.03f
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -504,7 +538,7 @@ fun EmptyView() {
                 color = BodyText,
                 fontFamily = figtreeFontFamily
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(space * 0.5f))
             Text(
                 "Try again with other keywords",
                 style = MaterialTheme.typography.bodyMedium,
@@ -521,13 +555,20 @@ fun CategoryChip(
     text: String,
     isPrimary: Boolean = true
 ) {
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val maxHeight = configuration.screenHeightDp.dp
+    val iconSize = (maxHeight * 0.03f)
+    val buttonSize = maxWidth * 0.07f
+    val space = maxHeight * 0.03f
+
     Surface(
         shape = RoundedCornerShape(20.dp),
         color = if (isPrimary) PrimaryContainer else SecondaryContainer
     ) {
         Text(
             text = text,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = space * 0.5f, vertical = space * 0.1f),
             color = if (isPrimary) Primary else Tertiary,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
@@ -578,72 +619,70 @@ fun TutorialStepCard(
             .padding(vertical = space * 0.2f)
     ) {
 
-        Spacer(modifier = Modifier.height(space * 0.5f))
-
+        // Step Card Content
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = White),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-
             Box(
-                modifier = Modifier.fillMaxWidth()
-            ){
-                Box(
-                    modifier = Modifier
-                        .width(14.dp)
-                        .fillMaxHeight()
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    Primary.copy(alpha = 0.6f),
-                                    Primary.copy(alpha = 0.2f),
-                                    Color.Transparent
-                                )
-                            ),
-                            shape = RoundedCornerShape(
-                                topStart = 16.dp,
-                                bottomStart = 16.dp
+                modifier = Modifier
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colorStops = arrayOf(
+                                0.0f to Primary,                // kiri
+                                0.02f to Primary,
+                                0.02f to Color.White,           // batas keras
+                                1.0f to Color.White
                             )
                         )
-                )
+                    )
+                    .padding(space * 0.3f)
+            ) {
 
-                if (parsedColor != null && imageUrl.isNullOrEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    //disini
+                    // =========================
+                    // 🔴 VERSION 1: COLOR (HORIZONTAL)
+                    // =========================
+                    if (parsedColor != null && imageUrl.isNullOrEmpty()) {
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        // Color circle + step badge
-                        Box {
-                            Box(
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .clip(CircleShape)
-                                    .background(parsedColor)
-                            )
-                        }
-
-                        Spacer(Modifier.width(space * 0.3f))
-
-                        Column(
-                            modifier = Modifier.weight(1f)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(space * 0.5f),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = title,
-                                fontSize = fontSize * 0.6f,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Heading,
-                                fontFamily = figtreeFontFamily
-                            )
+
+                            // Color circle + step badge
+                            Box {
+                                Box(
+                                    modifier = Modifier
+                                        .size(iconSize * 2.3f)
+                                        .clip(CircleShape)
+                                        .background(parsedColor)
+                                )
+                            }
+
+                            Spacer(Modifier.width(space * 0.4f))
+
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = title,
+                                    fontSize = fontSize * 0.6f,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Heading,
+                                    fontFamily = figtreeFontFamily
+                                )
 
                             Text(
                                 text = description,
-                                fontSize = fontSize * 0.6f,
+                                fontSize = fontSize * 0.5f,
                                 lineHeight = fontSize * 0.5f,
                                 color = BodyText,
                                 fontFamily = figtreeFontFamily
@@ -652,6 +691,9 @@ fun TutorialStepCard(
                     }
                 }
 
+                // =========================
+                // 🔵 VERSION 2: IMAGE (VERTICAL)
+                // =========================
                 else if (!imageUrl.isNullOrEmpty()) {
 
                     Column(
@@ -666,7 +708,7 @@ fun TutorialStepCard(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(24.dp)
+                                    .size(iconSize)
                                     .clip(CircleShape)
                                     .background(Primary),
                                 contentAlignment = Alignment.Center
@@ -675,12 +717,13 @@ fun TutorialStepCard(
                                     text = stepNumber.toString(),
                                     color = White,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp,
+                                    fontSize = fontSize * 0.6f,
                                     fontFamily = figtreeFontFamily,
+//                                lineHeight = 13.sp
                                 )
                             }
 
-                            Spacer(Modifier.width(12.dp))
+                            Spacer(Modifier.width(space * 0.5f))
 
                             Text(
                                 text = title,
@@ -691,29 +734,33 @@ fun TutorialStepCard(
                             )
                         }
 
-                        Spacer(Modifier.height(12.dp))
+                            Spacer(Modifier.height(space * 0.3f))
 
-                        // Image
-                        AsyncImage(
-                            model = imageUrl,
-                            contentDescription = title,
-                            modifier = Modifier
-                                .width(maxWidth * 0.7f)
-                                .height(maxHeight * 0.3f)
-                                .align(Alignment.CenterHorizontally),
-                            contentScale = ContentScale.Crop
-                        )
+                            // Image
+                            AsyncImage(
+                                model = imageUrl,
+                                contentDescription = title,
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .clip(RoundedCornerShape(8.dp))
+//                                    .width(maxWidth * 0.7f)
+                                    .height(maxHeight * 0.2f)
+                                    .sizeIn(maxWidth = maxWidth * 0.8f, maxHeight = maxHeight * 0.5f)
+                                    .align(Alignment.CenterHorizontally),
+                                contentScale = ContentScale.Fit
+                            )
 
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(space * 0.5f))
 
-                        // Description
-                        Text(
-                            text = description,
-                            fontSize = 14.sp,
-                            lineHeight = 18.sp,
-                            color = Heading,
-                            fontFamily = figtreeFontFamily
-                        )
+                            // Description
+                            Text(
+                                text = description,
+                                fontSize = fontSize * 0.5f,
+                                lineHeight = fontSize * 0.6f,
+                                color = Heading,
+                                fontFamily = figtreeFontFamily
+                            )
+                        }
                     }
                 }
 

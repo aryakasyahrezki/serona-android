@@ -406,7 +406,7 @@ fun TutorialDetailPage(
     val configuration = LocalConfiguration.current
     val maxWidth = configuration.screenWidthDp.dp
     val maxHeight = configuration.screenHeightDp.dp
-
+    val iconSize = (maxHeight * 0.03f)
     val fontSize = (maxWidth * 0.06f).value.sp
     val horiPadding = maxWidth * 0.05f
     val vertiPadding = maxHeight * 0.0625f
@@ -468,7 +468,7 @@ fun TutorialDetailPage(
                     contentDescription = "Favorite",
                     tint = if (isFavorite) Color(0xFFDC143C) else BodyText,
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(iconSize)
                         .clickable(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() }
@@ -492,7 +492,7 @@ fun TutorialDetailPage(
                 // Category Tags
                 item {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(space * 0.4f)
                     ) {
                         CategoryChip(tut.main_category, isPrimary = true)
                         CategoryChip(tut.sub_category, isPrimary = false)
@@ -506,7 +506,8 @@ fun TutorialDetailPage(
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = Heading,
-                        fontFamily = figtreeFontFamily
+                        fontFamily = figtreeFontFamily,
+                        fontSize = fontSize
                     )
                 }
 
@@ -516,24 +517,25 @@ fun TutorialDetailPage(
                         text = tut.description,
                         style = MaterialTheme.typography.bodyLarge,
                         color = BodyText,
-                        lineHeight = 24.sp,
-                        fontFamily = figtreeFontFamily
+                        lineHeight = fontSize,
+                        fontFamily = figtreeFontFamily,
+                        fontSize = fontSize* 0.6f
                     )
                 }
             }
 
             // Steps Section
             if (steps.isNotEmpty()) {
-                item {
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "Tutorial Steps",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = figtreeFontFamily,
-                        color = Heading
-                    )
-                }
+//                item {
+//                    Spacer(Modifier.height(8.dp))
+//                    Text(
+//                        text = "Tutorial Steps",
+//                        style = MaterialTheme.typography.titleLarge,
+//                        fontWeight = FontWeight.Bold,
+//                        fontFamily = figtreeFontFamily,
+//                        color = Heading
+//                    )
+//                }
 
                 items(steps) { step ->
                     TutorialStepCard(
@@ -549,8 +551,9 @@ fun TutorialDetailPage(
                     Text(
                         "No content available for this tutorial.",
                         color = BodyText,
-                        modifier = Modifier.padding(vertical = 16.dp),
-                        fontFamily = figtreeFontFamily
+                        modifier = Modifier.padding(vertical = space * 0.8f),
+                        fontFamily = figtreeFontFamily,
+                        fontSize = fontSize * 0.6f
                     )
                 }
             }

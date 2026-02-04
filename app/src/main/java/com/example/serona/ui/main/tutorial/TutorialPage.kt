@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -80,14 +81,16 @@ fun TutorialPage(
                 "Tutorial",
                 style = MaterialTheme.typography.headlineSmall,
                 color = Heading,
+                fontSize = fontSize,
                 fontWeight = FontWeight.Bold,
                 fontFamily = figtreeFontFamily
             )
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(space * 0.1f))
             Text(
                 "Here are the tutorials for you!",
                 style = MaterialTheme.typography.bodyMedium,
                 color = BodyText,
+                fontSize = fontSize * 0.6f,
                 fontFamily = figtreeFontFamily
             )
         }
@@ -112,17 +115,18 @@ fun TutorialPage(
             fontSize = fontSize
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(space * 0.6f))
         // Active Filters Section
         if (activeFilters.isNotEmpty()) {
-            Spacer(Modifier.height(6.dp))
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = space * 0.2f),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .height(space * 1.8f)
+//                    .border(width = 1.dp, color = Primary50)
+                    .horizontalScroll(rememberScrollState()),
+//                    .padding(horizontal = space * 0.5f),
+                horizontalArrangement = Arrangement.spacedBy(space * 0.2f),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 activeFilters.forEach { filter ->
                     ActiveFilterChip(
@@ -134,14 +138,14 @@ fun TutorialPage(
 
                 if (activeFilters.size > 1) {
                     TextButton(
-                        onClick = vm::clearAllFilters,
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                        onClick = vm::clearAllFilters
                     ) {
                         Text(
                             "Clear All",
                             color = Primary,
-                            fontSize = 12.sp,
-                            fontFamily = figtreeFontFamily
+                            fontSize = fontSize * 0.5f,
+                            fontFamily = figtreeFontFamily,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -149,7 +153,7 @@ fun TutorialPage(
 
         }
 
-        Spacer(modifier = Modifier.height(space * 0.5f))
+        Spacer(modifier = Modifier.height(space * 0.6f))
 
         // Content Section lsg pakai tutorial dari viewmodel
         when {
@@ -175,7 +179,7 @@ fun TutorialPage(
 //                        top = 8.dp,
 //                        end = 8.dp,
                         bottom = maxHeight * 0.12f),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(space*0.5f)
                 ) {
 
                     // Face Shape Section

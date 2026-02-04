@@ -86,14 +86,16 @@ fun FavoritePage(
                 style = MaterialTheme.typography.headlineSmall,
                 color = Heading,
                 fontWeight = FontWeight.Bold,
-                fontFamily = figtreeFontFamily
+                fontFamily = figtreeFontFamily,
+                fontSize = fontSize
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 "Here are the article you like!",
                 style = MaterialTheme.typography.bodyMedium,
                 color = BodyText,
-                fontFamily = figtreeFontFamily
+                fontFamily = figtreeFontFamily,
+                fontSize = fontSize * 0.6f
             )
         }
 
@@ -114,7 +116,7 @@ fun FavoritePage(
         } else {
             LazyColumn(
                 contentPadding = PaddingValues(bottom = maxHeight * 0.12f),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(space)
             ) {
                 items(filteredFavorites, key = { it.id }) { tutorial ->
                     TutorialCard(
@@ -134,6 +136,10 @@ fun FavoritePage(
 
 @Composable
 fun EmptySearchResultView() {
+
+    val configuration = LocalConfiguration.current
+    val maxWidth = configuration.screenWidthDp.dp
+    val fontSize = (maxWidth * 0.06f).value.sp
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -147,7 +153,8 @@ fun EmptySearchResultView() {
                 "Tidak ada hasil",
                 style = MaterialTheme.typography.titleMedium,
                 color = Heading,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                fontSize = fontSize * 0.7f
             )
             Spacer(Modifier.height(8.dp))
             Text(
@@ -155,7 +162,8 @@ fun EmptySearchResultView() {
                 style = MaterialTheme.typography.bodyMedium,
                 color = BodyText,
                 fontFamily = figtreeFontFamily,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                fontSize = fontSize * 0.6f
             )
         }
     }
