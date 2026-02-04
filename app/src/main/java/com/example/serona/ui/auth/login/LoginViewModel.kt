@@ -24,7 +24,6 @@ class LoginViewModel @Inject constructor(
     private val _loginFormState = MutableLiveData(LoginFormState())
     val loginFormState : LiveData<LoginFormState> = _loginFormState
 
-    //ini state hanya untuk login aja, state untuk tau user sebelumnya uda login atau belum (session), ada di AuthViewModel
     private val _loginState = MutableLiveData<AuthState>()
     val loginState : LiveData<AuthState> = _loginState
 
@@ -71,16 +70,18 @@ class LoginViewModel @Inject constructor(
         repo.login(state.email, state.password) { result ->
             if (result.isSuccess) {
                 viewModelScope.launch {
-                    // Ambil dari BE & Simpan ke Room dan ke UserSession
-                    val apiResult = userRepo.syncFullProfile()
-
-                    if (apiResult.isSuccess) {
-                        // UI akan otomatis update via userDataFlow di Repository
-                        _loginState.postValue(AuthState.Authenticated)
+                    val syncResult = userRepo.syncFullProfile()
+                    if (syncResult.isSuccess) {
+                        val user = syncResult.getOrNull()
+                        if (user == null) { // Tambahkan pengecekan null extra
+                            _loginState.postValue(AuthState.Error("Profile not found"))
+                        } else if (user.country.isNullOrBlank()) {
+                            _loginState.postValue(AuthState.NeedPersonalInfo)
+                        } else {
+                            _loginState.postValue(AuthState.Authenticated)
+                        }
                     } else {
-                        _loginState.postValue(
-                            AuthState.Error(apiResult.exceptionOrNull()?.message ?: "Failed fetch user data")
-                        )
+                        _loginState.postValue(AuthState.NeedPersonalInfo)
                     }
                 }
             } else {

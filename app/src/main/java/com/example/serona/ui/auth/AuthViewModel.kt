@@ -25,35 +25,37 @@ class AuthViewModel @Inject constructor (
     }
 
     fun checkAuthStatus() {
-        _authState.value = AuthState.Loading
-
         val currentUser = authRepo.getCurrentUser()
+
         if (currentUser == null) {
-            _authState.value = AuthState.Unauthenticated
+            viewModelScope.launch {
+                userRepo.clearAllLocalData()
+                _authState.value = AuthState.Unauthenticated
+            }
             return
         }
 
-        // Langsung set Authenticated jika Firebase User ada
-        _authState.value = AuthState.Authenticated
+        _authState.value = AuthState.Loading
 
         viewModelScope.launch {
             try {
-                loadUserSync()
-                // Data profil akan terisi di userSession secara diam-diam
+                val result = userRepo.syncFullProfile()
+
+                if (result.isSuccess) {
+                    val user = result.getOrNull()
+
+                    if (user?.gender == null || user?.country.isNullOrBlank()) {
+                        _authState.value = AuthState.NeedPersonalInfo
+                    } else {
+                        _authState.value = AuthState.Authenticated
+                    }
+                } else {
+                    userRepo.clearAllLocalData()
+                    _authState.value = AuthState.Unauthenticated
+                }
             } catch (e: Exception) {
-                // Jika gagal ambil profil, bisa ditangani di halaman Home (misal: minta logout)
+                _authState.value = AuthState.Error("Connection failed: ${e.message}")
             }
-        }
-    }
-
-    private suspend fun loadUserSync() {
-        if (userSession.isInitialized.value) return
-
-        val result = userRepo.syncFullProfile()
-        if (result.isSuccess) {
-            result.getOrNull()?.let { userSession.setUser(it) }
-        } else {
-            userSession.markInitialized()
         }
     }
 

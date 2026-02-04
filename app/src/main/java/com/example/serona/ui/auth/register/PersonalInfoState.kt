@@ -8,7 +8,8 @@ data class PersonalInfoState(
     val day: String = "",
     val month: String = "",
     val year: String = "",
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val dobError: String? = null
 ){
     val answeredCount: Int
         get() {

@@ -1,5 +1,7 @@
 package com.example.serona.data.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class UserProfileResponse(
     val success: Boolean,
     val data: UserDataResponse // Data asli ada di sini
@@ -11,6 +13,6 @@ data class UserDataResponse(
     val gender: String,
     val country: String,
     val birth_date: String,
-    val face_shape_id: String?,
-    val skin_tone_id: String?
+    @SerializedName("face_shape") val face_shape: String?, // Tambahkan ini!
+    @SerializedName("skin_tone") val skin_tone: String?
 )

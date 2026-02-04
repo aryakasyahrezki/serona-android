@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import com.example.serona.theme.MutedLight
 import com.example.serona.theme.Primary
 import com.example.serona.theme.Primary50
 import com.example.serona.theme.White
@@ -61,6 +62,12 @@ fun AuthTextField(
                 )
             },
             singleLine = true,
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = fontSize * 0.7f,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Medium,
+                color = White
+            ),
             shape = RoundedCornerShape(15.dp),
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.Transparent,
@@ -113,6 +120,12 @@ fun AuthPasswordField(
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.Medium)
             },
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = fontSize * 0.7f,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Medium,
+                color = White
+            ),
             singleLine = true,
             shape = RoundedCornerShape(15.dp),
             visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),

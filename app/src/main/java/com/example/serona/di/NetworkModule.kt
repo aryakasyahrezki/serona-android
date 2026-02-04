@@ -1,6 +1,7 @@
 package com.example.serona.di
 
 import com.example.serona.data.api.UserApi
+import com.example.serona.data.api.TutorialApi
 import com.example.serona.data.api.FaceAnalysisApi
 import com.example.serona.data.network.AuthInterceptor
 import com.example.serona.data.repository.AuthRepository
@@ -74,6 +75,12 @@ object NetworkModule {
     @Singleton
     fun provideUserApi(@UserRetrofit retrofit: Retrofit): UserApi {
         return retrofit.create(UserApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTutorialApi(@UserRetrofit retrofit: Retrofit): TutorialApi{
+        return retrofit.create(TutorialApi::class.java)
     }
 
     @Provides

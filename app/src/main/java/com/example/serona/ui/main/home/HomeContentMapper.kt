@@ -26,8 +26,8 @@ class HomeContentMapper @Inject constructor(
 
     fun getSkinDescription(skinTone: String?): String {
         return when (skinTone?.lowercase()) {
-            "light-fair" -> context.getString(R.string.desc_skin_light)
-            "medium-tan" -> context.getString(R.string.desc_skin_medium)
+            "fair light" -> context.getString(R.string.desc_skin_light)
+            "medium tan" -> context.getString(R.string.desc_skin_medium)
             "deep" -> context.getString(R.string.desc_skin_deep)
             else -> context.getString(R.string.skin_not_detected_body)
         }
@@ -35,8 +35,8 @@ class HomeContentMapper @Inject constructor(
 
     fun getSkinColor(skinTone: String?): Color {
         return when (skinTone?.lowercase()) {
-            "light-fair" -> Color(0xFFF5E1C8)
-            "medium-tan" -> Color(0xFFD4A373)
+            "fair light" -> Color(0xFFF5E1C8)
+            "medium tan" -> Color(0xFFD4A373)
             "deep" -> Color(0xFF8D5524)
             else -> Color(0xFFFFD7A8)
         }

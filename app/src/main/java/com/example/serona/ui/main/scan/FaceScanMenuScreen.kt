@@ -202,8 +202,13 @@ fun FaceScanMenuScreen(
                 .padding(maxWidth * 0.05f, maxWidth * 0.032f)
         ) {
             BackButton(
-                onBackClick = { navController.navigate("home") },
-                // Gunakan rasio agar konsisten
+                onBackClick = {
+                    navController.navigate("home"){
+                        popUpTo(Routes.HOME) {
+                            inclusive = true
+                        }
+                    }
+                },
                 buttonSize = minDimension * 0.07f,
                 fontSize = fontSize * 0.86
             )

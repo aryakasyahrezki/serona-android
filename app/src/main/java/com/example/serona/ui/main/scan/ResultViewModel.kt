@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.serona.data.dto.UpdateProfileRequest
 import com.example.serona.data.repository.UserRepository
+import com.example.serona.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -67,11 +68,24 @@ class ResultViewModel @Inject constructor(
             // Get current user session from the local data flow
             val currentUser = userRepo.userDataFlow.first()
             if (currentUser != null) {
+                val parsedDate = DateUtils.parseBirthDate(currentUser.birthDate)
+
+                // Ubah Triple tersebut menjadi string "2025-01-21"
+                val formattedDate = if (parsedDate != null) {
+                    DateUtils.formatBirthDate(
+                        day = parsedDate.first,
+                        month = parsedDate.second,
+                        year = parsedDate.third
+                    )
+                } else {
+                    currentUser.birthDate // Fallback jika parsing gagal
+                }
+
                 val request = UpdateProfileRequest(
                     name = currentUser.name,
                     email = currentUser.email,
                     country = currentUser.country,
-                    birth_date = currentUser.birthDate,
+                    birth_date = formattedDate,
                     gender = currentUser.gender.name.lowercase().replaceFirstChar { it.uppercase() },
                     face_shape = decodedShape,
                     skin_tone = decodedTone

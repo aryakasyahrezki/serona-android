@@ -48,6 +48,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.serona.theme.BgGrad
 import com.example.serona.theme.Heading
+import com.example.serona.theme.MutedLight
 import com.example.serona.theme.Primary
 import com.example.serona.theme.Tertiary
 import com.example.serona.theme.White
@@ -252,7 +253,7 @@ fun DeleteAccountDialog(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    placeholder = { Text("Enter your password", fontFamily = figtreeFontFamily, fontSize = fontSize * 0.6f) },
+                    placeholder = { Text("Enter your password", fontFamily = figtreeFontFamily, fontSize = fontSize * 0.6f, color = MutedLight) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true,
@@ -260,7 +261,13 @@ fun DeleteAccountDialog(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Primary,
                         unfocusedBorderColor = Color.LightGray
-                    )
+                    ),
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        fontSize = fontSize * 0.5f,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        color = MutedLight
+                    ),
                 )
 
                 Spacer(modifier = Modifier.height(space * 0.8f))

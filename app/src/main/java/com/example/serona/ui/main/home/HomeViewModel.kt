@@ -35,6 +35,7 @@ class HomeViewModel @Inject constructor(
         _dialogDismissed
     ){ user, showTooltip, dismissed->
             val scanned = !user?.faceShape.isNullOrEmpty() && !user?.skinTone.isNullOrEmpty()
+            android.util.Log.d("CHECK_DATA", "User: ${user?.name}, Shape: ${user?.faceShape}, Tone: ${user?.skinTone}, Scanned: $scanned")
             val userEmail = user?.email ?: ""
 
             val shouldShowDialog = !scanned && prefs.isFirstLaunch(userEmail) && !dismissed

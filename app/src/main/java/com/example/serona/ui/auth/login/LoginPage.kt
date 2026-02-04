@@ -40,6 +40,7 @@ import com.example.serona.ui.auth.ForgotPasswordState
 import com.example.serona.ui.auth.LoginFormState
 import com.example.serona.ui.component.AuthPasswordField
 import com.example.serona.ui.component.AuthTextField
+import com.example.serona.ui.navigation.Routes
 
 @Composable
 fun LoginPage(
@@ -63,11 +64,18 @@ fun LoginPage(
         when(authState){
             is AuthState.Authenticated-> {
                 navController.navigate("home") {
-                    popUpTo("login") { // artinya pop up to (jadi semua screen sampe login dihapus biar kalo user back lgsg ke luar, ngga login ulang lagi)
+                    popUpTo(Routes.LOGIN) {
                         inclusive = true
                     }
                 }
 
+                loginViewModel.resetLoginState()
+            }
+
+            is AuthState.NeedPersonalInfo -> {
+                navController.navigate(Routes.PERSONALINFO) {
+                    popUpTo(Routes.LOGIN) { inclusive = true }
+                }
                 loginViewModel.resetLoginState()
             }
 
@@ -111,8 +119,8 @@ fun LoginPage(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 color = Color.White,
                 fontFamily = leagueSpartanFontFamily,
-                fontSize = fontSize * 0.1f,
-                letterSpacing = (space * 0.04f).value.sp
+                fontSize = fontSize * 0.8f,
+                letterSpacing = fontSize * 0.25f
             )
 
             LoginCard(
@@ -200,6 +208,7 @@ fun LoginCard(
                     Text(
                         "Forgot Password",
                         color = Primary,
+                        fontFamily = figtreeFontFamily
                     )
                 }
 
@@ -276,7 +285,7 @@ fun ForgotPasswordDialog(
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(28.dp.toPx())
             )
         },
-        containerColor = Color(0xFFECD3D4).copy(alpha = 0.9f),
+        containerColor = Color(0xFFFFF2F2).copy(alpha = 0.9f),
         title = {
             Box(
                 modifier = Modifier.fillMaxWidth(),

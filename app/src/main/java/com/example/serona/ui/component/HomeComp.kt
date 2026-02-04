@@ -2,6 +2,7 @@ package com.example.serona.ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -192,7 +193,8 @@ fun eventCard(
     bgColor: Color,
     icon: ImageVector,
     screenHeight: Dp,
-    screenWidth: Dp
+    screenWidth: Dp,
+    onClick : () -> Unit
 ) {
     val space = (screenHeight * 0.04f)
 
@@ -204,7 +206,8 @@ fun eventCard(
                 color = bgColor,
                 shape = RoundedCornerShape(10.dp)
             )
-            .padding(10.dp),
+            .padding(10.dp)
+            .clickable(onClick = {onClick()}),
         contentAlignment = Alignment.Center
     ){
         Column(

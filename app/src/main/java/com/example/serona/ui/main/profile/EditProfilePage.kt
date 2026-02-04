@@ -79,7 +79,6 @@ fun EditProfilePage(
             .fillMaxSize()
             .background(brush = BgGrad)
             .padding(vertical = vertiPadding, horizontal = horiPadding)
-            .verticalScroll(rememberScrollState())
     ) {
 
         Column() {
@@ -92,15 +91,15 @@ fun EditProfilePage(
                 fontSize = fontSize * 0.86
             )
 
-            Spacer(modifier = Modifier.height(space))
-
             // Profile Section
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(horiPadding * 0.3f)
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
             ) {
+                Spacer(modifier = Modifier.height(space))
 
                 // Avatar
                 Box(

@@ -1,8 +1,13 @@
 package com.example.serona.ui.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,11 +15,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -29,7 +37,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.serona.theme.GenderButtonGrad
 import com.example.serona.theme.Tertiary20
 import androidx.compose.material3.DropdownMenuItem
@@ -48,7 +55,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.example.serona.theme.Grey40
 import com.example.serona.theme.MutedLight
+import com.example.serona.theme.ParagraphLight
+import com.example.serona.theme.Primary
 import com.example.serona.theme.Primary50
 import com.example.serona.theme.White
 import com.example.serona.theme.figtreeFontFamily
@@ -124,66 +134,98 @@ fun PersonalInfoTextField(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    // State untuk menyimpan lebar TextField, agar Popup bisa menyesuaikan
     var textFieldWidth by remember { mutableStateOf(0) }
     var textFieldHeight by remember { mutableStateOf(0) }
     val density = LocalDensity.current
 
     if (isDropdown) {
-        // ExposedDropdownMenuBox tetap digunakan sebagai container utama
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded },
             modifier = modifier
         ) {
-            // TextField yang menjadi jangkar visual
-            OutlinedTextField(
-                value = value,
-                onValueChange = {},
-                readOnly = true,
-                label = {
-                    Text(
-                        label,
-                        fontSize = labelFontSize,
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                textStyle = TextStyle(
-                    fontSize = fontSize * 0.6f,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MutedLight
-                ),
-                shape = RoundedCornerShape(15.dp),
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor() // Tetap digunakan agar Box tahu posisi anchor
-                    .onSizeChanged {
-                        // Simpan lebar TextField saat ukurannya berubah
-                        textFieldWidth = it.width
-                        textFieldHeight = it.height
+            Box(contentAlignment = Alignment.CenterStart) {
+                val isCountryField = label == "Choose Your Country"
+
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = {},
+                    readOnly = true,
+                    shape = RoundedCornerShape(15.dp),
+                    label = if (isCountryField) null else {
+                        { Text(
+                            label,
+                            fontSize = fontSize * 0.7f,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Primary
+                        ) }
                     },
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedIndicatorColor = Primary50.copy(alpha = 0.4f),
-                    focusedIndicatorColor = Primary50.copy(alpha = 0.5f),
-                    unfocusedLabelColor = Primary50.copy(alpha = 0.8f),
-                    focusedLabelColor = Primary50,
-                    errorContainerColor = Color.Transparent,
+                    textStyle = TextStyle(
+                        fontSize = fontSize * 0.65f,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        color = Grey40
+                    ),
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                        .onSizeChanged {
+                            textFieldWidth = it.width
+                            textFieldHeight = it.height
+                        },
+
+                    trailingIcon = {
+                        if (isDropdown) {
+                            androidx.compose.material3.Icon(
+                                imageVector = if (expanded)
+                                    androidx.compose.material.icons.Icons.Filled.KeyboardArrowUp
+                                else
+                                    androidx.compose.material.icons.Icons.Filled.KeyboardArrowDown,
+                                contentDescription = null,
+                                tint = MutedLight
+                            )
+                        }
+                    },
+
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedIndicatorColor = Primary50.copy(alpha = 0.4f),
+                        focusedIndicatorColor = Primary50.copy(alpha = 0.5f),
+                        unfocusedLabelColor = Primary50.copy(alpha = 0.8f),
+                        focusedLabelColor = Primary50,
+                        errorContainerColor = Color.Transparent,
+                    )
                 )
-            )
+
+                // INI ADALAH PLACEHOLDER/LABEL MANUAL KAMU
+                if (isCountryField) {
+                    AnimatedVisibility(
+                        // Muncul saat kosong, HILANG saat fokus atau expand
+                        visible = value.isEmpty() && !expanded,
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                        modifier = Modifier.padding(start = 16.dp)
+                    ) {
+                        Text(
+                            text = label, // "Choose Your Country"
+                            fontSize = fontSize * 0.7f, // Sesuaikan ukuran agar sama dengan isi
+                            fontFamily = figtreeFontFamily,
+                            color = Primary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            }
 
             if (expanded) {
                 Popup(
                     alignment = Alignment.TopEnd,
                     offset = IntOffset(
-                        x = 0,               // Tidak digeser secara horizontal
-                        y = textFieldHeight  // Geser ke bawah
+                        x = 0,
+                        y = textFieldHeight
                     ),
                     onDismissRequest = { expanded = false },
                     properties = PopupProperties(
@@ -196,10 +238,10 @@ fun PersonalInfoTextField(
                     Column(
                         modifier = Modifier
                             .width(with(density) { textFieldWidth.toDp() })
-                            .heightIn(max = maxHeight * 0.3f)
+                            .heightIn(max = maxHeight * 0.2f)
                             .shadow(elevation = 8.dp, shape = RoundedCornerShape(15.dp))
                             .background(
-                                color = White, // Warna latar belakang menu
+                                color = White,
                                 shape = RoundedCornerShape(15.dp)
                             )
                             .verticalScroll(rememberScrollState())
@@ -212,7 +254,8 @@ fun PersonalInfoTextField(
                                         item,
                                         fontSize = fontSize * 0.7f,
                                         fontFamily = figtreeFontFamily,
-                                        fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal
+                                        fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal,
+                                        color = Grey40
                                     )
                                 },
                                 onClick = {

@@ -3,7 +3,9 @@ package com.example.serona.ui.auth.register
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Male
@@ -22,15 +24,24 @@ import com.example.serona.theme.White
 import com.example.serona.ui.component.GenderCard
 import androidx.navigation.NavController
 import com.example.serona.data.model.Gender
+import com.example.serona.theme.Heading
 import com.example.serona.theme.MutedLight
+import com.example.serona.theme.Primary
+import com.example.serona.theme.Primary50
 import com.example.serona.theme.figtreeFontFamily
+import com.example.serona.ui.auth.AuthViewModel
+import com.example.serona.ui.auth.login.LoginViewModel
 import com.example.serona.ui.component.CleanLinearProgress
 import com.example.serona.ui.component.PersonalInfoTextField
+import com.example.serona.ui.navigation.Routes
+
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun PersonalInfoPage(
     navController: NavController,
-    viewModel: PersonalInfoViewModel = hiltViewModel()
+    viewModel: PersonalInfoViewModel = hiltViewModel(),
+    loginViewModel : LoginViewModel = hiltViewModel(),
+    authViewModel : AuthViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val progress = state.answeredCount / 3f
@@ -49,7 +60,7 @@ fun PersonalInfoPage(
 
     val fontSize = (maxWidth * 0.052f).value.sp
     val calculatedLabelSize = (fontSize.value * 0.73f).sp
-    val horiPadding = maxWidth * 0.05f
+    val horiPadding = maxWidth * 0.04f
     val space = maxHeight * 0.07f
     val buttonHeight = (fontSize * 2f).value.dp
 
@@ -88,7 +99,17 @@ fun PersonalInfoPage(
                 color = MutedLight
             )
 
-            Spacer(modifier = Modifier.height(space * 0.5f))
+            Spacer(modifier = Modifier.height(space * 0.4f))
+
+            Text(
+                text = "Gender",
+                fontSize = fontSize * 0.75f,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                color = Heading
+            )
+
+            Spacer(modifier = Modifier.height(space * 0.1f))
 
             // Gender Selection
             Row(
@@ -121,6 +142,16 @@ fun PersonalInfoPage(
 
             Spacer(modifier = Modifier.height(space * 0.5f))
 
+            Text(
+                text = "Country",
+                fontSize = fontSize * 0.75f,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                color = Heading
+            )
+
+            Spacer(modifier = Modifier.height(space * 0.1f))
+
             // COUNTRY DROPDOWN
             PersonalInfoTextField(
                 label = "Choose Your Country",
@@ -151,10 +182,20 @@ fun PersonalInfoPage(
 
             Spacer(modifier = Modifier.height(space * 0.5f))
 
+            Text(
+                text = "Date of Birth",
+                fontSize = fontSize * 0.75f,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                color = Heading
+            )
+
+            Spacer(modifier = Modifier.height(space * 0.008f))
+
             // DATE OF BIRTH
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                horizontalArrangement = Arrangement.spacedBy(maxWidth * 0.007f)
             ) {
 
                 PersonalInfoTextField(
@@ -162,7 +203,7 @@ fun PersonalInfoPage(
                     value = state.day,
                     onValueChange = { },
                     isDropdown = true,
-                    dropdownItems = (1..30).map { it.toString() },
+                    dropdownItems = (1..31).map { it.toString() },
                     onDropdownItemSelected = { day ->
                         viewModel.selectDOB(day, state.month, state.year)
                     },
@@ -207,7 +248,7 @@ fun PersonalInfoPage(
                     value = state.year,
                     onValueChange = { },
                     isDropdown = true,
-                    dropdownItems = (1999..2010).map { it.toString() },
+                    dropdownItems = (1990..2010).map { it.toString() },
                     onDropdownItemSelected = { year ->
                         viewModel.selectDOB(state.day, state.month, year)
                     },
@@ -220,14 +261,26 @@ fun PersonalInfoPage(
 
             }
 
-            Spacer(modifier = Modifier.height(space * 0.5f))
+            if (state.dobError != null) {
+                Text(
+                    text = state.dobError!!,
+                    color = Primary50,
+                    fontSize = fontSize * 0.6f,
+                    fontFamily = figtreeFontFamily,
+                    modifier = Modifier.padding(start = space * 0.08f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(space * 0.8f))
 
             // NEXT BUTTON
             Button(
                 onClick = {
                     viewModel.submitPersonalInfo {
+                        authViewModel.checkAuthStatus()
+
                         navController.navigate("home") {
-                            popUpTo("personalInfo") {
+                            popUpTo(Routes.PERSONALINFO) {
                                 inclusive = true
                             }
                         }
@@ -247,6 +300,39 @@ fun PersonalInfoPage(
                     color = Color.White,
                     fontSize = fontSize * 0.8f,
                     fontFamily = figtreeFontFamily
+                )
+            }
+
+            Spacer(modifier = Modifier.height(space * 0.5f))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Back to Login ? ",
+                    color = MutedLight,
+                    fontSize = fontSize * 0.6f,
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Text(
+                    text = "Login",
+                    color = Primary,
+                    fontSize = fontSize * 0.6f,
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.clickable{
+                        navController.navigate(Routes.LOGIN){
+                            popUpTo(Routes.LOGIN){
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                        loginViewModel.resetLoginState()
+                    }
                 )
             }
         }

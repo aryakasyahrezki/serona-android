@@ -9,13 +9,13 @@ import com.example.serona.data.model.User
 // Fungsi untuk mengubah Respon API ke Tabel Database (Entity)
 fun UserDataResponse.toEntity(): UserEntity {
     return UserEntity(
-        name = this.name,
-        email = this.email,
+        name = this.name ?: "",
+        email = this.email ?: "",
         gender = this.gender ?: "",
         country = this.country ?: "",
         birthDate = this.birth_date ?: "",
-        faceShape = this.face_shape_id,
-        skinTone = this.skin_tone_id
+        faceShape = this.face_shape,
+        skinTone = this.skin_tone
     )
 }
 
@@ -24,7 +24,7 @@ fun UserEntity.toDomain(): User {
     return User(
         name = this.name,
         email = this.email,
-        gender = if (this.gender.lowercase() == "male") Gender.MALE else Gender.FEMALE,
+        gender = if (this.gender.lowercase().trim() == "male") Gender.MALE else Gender.FEMALE,
         country = this.country,
         birthDate = this.birthDate,
         faceShape = this.faceShape,

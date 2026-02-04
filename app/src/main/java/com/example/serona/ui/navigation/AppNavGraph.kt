@@ -1,6 +1,5 @@
 package com.example.serona.ui.navigation
 
-import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -9,11 +8,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.serona.ui.auth.login.LoginPage
 import com.example.serona.ui.auth.register.PersonalInfoPage
 import com.example.serona.ui.auth.register.RegisterPage
 import com.example.serona.ui.landing.LandingPageCarousel
+import com.example.serona.ui.main.favorite.FavoritePage
+import com.example.serona.ui.main.tutorial.TutorialDetailPage
+import com.example.serona.ui.main.tutorial.TutorialPage
 import com.example.serona.ui.main.home.HomePage
 import com.example.serona.ui.main.scan.FaceScanMenuScreen
 import com.example.serona.ui.main.scan.ScanScreen
@@ -22,34 +26,31 @@ import com.example.serona.ui.main.profile.EditProfilePage
 import com.example.serona.ui.main.profile.PrivacyPage
 import com.example.serona.ui.main.profile.ProfilePage
 import com.example.serona.ui.splash.SplashFullBackground
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import com.example.serona.ui.main.scan.ResultScreen
 
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
 ) {
 
     NavHost(
         navController = navController,
         startDestination = Routes.SPLASH,
         modifier = Modifier.fillMaxSize(),
-
-        enterTransition = {
-            fadeIn(animationSpec = tween(200))
-        },
-        exitTransition = {
-            fadeOut(animationSpec = tween(200))
-        },
-        popEnterTransition = {
-            fadeIn(animationSpec = tween(200))
-        },
-        popExitTransition = {
-            fadeOut(animationSpec = tween(200))
-        }
-    ){
+//
+//        enterTransition = {
+//            fadeIn(animationSpec = tween(200))
+//        },
+//        exitTransition = {
+//            fadeOut(animationSpec = tween(200))
+//        },
+//        popEnterTransition = {
+//            fadeIn(animationSpec = tween(200))
+//        },
+//        popExitTransition = {
+//            fadeOut(animationSpec = tween(200))
+//        }
+    ) {
         composable(
             Routes.SPLASH
         ) {
@@ -57,7 +58,7 @@ fun AppNavGraph(
         }
         composable(
             Routes.LANDING,
-            enterTransition = { fadeIn(animationSpec = tween(800)) }
+//            enterTransition = { fadeIn(animationSpec = tween(800)) }
         ) {
             LandingPageCarousel(navController)
         }
@@ -77,9 +78,57 @@ fun AppNavGraph(
             HomePage(navController)
         }
 
-        composable(Routes.TUTORIAL){}
+        composable(
+            route = Routes.TUTORIAL,
+            arguments = listOf(
+                navArgument("faceShape") {
+                    type = NavType.StringType
+                    defaultValue = "none"
+                },
+                navArgument("skinTone") {
+                    type = NavType.StringType
+                    defaultValue = "none"
+                },
+                navArgument("occasion") {
+                    type = NavType.StringType
+                    defaultValue = "none"
+                }
+            ),
+//            enterTransition = { fadeIn(animationSpec = tween(200)) }
+        ) {
+            TutorialPage(
+                onTutorialClick = { tutorialId ->
+                    navController.navigate("${Routes.DETAIL}/$tutorialId")
+                },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
 
-        composable(Routes.FAVORITE){}
+        composable(
+            "${Routes.DETAIL}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val tutorialId = backStackEntry.arguments?.getInt("id") ?: 0
+
+            TutorialDetailPage(
+                tutorialId = tutorialId,
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            Routes.FAVORITE,
+//            enterTransition = { fadeIn(animationSpec = tween(200)) }
+        ) {
+            FavoritePage (
+                onTutorialClick = { tutorialId ->
+                    navController.navigate("${Routes.DETAIL}/$tutorialId")
+                },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
 
         composable(Routes.PRIVACY){
             PrivacyPage(
@@ -90,7 +139,7 @@ fun AppNavGraph(
             DeleteAccPage(
                 onDeleteConfirm = {
                     navController.navigate(Routes.SPLASH) {
-                        popUpTo(0) {
+                        popUpTo(navController.graph.id) {
                             inclusive = true
                         }
                     }
@@ -132,5 +181,4 @@ fun AppNavGraph(
         }
 
     }
-    
 }

@@ -306,7 +306,7 @@ fun LogoutAlertDialog(
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
-                        .height(space * 0.85f)
+                        .height((fontSize * 1.3f).value.dp)
                 ) {
                     Text(
                         text = "Logout",
@@ -324,6 +324,7 @@ fun LogoutAlertDialog(
                     color = Primary,
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.Bold,
+                    fontSize = fontSize * 0.53f,
                     modifier = Modifier.clickable { onDismiss() }
                 )
             }
