@@ -1,6 +1,7 @@
 package com.example.serona.di
 
 import com.example.serona.data.api.UserApi
+import com.example.serona.data.api.FaceAnalysisApi
 import com.example.serona.data.network.AuthInterceptor
 import com.example.serona.data.repository.AuthRepository
 import dagger.Module
@@ -12,36 +13,43 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
+// 1. Tambahkan Qualifier di sini agar tidak bentrok
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class UserRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class FaceAnalysisRetrofit
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule{
+object NetworkModule {
 
     @Provides
     @Singleton
     fun provideOkHttp(
         authRepo: AuthRepository
-    ): OkHttpClient{
+    ): OkHttpClient {
         val logging = HttpLoggingInterceptor()
         logging.level = HttpLoggingInterceptor.Level.BODY
 
         return OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(authRepo))
             .addInterceptor(logging)
-            // ini untuk nyoba dlu karena database nya lama bgt
-            .connectTimeout(60, TimeUnit.SECONDS) // Waktu maksimal untuk menyambung ke server
-            .readTimeout(60, TimeUnit.SECONDS)    // Waktu maksimal untuk membaca respon
-            .writeTimeout(60, TimeUnit.SECONDS)   // Waktu maksimal untuk mengirim data
-
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 
+    // 2. Retrofit Khusus Backend User
+    @UserRetrofit
     @Provides
     @Singleton
-    fun provideRetrofit(
-        client: OkHttpClient
-    ): Retrofit {
+    fun provideUserRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://serona.azurewebsites.net/api/")
             .client(client)
@@ -49,9 +57,28 @@ object NetworkModule{
             .build()
     }
 
+    // 3. Retrofit Khusus ML (Azure Container Apps)
+    @FaceAnalysisRetrofit
     @Provides
     @Singleton
-    fun provideUserApi(retrofit: Retrofit): UserApi{
+    fun provideFaceAnalysisRetrofit(client: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://serona-ml.wittysmoke-32718122.southeastasia.azurecontainerapps.io/")
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    // 4. Inject masing-masing API dengan Retrofit yang sesuai
+    @Provides
+    @Singleton
+    fun provideUserApi(@UserRetrofit retrofit: Retrofit): UserApi {
         return retrofit.create(UserApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFaceAnalysisApi(@FaceAnalysisRetrofit retrofit: Retrofit): FaceAnalysisApi {
+        return retrofit.create(FaceAnalysisApi::class.java)
     }
 }

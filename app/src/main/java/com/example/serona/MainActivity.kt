@@ -117,7 +117,7 @@ class MainActivity : ComponentActivity() {
                                                 }
                                             },
                                             onCenterClick = {
-                                                navController.navigate(Routes.SCAN)
+                                                navController.navigate(Routes.SCAN_MENU)
                                             }
                                         )
                                     }
