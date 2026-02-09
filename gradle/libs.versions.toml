@@ -1,7 +1,7 @@
 [versions]
 agp = "8.5.2"
 kotlin = "1.9.24"
-coreKtx = "1.10.1"
+coreKtx = "1.13.1" #awalnya 1.10.1
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
@@ -15,8 +15,8 @@ ksp = "1.9.24-1.0.20"
 #navigationRuntimeKtx = "2.9.6"
 
 # === TAMBAHAN UNTUK SERONA (Face Detection) ===
-camerax = "1.3.4"         # Stable & Safe for Kotlin 1.9
-mlkitFace = "16.1.6"      # Latest Stable
+camerax = "1.4.0"         # Stable & Safe for Kotlin 1.9, ini uda ganti, awalnya 1.3.4
+mlkitFace = "16.1.7"      # sesuai dengan API 35, awalnya 16.1.6
 coil = "2.6.0"            # Best for Compose + Kotlin 1.9
 accompanist = "0.34.0"    # Strict match for Kotlin 1.9.24
 

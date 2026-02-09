@@ -73,7 +73,7 @@ class ScanViewModel @Inject constructor(
                 val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
-                val response = apiService.detectFace(body)
+                val response = apiService.detectFace(body  )
 
                 withContext(Dispatchers.Main) {
                     if (response != null &&
