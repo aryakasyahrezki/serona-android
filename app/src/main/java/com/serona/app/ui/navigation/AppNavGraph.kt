@@ -2,6 +2,8 @@ package com.serona.app.ui.navigation
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -10,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.serona.app.theme.White
 import com.serona.app.ui.auth.login.LoginPage
 import com.serona.app.ui.auth.register.PersonalInfoPage
 import com.serona.app.ui.auth.register.RegisterPage
@@ -35,20 +38,14 @@ fun AppNavGraph(
     NavHost(
         navController = navController,
         startDestination = Routes.SPLASH,
-        modifier = Modifier.fillMaxSize(),
-//
-//        enterTransition = {
-//            fadeIn(animationSpec = tween(200))
-//        },
-//        exitTransition = {
-//            fadeOut(animationSpec = tween(200))
-//        },
-//        popEnterTransition = {
-//            fadeIn(animationSpec = tween(200))
-//        },
-//        popExitTransition = {
-//            fadeOut(animationSpec = tween(200))
-//        }
+        modifier = Modifier
+            .fillMaxSize()
+            .background(White),
+
+        enterTransition = { fadeIn(animationSpec = tween (300)) },
+        exitTransition = { fadeOut(animationSpec = tween(300)) },
+        popEnterTransition = { fadeIn(animationSpec = tween(300)) },
+        popExitTransition = { fadeOut(animationSpec = tween(300)) }
     ) {
         composable(
             Routes.SPLASH
@@ -56,8 +53,7 @@ fun AppNavGraph(
             SplashFullBackground(navController)
         }
         composable(
-            Routes.LANDING,
-//            enterTransition = { fadeIn(animationSpec = tween(800)) }
+            Routes.LANDING
         ) {
             LandingPageCarousel(navController)
         }
@@ -71,8 +67,7 @@ fun AppNavGraph(
             PersonalInfoPage(navController)
         }
         composable(
-            Routes.HOME,
-            enterTransition = { fadeIn(animationSpec = tween(200)) }
+            Routes.HOME
         ) {
             HomePage(navController)
         }
@@ -92,8 +87,7 @@ fun AppNavGraph(
                     type = NavType.StringType
                     defaultValue = "none"
                 }
-            ),
-//            enterTransition = { fadeIn(animationSpec = tween(200)) }
+            )
         ) {
             TutorialPage(
                 onTutorialClick = { tutorialId ->
@@ -118,8 +112,7 @@ fun AppNavGraph(
         }
 
         composable(
-            Routes.FAVORITE,
-//            enterTransition = { fadeIn(animationSpec = tween(200)) }
+            Routes.FAVORITE
         ) {
             FavoritePage (
                 onTutorialClick = { tutorialId ->

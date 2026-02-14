@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -41,6 +42,7 @@ import com.serona.app.ui.component.BackButton
 import com.serona.app.ui.navigation.Routes
 import com.serona.app.utils.FileUtils
 import com.serona.app.R
+import com.serona.app.utils.rememberNavigationGuard
 
 /**
  * Entry point for the face analysis feature.
@@ -74,6 +76,7 @@ fun FaceScanMenuScreen(
 
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val (isNavigating, safeAction, resetNavigation) = rememberNavigationGuard()
 
     /**
      * CAMERA PERMISSION HANDLER
@@ -96,6 +99,12 @@ fun FaceScanMenuScreen(
         uri?.let {
             val file = FileUtils.uriToFile(it, context)
             viewModel.uploadAndAnalyzeImage(file, navController)
+        }
+    }
+
+    LaunchedEffect(errorMessage) {
+        if (errorMessage != null) {
+            resetNavigation()
         }
     }
 
@@ -167,19 +176,28 @@ fun FaceScanMenuScreen(
             Spacer(modifier = Modifier.height(maxHeight * 0.035f))
 
             Column(
-                modifier = Modifier.fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f).padding(horizontal = horiPadding * 0.5f),
+                modifier = Modifier
+                    .fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f)
+                    .padding(horizontal = horiPadding * 0.5f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(
                     onClick = {
-                        val permission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-                        if (permission == PackageManager.PERMISSION_GRANTED) {
-                            navController.navigate(Routes.SCAN)
-                        } else {
-                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        safeAction {
+                            val permission = ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.CAMERA
+                            )
+                            if (permission == PackageManager.PERMISSION_GRANTED) {
+                                navController.navigate(Routes.SCAN)
+                            } else {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -187,8 +205,17 @@ fun FaceScanMenuScreen(
                 }
 
                 Button(
-                    onClick = { galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    onClick = {
+                        safeAction {
+                            galleryLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        } },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -196,7 +223,9 @@ fun FaceScanMenuScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.navigationBarsPadding().height(24.dp))
+            Spacer(modifier = Modifier
+                .navigationBarsPadding()
+                .height(24.dp))
         }
 
         Column(
@@ -208,8 +237,10 @@ fun FaceScanMenuScreen(
 
             BackButton(
                 onBackClick = {
-                    navController.navigate("home") {
-                        popUpTo("home") { inclusive = true }
+                    safeAction {
+                        navController.navigate("home") {
+                            popUpTo("home") { inclusive = true }
+                        }
                     }
                 },
                 buttonSize = buttonSize,
@@ -223,7 +254,9 @@ fun FaceScanMenuScreen(
          */
         if (isLoading) {
             Box(
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.6f)),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -265,6 +298,19 @@ fun FaceScanMenuScreen(
                 },
                 containerColor = White,
                 shape = RoundedCornerShape(20.dp)
+            )
+        }
+
+        if (isNavigating || isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent)
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) { awaitPointerEvent() }
+                        }
+                    }
             )
         }
     }

@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -97,6 +98,7 @@ import com.serona.app.ui.component.ScannedInfoCard
 import com.serona.app.ui.component.eventCard
 import com.serona.app.ui.component.guideCard
 import com.serona.app.ui.navigation.Routes
+import com.serona.app.utils.rememberNavigationGuard
 
 @Composable
 fun HomePage(
@@ -117,6 +119,8 @@ fun HomePage(
     val space = (screenHeight * 0.04f)
     val topContentSize = screenWidth * 0.25f
     val fabSize = screenHeight * 0.08f
+
+    val (isNavigating, safeAction, resetNavigation) = rememberNavigationGuard()
 
     if(state.showScanDialog){
         ScanDialog(homeViewModel, fontSize, screenWidth, screenHeight, space)
@@ -347,9 +351,13 @@ fun HomePage(
                         screenHeight = screenHeight,
                         screenWidth = screenWidth,
                         onClick = {
-                            navController.navigate(
-                                Routes.navigateToTutorial(occasion = "Office")
-                            )
+                            safeAction{
+                                navController.navigate(
+                                    Routes.navigateToTutorial(occasion = "Office")
+                                ){
+                                    launchSingleTop = true
+                                }
+                            }
                         }
                     )
 
@@ -364,9 +372,13 @@ fun HomePage(
                         screenHeight = screenHeight,
                         screenWidth = screenWidth,
                         onClick = {
-                            navController.navigate(
-                                Routes.navigateToTutorial(occasion = "Casual")
-                            )
+                            safeAction{
+                                navController.navigate(
+                                    Routes.navigateToTutorial(occasion = "Casual")
+                                ){
+                                    launchSingleTop = true
+                                }
+                            }
                         }
                     )
 
@@ -381,9 +393,13 @@ fun HomePage(
                         screenHeight = screenHeight,
                         screenWidth = screenWidth,
                         onClick = {
-                            navController.navigate(
-                                Routes.navigateToTutorial(occasion = "Festival")
-                            )
+                            safeAction{
+                                navController.navigate(
+                                    Routes.navigateToTutorial(occasion = "Festival")
+                                ){
+                                    launchSingleTop = true
+                                }
+                            }
                         }
                     )
 
@@ -398,9 +414,13 @@ fun HomePage(
                         screenHeight = screenHeight,
                         screenWidth = screenWidth,
                         onClick = {
-                            navController.navigate(
-                                Routes.navigateToTutorial(occasion = "Party")
-                            )
+                            safeAction{
+                                navController.navigate(
+                                    Routes.navigateToTutorial(occasion = "Party")
+                                ){
+                                    launchSingleTop = true
+                                }
+                            }
                         }
                     )
 
@@ -415,9 +435,13 @@ fun HomePage(
                         screenHeight = screenHeight,
                         screenWidth = screenWidth,
                         onClick = {
-                            navController.navigate(
-                                Routes.navigateToTutorial(occasion = "Wedding")
-                            )
+                            safeAction {
+                                navController.navigate(
+                                    Routes.navigateToTutorial(occasion = "Wedding")
+                                ) {
+                                    launchSingleTop = true
+                                }
+                            }
                         }
                     )
                 }
@@ -438,7 +462,7 @@ fun HomePage(
                     indication = null
                 ) {
                     // Opsional: Kalau mau klik di luar tooltip menutup tooltipnya
-                     homeViewModel.dismissTooltip()
+                    homeViewModel.dismissTooltip()
                 }
         )
     }
@@ -464,8 +488,10 @@ fun HomePage(
                         .size(fabSize)
                         .background(Primary, CircleShape)
                         .clickable() {
-                            homeViewModel.dismissTooltip()
-                            navController.navigate("scan")
+                            safeAction {
+                                homeViewModel.dismissTooltip()
+                                navController.navigate("scan")
+                            }
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -478,6 +504,22 @@ fun HomePage(
                 }
             }
         }
+
+    }
+
+    if (isNavigating) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .zIndex(10f) // Pastikan di atas segalanya
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            awaitPointerEvent()
+                        }
+                    }
+                }
+        )
     }
 }
 

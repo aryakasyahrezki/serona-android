@@ -2,6 +2,7 @@ package com.serona.app.ui.main.scan
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.service.credentials.Action
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.camera2.interop.Camera2Interop
@@ -68,6 +69,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.Executors
 import com.serona.app.R
+import com.serona.app.utils.rememberNavigationGuard
 
 
 /**
@@ -99,6 +101,8 @@ fun ScanScreen(
     var lastProcessedTime by remember { mutableLongStateOf(0L) }
     val analysisExecutor = remember { Executors.newSingleThreadExecutor() }
     var previewView by remember { mutableStateOf<PreviewView?>(null) }
+
+    val (isNavigating, safeAction) = rememberNavigationGuard()
 
     /**
      * CAMERA CONFIGURATION & BINDING
@@ -198,7 +202,8 @@ fun ScanScreen(
                 } else {
                     CameraSelector.LENS_FACING_FRONT
                 }
-            }
+            },
+            safeAction = safeAction
         )
 
         if (showPopup) {
@@ -208,6 +213,20 @@ fun ScanScreen(
                 .pointerInput(Unit) {}
             )
             InstructionDialog(onDismiss = { viewModel.dismissPopup() })
+        }
+
+        if (isNavigating || viewModel.isCurrentlyUploading.value) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    }
+            )
         }
     }
 }
@@ -227,7 +246,8 @@ fun ScanUIContent(
     maxWidth: Dp,
     maxHeight: Dp,
     minDimension: Dp,
-    onSwitchCamera: () -> Unit
+    onSwitchCamera: () -> Unit,
+    safeAction: (action: () -> Unit) -> Unit
 ) {
     val isFaceInFrame = viewModel.isFaceInFrame.value
     val baseFontSize = (minDimension.value * 0.05f).sp
@@ -263,9 +283,11 @@ fun ScanUIContent(
                 IconButton(
                     onClick = {
                         if (!showPopup) {
-                            viewModel.stopScanning()
-                            navController.navigate(Routes.SCAN_MENU) {
-                                popUpTo(Routes.SCAN_MENU) { inclusive = true }
+                            safeAction {
+                                viewModel.stopScanning()
+                                navController.navigate(Routes.SCAN_MENU) {
+                                    popUpTo(Routes.SCAN_MENU) { inclusive = true }
+                                }
                             }
                         }
                     },
@@ -317,7 +339,9 @@ fun ScanUIContent(
                 Spacer(modifier = Modifier.height(maxHeight * 0.02f))
 
                 Card(
-                    modifier = Modifier.wrapContentWidth().align(Alignment.CenterHorizontally),
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .align(Alignment.CenterHorizontally),
                     colors = CardDefaults.cardColors(containerColor = White.copy(alpha = 0.9f)),
                     shape = RoundedCornerShape(12.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
@@ -328,7 +352,10 @@ fun ScanUIContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         ResultSummaryItem(label = "Face Shape", value = scanResult.shape ?: "-", minDimension)
-                        Box(modifier = Modifier.width(1.dp).height(24.dp).background(Color.LightGray))
+                        Box(modifier = Modifier
+                            .width(1.dp)
+                            .height(24.dp)
+                            .background(Color.LightGray))
                         ResultSummaryItem(label = "Skintone", value = scanResult.skintone ?: "-", minDimension)
                     }
                 }
@@ -398,13 +425,18 @@ fun ScanUIContent(
                 Button(
                     onClick = {
                         if (showResultBtn) {
-                            val shape = scanResult?.shape ?: "Unknown"
-                            val color = scanResult?.skintone ?: "Unknown"
-                            navController.navigate("result/$shape/$color") {
-                                popUpTo(Routes.SCAN) { inclusive = true } }
+                            safeAction {
+                                val shape = scanResult?.shape ?: "Unknown"
+                                val color = scanResult?.skintone ?: "Unknown"
+                                navController.navigate("result/$shape/$color") {
+                                    popUpTo(Routes.SCAN) { inclusive = true }
+                                }
+                            }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth(0.9f).height(maxHeight * 0.07f),
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .height(maxHeight * 0.07f),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (showResultBtn) Primary else White.copy(alpha = 0.2f),
                         contentColor = if (showResultBtn) White else Color.Gray
@@ -501,12 +533,17 @@ fun InstructionDialog(onDismiss: () -> Unit) {
 
     Dialog(onDismissRequest = { }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Card(
-            modifier = Modifier.width(if (configuration.screenWidthDp > configuration.screenHeightDp) configuration.screenWidthDp.dp * 0.7f else configuration.screenWidthDp.dp * 0.9f).wrapContentHeight().padding(vertical = 16.dp),
+            modifier = Modifier
+                .width(if (configuration.screenWidthDp > configuration.screenHeightDp) configuration.screenWidthDp.dp * 0.7f else configuration.screenWidthDp.dp * 0.9f)
+                .wrapContentHeight()
+                .padding(vertical = 16.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = White)
         ) {
             Column(
-                modifier = Modifier.padding(minDimension * 0.06f, minDimension * 0.05f).verticalScroll(rememberScrollState()),
+                modifier = Modifier
+                    .padding(minDimension * 0.06f, minDimension * 0.05f)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Face Scanning Guide", fontSize = baseFontSize, fontFamily = figtreeFontFamily, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
@@ -518,7 +555,9 @@ fun InstructionDialog(onDismiss: () -> Unit) {
                 InstructionItem( "Avoid poor lighting","Avoid shadows or dim light on your face", R.drawable.scan_guide3)
                 InstructionItem( "Don't tilt your head","Keep your head straight, don't tilt it", R.drawable.scan_guide4)
                 Spacer(modifier = Modifier.height(minDimension * 0.05f))
-                Button(onClick = onDismiss, modifier = Modifier.width(minDimension * 0.4f).height(minDimension * 0.12f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF04B63)), shape = RoundedCornerShape(8.dp)) {
+                Button(onClick = onDismiss, modifier = Modifier
+                    .width(minDimension * 0.4f)
+                    .height(minDimension * 0.12f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF04B63)), shape = RoundedCornerShape(8.dp)) {
                     Text("Start", fontSize = baseFontSize * 0.7f, fontWeight = FontWeight.Bold, color = White)
                 }
             }
@@ -533,12 +572,18 @@ fun InstructionItem(title: String, description: String, imageRes: Int) {
     val fontSize = (minDimension.value * 0.05f).sp
     val imgSize = minDimension * 0.15f
 
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = minDimension * 0.025f), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = minDimension * 0.025f), verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.size(imgSize)) {
-            Card(shape = RoundedCornerShape(10.dp), modifier = Modifier.size(imgSize * 0.95f).align(Alignment.BottomStart)) {
+            Card(shape = RoundedCornerShape(10.dp), modifier = Modifier
+                .size(imgSize * 0.95f)
+                .align(Alignment.BottomStart)) {
                 Image(painter = painterResource(id = imageRes), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
             }
-            Surface(shape = RoundedCornerShape(4.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(0.5.dp, Grey40), modifier = Modifier.size(imgSize * 0.3f).align(Alignment.TopEnd)) {
+            Surface(shape = RoundedCornerShape(4.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(0.5.dp, Grey40), modifier = Modifier
+                .size(imgSize * 0.3f)
+                .align(Alignment.TopEnd)) {
                 Icon(imageVector = Icons.Default.Close, contentDescription = null, tint = Primary, modifier = Modifier.padding(2.dp))
             }
         }

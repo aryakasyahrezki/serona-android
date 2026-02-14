@@ -21,14 +21,18 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -53,6 +57,7 @@ import com.serona.app.theme.White
 import com.serona.app.theme.figtreeFontFamily
 import com.serona.app.ui.auth.AuthViewModel
 import com.serona.app.ui.component.BackButton
+import com.serona.app.utils.rememberNavigationGuard
 
 @Composable
 fun ProfilePage(
@@ -85,142 +90,161 @@ fun ProfilePage(
     val birthDate = user?.birthDate ?: "-"
     val country = user?.country ?: "-"
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = BgGrad
-            )
-    ) {
+    val (isNavigating, safeAction, resetNavigation) = rememberNavigationGuard()
 
-        Column(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(
             modifier = Modifier
-                .padding(horizontal = horiPadding, vertical = vertiPadding)
+                .fillMaxSize()
+                .background(
+                    brush = BgGrad
+                )
         ) {
 
-            Spacer(modifier = Modifier.height(space * 0.15f))
-
-            // Back Button
-            BackButton(
-                onBackClick = { onBackClick() },
-                buttonSize = buttonSize,
-                fontSize = fontSize * 0.86
-            )
-
-            Spacer(modifier = Modifier.height(space))
-
-            // Profile Section
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .padding(horizontal = horiPadding, vertical = vertiPadding)
             ) {
-
-                // Avatar
-                Box(
-                    modifier = Modifier
-                        .size(profileSize)
-                        .clip(CircleShape)
-                        .border(
-                            width = 1.dp,
-                            color = Primary,
-                            shape = CircleShape
-                        )
-                        .padding(3.5.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = if(user?.gender == Gender.FEMALE) R.drawable.profile_pic_female else R.drawable.profile_pic_male),
-                        contentDescription = "Profile Picture",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                    )
-                }
 
                 Spacer(modifier = Modifier.height(space * 0.15f))
 
-                // Name
-                Text(
-                    text = name,
-                    fontSize = fontSize,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Heading
+                // Back Button
+                BackButton(
+                    onBackClick = { safeAction { onBackClick() } },
+                    buttonSize = buttonSize,
+                    fontSize = fontSize * 0.86
                 )
 
-                Spacer(modifier = Modifier.height(space * 0.08f))
+                Spacer(modifier = Modifier.height(space))
 
-                // Email
-                Text(
-                    text = email,
-                    fontSize = fontSize * 0.6,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    color = OnSecondaryContainer
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.25f))
-
-                // Edit Profile Button
-                Button(
-                    onClick = onEditProfile,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Primary
-                    ),
-                    shape = RoundedCornerShape(24.dp)
+                // Profile Section
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
+
+                    // Avatar
+                    Box(
+                        modifier = Modifier
+                            .size(profileSize)
+                            .clip(CircleShape)
+                            .border(
+                                width = 1.dp,
+                                color = Primary,
+                                shape = CircleShape
+                            )
+                            .padding(profileSize * 0.03f)
+                    ) {
+                        Image(
+                            painter = painterResource(id = if (user?.gender == Gender.FEMALE) R.drawable.profile_pic_female else R.drawable.profile_pic_male),
+                            contentDescription = "Profile Picture",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(space * 0.15f))
+
+                    // Name
                     Text(
-                        text = "Edit Profile",
-                        color = White,
+                        text = name,
+                        fontSize = fontSize,
                         fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = fontSize * 0.5
+                        fontWeight = FontWeight.SemiBold,
+                        color = Heading
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.08f))
+
+                    // Email
+                    Text(
+                        text = email,
+                        fontSize = fontSize * 0.6,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        color = OnSecondaryContainer
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.25f))
+
+                    // Edit Profile Button
+                    Button(
+                        onClick = { safeAction { onEditProfile() } },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Primary
+                        ),
+                        shape = RoundedCornerShape(24.dp)
+                    ) {
+                        Text(
+                            text = "Edit Profile",
+                            color = White,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = fontSize * 0.5
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(space * 0.8f))
+
+                // Info Section
+                ProfileInfoItem(
+                    title = "Birth of Date",
+                    value = birthDate,
+                    fontSize = fontSize * 0.6
+                )
+
+                ProfileInfoItem(
+                    title = "Country",
+                    value = country,
+                    fontSize = fontSize * 0.6
+                )
+
+                Spacer(modifier = Modifier.height(space * 0.4f))
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ProfileMenuItem(
+                        text = "Privacy Settings",
+                        onClick = { safeAction { onPrivacyClick() } },
+                        modifier = Modifier.width(menuWidth),
+                        fontSize = fontSize * 0.6
+                    )
+
+                    ProfileMenuItem(
+                        text = "Logout",
+                        onClick = { safeAction { logoutDialogBox = true } },
+                        modifier = Modifier.width(menuWidth),
+                        fontSize = fontSize * 0.6
+                    )
+
+                    ProfileMenuItem(
+                        text = "Delete Account",
+                        onClick = { safeAction { onDeleteAccountClick() } },
+                        modifier = Modifier.width(menuWidth),
+                        fontSize = fontSize * 0.6
                     )
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.height(space * 0.8f))
-
-            // Info Section
-            ProfileInfoItem(
-                title = "Birth of Date",
-                value = birthDate,
-                fontSize = fontSize * 0.6
+        if (isNavigating) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent)
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    }
             )
-
-            ProfileInfoItem(
-                title = "Country",
-                value = country,
-                fontSize = fontSize * 0.6
-            )
-
-            Spacer(modifier = Modifier.height(space * 0.4f))
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                ProfileMenuItem(
-                    text = "Privacy Settings",
-                    onClick = onPrivacyClick,
-                    modifier = Modifier.width(menuWidth),
-                    fontSize = fontSize * 0.6
-                )
-
-                ProfileMenuItem(
-                    text = "Logout",
-                    onClick = {logoutDialogBox = true},
-                    modifier = Modifier.width(menuWidth),
-                    fontSize = fontSize * 0.6
-                )
-
-                ProfileMenuItem(
-                    text = "Delete Account",
-                    onClick = onDeleteAccountClick,
-                    modifier = Modifier.width(menuWidth),
-                    fontSize = fontSize * 0.6
-                )
-            }
         }
     }
 
@@ -235,7 +259,10 @@ fun ProfilePage(
                     launchSingleTop = true
                 }
             },
-            onDismiss = { logoutDialogBox = false },
+            onDismiss = {
+                logoutDialogBox = false
+                resetNavigation()
+            },
             fontSize = fontSize,
             space = space,
             horiPadding = horiPadding,

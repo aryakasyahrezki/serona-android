@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -28,6 +30,7 @@ import com.serona.app.theme.*
 import com.serona.app.ui.component.BackButton
 import com.serona.app.ui.navigation.Routes
 import com.serona.app.R
+import com.serona.app.utils.rememberNavigationGuard
 
 /**
  * Screen that displays the final beauty analysis results.
@@ -41,6 +44,8 @@ fun ResultScreen(
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
+
+    val (isNavigating, safeAction, resetNavigation) = rememberNavigationGuard()
 
     val maxWidth = configuration.screenWidthDp.dp
     val maxHeight = configuration.screenHeightDp.dp
@@ -63,6 +68,7 @@ fun ResultScreen(
         state.errorMessage?.let { msg ->
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
             viewModel.clearError()
+            resetNavigation()
         }
     }
 
@@ -155,12 +161,18 @@ fun ResultScreen(
             ) {
                 Button(
                     onClick = {
-                        navController.navigate(Routes.navigateToTutorial(
-                            faceShape = decodedShape,
-                            skinTone = decodedTone
-                        ))
+                        safeAction {
+                            navController.navigate(
+                                Routes.navigateToTutorial(
+                                    faceShape = decodedShape,
+                                    skinTone = decodedTone
+                                )
+                            )
+                        }
                     },
-                    modifier = Modifier.fillMaxWidth().height(buttonHeight * 0.8f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(buttonHeight * 0.8f),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -177,9 +189,11 @@ fun ResultScreen(
                     horizontalArrangement = Arrangement.spacedBy(maxWidth * 0.03f)
                 ) {
                     OutlinedButton(
-                        onClick = { viewModel.saveToProfile() },
+                        onClick = { safeAction { viewModel.saveToProfile() } },
                         enabled = !state.isSaving,
-                        modifier = Modifier.weight(0.5f).height(buttonHeight * 0.8f),
+                        modifier = Modifier
+                            .weight(0.5f)
+                            .height(buttonHeight * 0.8f),
                         border = BorderStroke(1.5.dp, Primary),
                         shape = RoundedCornerShape(12.dp)
                     ) {
@@ -193,11 +207,15 @@ fun ResultScreen(
 
                     OutlinedButton(
                         onClick = {
-                            navController.navigate(Routes.HOME) {
-                                popUpTo(Routes.HOME) { inclusive = true }
+                            safeAction {
+                                navController.navigate(Routes.HOME) {
+                                    popUpTo(Routes.HOME) { inclusive = true }
+                                }
                             }
                         },
-                        modifier = Modifier.weight(0.5f).height(buttonHeight * 0.8f),
+                        modifier = Modifier
+                            .weight(0.5f)
+                            .height(buttonHeight * 0.8f),
                         border = BorderStroke(1.5.dp, Primary),
                         shape = RoundedCornerShape(12.dp)
                     ) {
@@ -212,23 +230,43 @@ fun ResultScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.navigationBarsPadding().padding(bottom = 16.dp))
+            Spacer(modifier = Modifier
+                .navigationBarsPadding()
+                .padding(bottom = 16.dp))
         }
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(horizontal = horiPadding, vertical = vertiPadding * 1.13f)
         ) {
             BackButton(
                 onBackClick = {
-                    navController.navigate(Routes.SCAN_MENU) {
-                        popUpTo(Routes.SCAN_MENU) {
-                            inclusive = true
+                    safeAction {
+                        navController.navigate(Routes.SCAN_MENU) {
+                            popUpTo(Routes.SCAN_MENU) {
+                                inclusive = true
+                            }
                         }
                     }
                 },
                 buttonSize = buttonSize,
                 fontSize = fontSize * 0.86
+            )
+        }
+
+        if (isNavigating || state.isSaving) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent)
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    }
             )
         }
     }
@@ -328,7 +366,7 @@ fun getFaceDescription(shape: String): String {
         shape.contains("Oval", ignoreCase = true) ->
             "Your face features a highly balanced and symmetrical structure. This harmonious proportion is considered a versatile canvas that elegantly complements almost any style."
         shape.contains("Square", ignoreCase = true) ->
-            "You have a strong jawline and a broad forehead, projecting a sense of confidence and authority. Your prominent bone structure gives your features an iconic and dignified look."
+            "You have a strong jawline and a broad forehead, projecting a sense of confidence and authority. Your prominent bone structure gives an iconic and dignified look."
         shape.contains("Round", ignoreCase = true) ->
             "Soft, curved lines without sharp angles provide you with a naturally friendly and fresh appearance. This structure often radiates a welcoming and youthful glow."
         shape.contains("Heart", ignoreCase = true) ->
