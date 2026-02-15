@@ -14,11 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.serona.app.theme.White
 import com.serona.app.ui.component.GenderCard
@@ -34,6 +36,7 @@ import com.serona.app.ui.auth.login.LoginViewModel
 import com.serona.app.ui.component.CleanLinearProgress
 import com.serona.app.ui.component.PersonalInfoTextField
 import com.serona.app.ui.navigation.Routes
+import com.serona.app.utils.rememberNavigationGuard
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
@@ -47,10 +50,23 @@ fun PersonalInfoPage(
     val progress = state.answeredCount / 3f
     val context = LocalContext.current
 
+    val (isNavigating, safeAction, resetNavigation) = rememberNavigationGuard()
+
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             viewModel.clearError()
+            resetNavigation()
+        }
+    }
+
+    LaunchedEffect(state.errorMessage, state.dobError) {
+        if (state.errorMessage != null || state.dobError != null) {
+            if (state.errorMessage != null) {
+                Toast.makeText(context, state.errorMessage, Toast.LENGTH_SHORT).show()
+                viewModel.clearError()
+            }
+            resetNavigation()
         }
     }
 
@@ -248,7 +264,7 @@ fun PersonalInfoPage(
                     value = state.year,
                     onValueChange = { },
                     isDropdown = true,
-                    dropdownItems = (1990..2010).map { it.toString() },
+                    dropdownItems = (1960..2015).map { it.toString() },
                     onDropdownItemSelected = { year ->
                         viewModel.selectDOB(state.day, state.month, year)
                     },
@@ -276,12 +292,15 @@ fun PersonalInfoPage(
             // NEXT BUTTON
             Button(
                 onClick = {
-                    viewModel.submitPersonalInfo {
-                        authViewModel.checkAuthStatus()
+                    safeAction {
+                        viewModel.submitPersonalInfo {
+                            authViewModel.checkAuthStatus()
 
-                        navController.navigate("home") {
-                            popUpTo(Routes.PERSONALINFO) {
-                                inclusive = true
+                            navController.navigate("home") {
+                                popUpTo(navController.graph.id) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
                             }
                         }
                     }
@@ -325,16 +344,34 @@ fun PersonalInfoPage(
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.clickable{
-                        navController.navigate(Routes.LOGIN){
-                            popUpTo(Routes.LOGIN){
-                                inclusive = true
+                        safeAction {
+                            navController.navigate(Routes.LOGIN) {
+                                popUpTo(Routes.LOGIN) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
                             }
-                            launchSingleTop = true
+                            loginViewModel.resetLoginState()
                         }
-                        loginViewModel.resetLoginState()
                     }
                 )
             }
+        }
+
+        if (isNavigating) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(100f) // Pastikan di depan dropdown dan input
+                    .background(Color.Transparent)
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    }
+            )
         }
     }
 }

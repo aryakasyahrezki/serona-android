@@ -1,6 +1,7 @@
 package com.serona.app.ui.auth.register
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -30,7 +32,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.serona.app.theme.AuthPageGrad
 import com.serona.app.theme.ForgotPasswordBorderGrad
@@ -47,6 +51,7 @@ import com.serona.app.ui.component.AuthTextField
 import com.serona.app.ui.component.RoundedCheckbox
 import com.serona.app.ui.navigation.Routes
 import com.serona.app.R
+import com.serona.app.utils.rememberNavigationGuard
 
 @Composable
 fun RegisterPage(
@@ -58,6 +63,8 @@ fun RegisterPage(
     val registerState by registerViewModel.registerState.observeAsState()
     val context = LocalContext.current
 
+    val (isNavigating, safeAction, resetNavigation) = rememberNavigationGuard()
+
     LaunchedEffect(registerState) {
         when (val state = registerState) {
             is RegisterState.Error -> {
@@ -67,18 +74,42 @@ fun RegisterPage(
                     Toast.LENGTH_SHORT
                 ).show()
                 registerViewModel.resetRegisterState()
+
+                resetNavigation()
             }
             else -> Unit
         }
     }
 
     LaunchedEffect(emailState) {
-        if(emailState == EmailVerificationState.Verified){
-            navController.navigate("personalInfo"){
-                popUpTo("register"){
-                    inclusive = true
+        when (emailState) {
+            is EmailVerificationState.Verified -> {
+                navController.navigate("personalInfo") {
+                    popUpTo("register") { inclusive = true }
+                    launchSingleTop = true
                 }
             }
+            is EmailVerificationState.EmailSent,
+            is EmailVerificationState.NotVerified -> {
+                resetNavigation()
+            }
+            else -> Unit
+        }
+    }
+
+    val form by registerViewModel.formState.observeAsState()
+
+    LaunchedEffect(
+        form?.nameError,
+        form?.emailError,
+        form?.passwordError,
+        form?.confirmPasswordError,
+        form?.agreeError
+    ) {
+        if (form?.nameError != null || form?.emailError != null ||
+            form?.passwordError != null || form?.confirmPasswordError != null ||
+            form?.agreeError != null) {
+            resetNavigation()
         }
     }
 
@@ -117,22 +148,44 @@ fun RegisterPage(
                 color = Color.White,
                 fontFamily = leagueSpartanFontFamily,
                 fontSize = fontSize * 0.8f,
-                letterSpacing = fontSize * 0.25f
+                letterSpacing = fontSize * 0.25f,
             )
 
-            RegisterCard(navController, registerViewModel, fontSize, space)
+            RegisterCard(navController, registerViewModel, fontSize, space, safeAction)
 
             if(emailState != EmailVerificationState.Idle) {
                 EmailVerificationDialog(
                     state = emailState,
                     onDismiss = {
                         registerViewModel.resetEmailVerificationState()
+                        resetNavigation()
                     },
-                    viewModel = registerViewModel,
+                    onCheckVerification = { registerViewModel.checkEmailVerification() },
+                    onUseAnotherEmail = {
+                        registerViewModel.resetEmailVerificationState()
+                        registerViewModel.deleteAccount()
+                    },
                     fontSize = fontSize,
-                    space = space
+                    space = space,
+                    safeAction = safeAction
                 )
             }
+        }
+
+        if (isNavigating) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(100f)
+                    .background(Color.Transparent)
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    }
+            )
         }
     }
 }
@@ -142,7 +195,8 @@ fun RegisterCard(
     navController: NavController,
     registerViewModel: RegisterViewModel,
     fontSize: TextUnit,
-    space: Dp
+    space: Dp,
+    safeAction: (action: () -> Unit) -> Unit
 ) {
 
     val form = registerViewModel.formState.observeAsState(RegisterFormState()).value
@@ -267,11 +321,13 @@ fun RegisterCard(
                                 .getStringAnnotations("PRIVACY_POLICY", offset, offset)
                                 .firstOrNull()
                                 ?.let {
-                                    navController.navigate("privacyPolicy") {
-                                        popUpTo(Routes.REGISTER) {
-                                            inclusive = false
+                                    safeAction {
+                                        navController.navigate("privacyPolicy") {
+                                            popUpTo(Routes.REGISTER) {
+                                                inclusive = false
+                                            }
+                                            launchSingleTop = true
                                         }
-                                        launchSingleTop = true
                                     }
                                 }
                         }
@@ -283,7 +339,7 @@ fun RegisterCard(
                 Button(
                     enabled = form.isAgree && (form.name != "") && (form.email != "") && (form.password != "") && (form.confirmPassword != ""),
                     onClick = {
-                        registerViewModel.submit()
+                        safeAction { registerViewModel.submit() }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
                     modifier = Modifier
@@ -317,7 +373,7 @@ fun RegisterCard(
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.clickable{
-                            navController.popBackStack()
+                            safeAction { navController.popBackStack() }
                         }
                     )
                 }
@@ -329,10 +385,12 @@ fun RegisterCard(
 @Composable
 fun EmailVerificationDialog(
     state: EmailVerificationState,
-    viewModel: RegisterViewModel,
     fontSize: TextUnit,
     space: Dp,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onCheckVerification: () -> Unit,
+    onUseAnotherEmail: () -> Unit,
+    safeAction: (action: () -> Unit) -> Unit
 ) {
     val dialogText = TextStyle(
         fontFamily = figtreeFontFamily,
@@ -418,7 +476,7 @@ fun EmailVerificationDialog(
                         modifier = Modifier
                             .fillMaxWidth(),
                         onClick = {
-                            viewModel.checkEmailVerification()
+                            safeAction { onCheckVerification() }
                         }
                     ) {
                         Text(
@@ -433,9 +491,10 @@ fun EmailVerificationDialog(
                         modifier = Modifier
                             .fillMaxWidth(),
                         onClick = {
-                            viewModel.resetEmailVerificationState()
-                            viewModel.deleteAccount()
-                            onDismiss()
+                            safeAction {
+                                onUseAnotherEmail()
+                                onDismiss()
+                            }
                         }
                     ) {
                         Text(
@@ -451,9 +510,10 @@ fun EmailVerificationDialog(
                         colors = ButtonDefaults.buttonColors(containerColor = Primary),
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            viewModel.resetEmailVerificationState()
-                            viewModel.deleteAccount()
-                            onDismiss()
+                            safeAction{
+                                onUseAnotherEmail()
+                                onDismiss()
+                            }
                         }
                     ) {
                         Text("Back to Register", style = buttonText, color = White)
@@ -464,7 +524,9 @@ fun EmailVerificationDialog(
                         fontSize = fontSize * 0.5f,
                         fontFamily = figtreeFontFamily,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth().padding(top = space * 0.2f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = space * 0.2f),
                         color = Primary.copy(alpha = 0.7f),
                         lineHeight = fontSize * 0.4f
                     )

@@ -3,7 +3,9 @@ package com.serona.app.ui.auth.register
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serona.app.data.dto.PersonalInfoRequest
+import com.serona.app.data.dto.RegisterUserRequest
 import com.serona.app.data.model.Gender
+import com.serona.app.data.repository.AuthRepository
 import com.serona.app.data.repository.UserRepository
 import com.serona.app.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PersonalInfoViewModel @Inject constructor(
     private val userRepo: UserRepository,
+    private val authRepo: AuthRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PersonalInfoState())
@@ -71,9 +74,29 @@ class PersonalInfoViewModel @Inject constructor(
             result.onSuccess {
                 onSuccess()
             }.onFailure { exception ->
-                _state.value = _state.value.copy(
-                    errorMessage = exception.message ?: "Failed to submit personal info"
-                )
+                val errorMsg = exception.message ?: ""
+
+                // JIKA GAGAL karena user belum ada di BE (Ghost User)
+                if (errorMsg.contains("401") || errorMsg.contains("unauthenticated", true) || errorMsg.contains("method", true)) {
+
+                    // Ambil info dari Firebase dan daftarkan ke Laravel dulu
+                    val (nameFb, emailFb) = authRepo.getCurrentUserInfo() ?: (null to null)
+                    if (nameFb != null && emailFb != null) {
+                        val regResult = userRepo.registerUser(RegisterUserRequest(nameFb, emailFb))
+
+                        if (regResult.isSuccess) {
+                            // Jika registrasi sukses, coba kirim Personal Info-nya lagi
+                            submitPersonalInfo(onSuccess)
+                        } else {
+                            _state.value = _state.value.copy(errorMessage = "Sync failed. Try re-logging.")
+                        }
+                    }
+                } else {
+                    _state.value = _state.value.copy(errorMessage = errorMsg)
+                }
+//                _state.value = _state.value.copy(
+//                    errorMessage = exception.message ?: "Failed to submit personal info"
+//                )
             }
         }
     }

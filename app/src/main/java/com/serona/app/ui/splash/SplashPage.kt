@@ -143,7 +143,7 @@ fun SplashFullBackground(
     LaunchedEffect(authState) {
         when (authState) {
             AuthState.Authenticated, AuthState.Unauthenticated, AuthState.NeedPersonalInfo -> {
-                delay(3000)
+                delay(1000)
 
                 if (authState == AuthState.Authenticated) {
                     navController.navigate(Routes.HOME) {

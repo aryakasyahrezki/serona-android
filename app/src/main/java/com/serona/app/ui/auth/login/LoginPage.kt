@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.serona.app.theme.AuthPageGrad
@@ -41,6 +43,7 @@ import com.serona.app.ui.component.AuthPasswordField
 import com.serona.app.ui.component.AuthTextField
 import com.serona.app.ui.navigation.Routes
 import com.serona.app.R
+import com.serona.app.utils.rememberNavigationGuard
 
 @Composable
 fun LoginPage(
@@ -60,13 +63,16 @@ fun LoginPage(
     val authState by loginViewModel.loginState.observeAsState(AuthState.Idle)
     val context = LocalContext.current
 
+    val (isNavigating, safeAction, resetNavigation) = rememberNavigationGuard()
+
     LaunchedEffect(authState) {
         when(authState){
             is AuthState.Authenticated-> {
                 navController.navigate("home") {
-                    popUpTo(Routes.LOGIN) {
+                    popUpTo(navController.graph.id) {
                         inclusive = true
                     }
+                    launchSingleTop = true
                 }
 
                 loginViewModel.resetLoginState()
@@ -86,9 +92,19 @@ fun LoginPage(
                     Toast.LENGTH_SHORT
                 ).show()
                 loginViewModel.resetLoginState()
+
+                resetNavigation()
             }
 
             else -> Unit
+        }
+    }
+
+    val form by loginViewModel.loginFormState.observeAsState()
+
+    LaunchedEffect(form?.emailError, form?.passwordError) {
+        if (form?.emailError != null || form?.passwordError != null) {
+            resetNavigation()
         }
     }
 
@@ -127,20 +143,41 @@ fun LoginPage(
                 navController,
                 loginViewModel,
                 onForgotPasswordClick = {
-                    forgotPasswordDialogBox = true
+                    safeAction { forgotPasswordDialogBox = true }
                 },
                 fontSize = fontSize,
-                space = space
+                space = space,
+                safeAction = safeAction
             )
 
             if (forgotPasswordDialogBox) {
                 ForgotPasswordDialog(
                     viewModel = loginViewModel,
-                    onDismiss = { forgotPasswordDialogBox = false },
+                    onDismiss = {
+                        forgotPasswordDialogBox = false
+                        resetNavigation()
+                    },
                     fontSize = fontSize,
-                    space = space * 0.6f
+                    space = space * 0.6f,
+                    safeAction = safeAction
                 )
             }
+        }
+
+        if (isNavigating) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(100f)
+                    .background(Color.Transparent)
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    }
+            )
         }
     }
 }
@@ -151,7 +188,8 @@ fun LoginCard(
     loginViewModel: LoginViewModel,
     onForgotPasswordClick: () -> Unit = {},
     fontSize: TextUnit,
-    space: Dp
+    space: Dp,
+    safeAction: (action: () -> Unit) -> Unit
 ) {
 
     val form = loginViewModel.loginFormState.observeAsState(LoginFormState()).value
@@ -168,7 +206,7 @@ fun LoginCard(
                     brush = glassColor,
                     shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
                 )
-                .padding(space* 0.5f)
+                .padding(space * 0.5f)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 Text(
@@ -217,7 +255,7 @@ fun LoginCard(
                 Button(
                     enabled = (form.email != "") && (form.password != ""),
                     onClick = {
-                        loginViewModel.submit()
+                        safeAction { loginViewModel.submit() }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE05757)),
                     modifier = Modifier
@@ -251,12 +289,14 @@ fun LoginCard(
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.clickable{
-                            navController.navigate("register") {
-                                popUpTo("login") {
-                                    saveState = true
+                            safeAction {
+                                navController.navigate("register") {
+                                    popUpTo("login") {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
                             }
                         }
                     )
@@ -271,7 +311,8 @@ fun ForgotPasswordDialog(
     viewModel: LoginViewModel,
     onDismiss: () -> Unit,
     fontSize: TextUnit,
-    space: Dp
+    space: Dp,
+    safeAction: (action: () -> Unit) -> Unit
 ) {
     val form = viewModel.forgotPasswordFormState.observeAsState(ForgotPasswordFormState()).value
     val state by viewModel.forgotPasswordState
@@ -346,7 +387,7 @@ fun ForgotPasswordDialog(
         confirmButton = {
             Column{
                 Button(
-                    onClick = { viewModel.sendResetPasswordEmail() },
+                    onClick = { safeAction { viewModel.sendResetPasswordEmail() } },
                     enabled = state !is ForgotPasswordState.Loading,
                     colors = ButtonDefaults.buttonColors(containerColor = Primary.copy(alpha = 0.8f)),
                     modifier = Modifier

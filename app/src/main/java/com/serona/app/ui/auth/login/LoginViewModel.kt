@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serona.app.data.dto.RegisterUserRequest
 import com.serona.app.data.repository.AuthRepository
 import com.serona.app.data.repository.UserRepository
 import com.serona.app.ui.auth.AuthState
@@ -68,19 +69,53 @@ class LoginViewModel @Inject constructor(
 
         repo.login(state.email, state.password) { result ->
             if (result.isSuccess) {
-                viewModelScope.launch {
-                    val syncResult = userRepo.syncFullProfile()
-                    if (syncResult.isSuccess) {
-                        val user = syncResult.getOrNull()
-                        if (user == null) { // Tambahkan pengecekan null extra
-                            _loginState.postValue(AuthState.Error("Profile not found"))
-                        } else if (user.country.isNullOrBlank()) {
-                            _loginState.postValue(AuthState.NeedPersonalInfo)
-                        } else {
-                            _loginState.postValue(AuthState.Authenticated)
+                repo.reloadUser { isVerified ->
+                    if (!isVerified) {
+                        repo.deleteCurrentUser { deleteResult ->
+                            _loginState.postValue(AuthState.Error("Email or password is incorrect"))
                         }
-                    } else {
-                        _loginState.postValue(AuthState.NeedPersonalInfo)
+                        return@reloadUser
+                    }
+                    viewModelScope.launch {
+                        val syncResult = userRepo.syncFullProfile()
+                        if (syncResult.isSuccess) {
+                            val user = syncResult.getOrNull()
+                            if (user == null) {
+                                _loginState.postValue(AuthState.Error("Profile not found"))
+                            } else if (user.country.isNullOrBlank()) {
+                                _loginState.postValue(AuthState.NeedPersonalInfo)
+                            } else {
+                                _loginState.postValue(AuthState.Authenticated)
+                            }
+                        } else {
+//                        _loginState.postValue(AuthState.NeedPersonalInfo)
+                            val errorMsg = syncResult.exceptionOrNull()?.message ?: ""
+
+                            if (errorMsg.contains("404") || errorMsg.contains("not found", ignoreCase = true)) {
+                                val (nameFb, emailFb) = repo.getCurrentUserInfo() ?: (null to null)
+
+                                if (nameFb != null && emailFb != null) {
+                                    val registerResult = userRepo.registerUser(RegisterUserRequest(nameFb, emailFb))
+
+                                    if (registerResult.isSuccess) {
+                                        _loginState.postValue(AuthState.NeedPersonalInfo)
+                                    } else {
+                                        val regError = registerResult.exceptionOrNull()?.message ?: ""
+                                        if (regError.contains("taken", ignoreCase = true) || regError.contains("exists", ignoreCase = true)) {
+                                            _loginState.postValue(AuthState.NeedPersonalInfo)
+                                        } else {
+                                            _loginState.postValue(AuthState.Error("Server error: $regError"))
+                                        }
+                                    }
+                                }else {
+                                    _loginState.postValue(AuthState.Error("Firebase user data missing"))
+                                }
+                            } else if (errorMsg.contains("Profile data is empty", ignoreCase = true)) {
+                                _loginState.postValue(AuthState.NeedPersonalInfo)
+                            } else {
+                                _loginState.postValue(AuthState.Error("Connection error. Please try again later."))
+                            }
+                        }
                     }
                 }
             } else {

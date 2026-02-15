@@ -33,6 +33,7 @@ class RegisterViewModel @Inject constructor(
     val emailVerificationState: LiveData<EmailVerificationState> = _emailVerificationState
 
 
+
     fun onNameChanged(value: String) {
         _formState.value = _formState.value?.copy(
             name = value,
@@ -136,9 +137,32 @@ class RegisterViewModel @Inject constructor(
                 _registerState.postValue(RegisterState.Success)
                 sendVerificationEmail()
             }else {
-                _registerState.postValue(
-                    RegisterState.Error(result.exceptionOrNull()?.message ?: "Register failed")
-                )
+                val exception = result.exceptionOrNull()
+
+                if (exception is com.google.firebase.auth.FirebaseAuthUserCollisionException) {
+
+                    repo.login(state.email, state.password) { loginResult ->
+                        if (loginResult.isSuccess) {
+                            repo.reloadUser { isVerified ->
+                                if (!isVerified) {
+                                    repo.deleteCurrentUser { deleteResult ->
+                                        if (deleteResult.isSuccess) {
+                                            submit()
+                                        } else {
+                                            _registerState.postValue(RegisterState.Error("Failed to reset unverified account"))
+                                        }
+                                    }
+                                } else {
+                                    _registerState.postValue(RegisterState.Error("Email is already in use by another account"))
+                                }
+                            }
+                        } else {
+                            _registerState.postValue(RegisterState.Error("Email is already in use"))
+                        }
+                    }
+                } else {
+                    _registerState.postValue(RegisterState.Error(exception?.message ?: "Register failed"))
+                }
             }
         }
     }
