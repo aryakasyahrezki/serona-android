@@ -275,7 +275,7 @@ fun DeleteAccountDialog(
                 Button(
                     onClick = { onConfirm(password) },
                     enabled = !isLoading && password.isNotBlank(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                    colors = ButtonDefaults.buttonColors(containerColor = Primary, disabledContainerColor = Primary.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth().height(buttonHeight)
                 ) {

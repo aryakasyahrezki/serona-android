@@ -1,6 +1,7 @@
 package com.serona.app.ui.main.favorite
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,6 +25,7 @@ import com.serona.app.ui.component.BackButton
 import com.serona.app.ui.component.EmptyView
 import com.serona.app.ui.component.TutorialCard
 import com.serona.app.ui.component.TutorialSearchBar
+import com.serona.app.utils.rememberNavigationGuard
 
 @Composable
 fun FavoritePage(
@@ -42,35 +45,16 @@ fun FavoritePage(
 
     val favorites = viewModel.favoriteList
     var searchQuery by remember { mutableStateOf("") }
-    var isNavigating by remember { mutableStateOf(true) }
 
-    val safeNavigateToDetail: (Int) -> Unit = { id ->
-        if (!isNavigating) {
-            isNavigating = true
-            if(onTutorialClick != null){
-                onTutorialClick(id)
-            }
-        }
-    }
-
-    val safeBackClick: () -> Unit = {
-        if (!isNavigating) {
-            isNavigating = true
-            onBackClick()
-        }
-    }
+    val (isNavigating, safeAction, resetNavigation) = rememberNavigationGuard()
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> {
-                    isNavigating = false
+                    resetNavigation()
                     viewModel.refreshFavorites()
-                }
-
-                Lifecycle.Event.ON_PAUSE -> {
-                    isNavigating = true
                 }
                 else -> {}
             }
@@ -93,11 +77,20 @@ fun FavoritePage(
         }
     }
 
+    val focusManager = LocalFocusManager.current
+
     LaunchedEffect(Unit) {
         viewModel.refreshFavorites()
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus() // 2. Lepas focus saat klik di mana saja
+            })
+        }
+    ) {
         Column(
             Modifier
                 .fillMaxSize()
@@ -105,7 +98,7 @@ fun FavoritePage(
                 .padding(vertical = vertiPadding, horizontal = horiPadding)
         ) {
             BackButton(
-                onBackClick = { safeBackClick() },
+                onBackClick = { safeAction { onBackClick() } },
                 buttonSize = buttonSize,
                 fontSize = fontSize
             )
@@ -139,7 +132,8 @@ fun FavoritePage(
             TutorialSearchBar(
                 query = searchQuery,
                 onQueryChange = { searchQuery = it },
-                fontSize = fontSize
+                fontSize = fontSize,
+                enabled = !isNavigating
             )
 
             Spacer(modifier = Modifier.height(space * 0.5f))
@@ -158,7 +152,7 @@ fun FavoritePage(
                             tutorial = tutorial,
                             favViewModel = viewModel
                         ) {
-                            safeNavigateToDetail(tutorial.id)
+                            safeAction { onTutorialClick?.invoke(tutorial.id) }
                         }
                     }
                 }
@@ -170,7 +164,11 @@ fun FavoritePage(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Transparent)
-                    .pointerInput(Unit) {}
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) { awaitPointerEvent() }
+                        }
+                    }
             )
         }
     }

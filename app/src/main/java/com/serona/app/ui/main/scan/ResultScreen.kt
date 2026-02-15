@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.serona.app.theme.*
@@ -73,6 +74,28 @@ fun ResultScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFFFF0F1))
+                .padding(start = horiPadding, end=horiPadding, top = vertiPadding * 1.14f)
+                .zIndex(2f)
+        ) {
+            BackButton(
+                onBackClick = {
+                    safeAction {
+                        navController.navigate(Routes.SCAN_MENU) {
+                            popUpTo(Routes.SCAN_MENU) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                },
+                buttonSize = buttonSize,
+                fontSize = fontSize * 0.86
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -233,26 +256,6 @@ fun ResultScreen(
             Spacer(modifier = Modifier
                 .navigationBarsPadding()
                 .padding(bottom = 16.dp))
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = horiPadding, vertical = vertiPadding * 1.13f)
-        ) {
-            BackButton(
-                onBackClick = {
-                    safeAction {
-                        navController.navigate(Routes.SCAN_MENU) {
-                            popUpTo(Routes.SCAN_MENU) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                },
-                buttonSize = buttonSize,
-                fontSize = fontSize * 0.86
-            )
         }
 
         if (isNavigating || state.isSaving) {

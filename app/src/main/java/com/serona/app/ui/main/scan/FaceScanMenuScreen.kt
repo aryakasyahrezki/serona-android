@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -109,6 +110,27 @@ fun FaceScanMenuScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = horiPadding, vertical = vertiPadding)
+                .zIndex(2f)
+        ) {
+            Spacer(modifier = Modifier.height(space * 0.15f))
+
+            BackButton(
+                onBackClick = {
+                    safeAction {
+                        navController.navigate("home") {
+                            popUpTo("home") { inclusive = true }
+                        }
+                    }
+                },
+                buttonSize = buttonSize,
+                fontSize = fontSize * 0.86
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -226,26 +248,6 @@ fun FaceScanMenuScreen(
             Spacer(modifier = Modifier
                 .navigationBarsPadding()
                 .height(24.dp))
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = horiPadding, vertical = vertiPadding)
-        ) {
-            Spacer(modifier = Modifier.height(space * 0.15f))
-
-            BackButton(
-                onBackClick = {
-                    safeAction {
-                        navController.navigate("home") {
-                            popUpTo("home") { inclusive = true }
-                        }
-                    }
-                },
-                buttonSize = buttonSize,
-                fontSize = fontSize * 0.86
-            )
         }
 
         /**

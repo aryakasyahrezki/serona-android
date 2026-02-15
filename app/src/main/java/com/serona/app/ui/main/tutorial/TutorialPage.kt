@@ -1,6 +1,7 @@
 package com.serona.app.ui.main.tutorial
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,17 +14,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.serona.app.theme.*
 import com.serona.app.ui.component.*
 import com.serona.app.ui.main.favorite.FavoriteViewModel
+import com.serona.app.utils.rememberNavigationGuard
 
 @Composable
 fun TutorialPage(
@@ -41,21 +45,16 @@ fun TutorialPage(
     val space = maxHeight * 0.03f
     val buttonSize = maxWidth * 0.07f
 
+    val focusManager = LocalFocusManager.current
     val favVM: FavoriteViewModel = hiltViewModel()
-    var isNavigating by remember { mutableStateOf(false) }
+    var (isNavigating, safeAction, resetNavigation) = rememberNavigationGuard()
 
     val safeNavigateToDetail: (Int) -> Unit = { id ->
-        if (!isNavigating) {
-            isNavigating = true
-            onTutorialClick(id)
-        }
+        safeAction { onTutorialClick(id) }
     }
 
     val safeBackClick: () -> Unit = {
-        if (!isNavigating) {
-            isNavigating = true
-            onBackClick()
-        }
+        safeAction { onBackClick() }
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -63,13 +62,9 @@ fun TutorialPage(
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> {
-                    isNavigating = false
+                    resetNavigation()
                     vm.refreshTutorials()
                     favVM.refreshFavorites()
-                }
-
-                Lifecycle.Event.ON_PAUSE -> {
-                    isNavigating = true
                 }
                 else -> {}
             }
@@ -90,7 +85,13 @@ fun TutorialPage(
         vm.refreshTutorials()
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus()
+        })
+    }) {
         Column(
             Modifier
                 .fillMaxSize()
@@ -135,7 +136,8 @@ fun TutorialPage(
             TutorialSearchBar(
                 query = searchQuery,
                 onQueryChange = vm::onQueryChange,
-                fontSize = fontSize
+                fontSize = fontSize,
+                enabled = !isNavigating
             )
 
             Spacer(modifier = Modifier.height(space * 0.5f))
@@ -146,8 +148,11 @@ fun TutorialPage(
                 subCategoryOptions = vm.subCategoryOptions,
                 activeFilters = activeFilters,
                 isFilterActive = isFilterActive,
-                onFilterSelected = vm::onFilterSelected,
-                fontSize = fontSize
+                onFilterSelected = { filter ->
+                    vm.onFilterSelected(filter)
+                },
+                fontSize = fontSize,
+                enabled = !isNavigating
             )
 
             Spacer(modifier = Modifier.height(space * 0.6f))
@@ -171,7 +176,7 @@ fun TutorialPage(
 
                     if (activeFilters.size > 1) {
                         TextButton(
-                            onClick = vm::clearAllFilters
+                            onClick = { vm.clearAllFilters() }
                         ) {
                             Text(
                                 "Clear All",
@@ -269,9 +274,16 @@ fun TutorialPage(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .zIndex(100f)
                     .background(Color.Transparent)
-                    // pointerInput(Unit) {} akan memakan semua input sentuhan agar tidak tembus ke bawah
-                    .pointerInput(Unit) {}
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                // Memakan semua event sentuhan secara paksa
+                                awaitPointerEvent()
+                            }
+                        }
+                    }
             )
         }
     }

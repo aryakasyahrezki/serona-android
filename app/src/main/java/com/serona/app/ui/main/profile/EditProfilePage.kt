@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -75,6 +77,7 @@ fun EditProfilePage(
     val context = LocalContext.current
 
     val (isNavigating, safeAction, resetNavigation) = rememberNavigationGuard()
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let { msg ->
@@ -84,7 +87,20 @@ fun EditProfilePage(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    LaunchedEffect(state.nameError, state.countryError, state.dobError) {
+        if (state.nameError != null || state.countryError != null || state.dobError != null) {
+            resetNavigation()
+        }
+    }
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .pointerInput(Unit) {
+            detectTapGestures (onTap = {
+                focusManager.clearFocus()
+            })
+        }
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -154,7 +170,8 @@ fun EditProfilePage(
                             },
                             errorText = state.nameError,
                             fontSize = fontSize,
-                            space = space
+                            space = space,
+                            enabled = !isNavigating
                         )
 
                         EditProfileField(
@@ -261,7 +278,7 @@ fun EditProfilePage(
                                     value = state.year,
                                     onValueChange = {},
                                     isDropdown = true,
-                                    dropdownItems = (1990..2010).map { it.toString() },
+                                    dropdownItems = (1960..2015).map { it.toString() },
                                     onDropdownItemSelected = {
                                         editProfileViewModel.onEvent(
                                             EditProfileEvent.YearChanged(it)

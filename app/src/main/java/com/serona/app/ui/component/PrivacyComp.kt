@@ -174,16 +174,6 @@ fun PrivacyCard(
                     lineHeight = fontSize
                 )
             }
-
-            // Chevron kanan bawah
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = Tertiary,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .size(iconSize * 2)
-            )
         }
     }
 }

@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
@@ -217,9 +218,19 @@ fun SectionTitle(title: String) {
 fun TutorialSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    fontSize: TextUnit
+    fontSize: TextUnit,
+    enabled: Boolean = true
 ) {
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(enabled) {
+        if (!enabled) {
+            focusManager.clearFocus()
+        }
+    }
+
     OutlinedTextField(
+        enabled = enabled,
         value = query,
         onValueChange = onQueryChange,
         modifier = Modifier
@@ -254,7 +265,9 @@ fun TutorialSearchBar(
             focusedBorderColor = Primary,
             unfocusedBorderColor = Grey20,
             focusedContainerColor = White,
-            unfocusedContainerColor = White
+            unfocusedContainerColor = White,
+            disabledContainerColor = White,
+            disabledBorderColor = Grey20,
         )
     )
 }
@@ -270,7 +283,8 @@ fun FilterRow(
     activeFilters: Set<String>,
     isFilterActive: Boolean,
     onFilterSelected: (String) -> Unit,
-    fontSize: TextUnit
+    fontSize: TextUnit,
+    enabled: Boolean = true
 ) {
     val configuration = LocalConfiguration.current
     val maxWidth = configuration.screenWidthDp.dp
@@ -290,7 +304,8 @@ fun FilterRow(
                 isActive = isFilterActive,
                 showIcon = true,
                 onClick = { /* TODO: Show filter dialog */ },
-                fontSize = fontSize
+                fontSize = fontSize,
+                enabled = enabled
             )
         }
 
@@ -302,7 +317,8 @@ fun FilterRow(
                 subOptions = subCategoryOptions[category] ?: emptyList(),
                 activeFilters = activeFilters,
                 onFilterSelected = onFilterSelected,
-                fontSize = fontSize
+                fontSize = fontSize,
+                enabled = enabled
             )
         }
     }
@@ -314,7 +330,8 @@ fun FilterButton(
     isActive: Boolean,
     showIcon: Boolean = false,
     onClick: () -> Unit,
-    fontSize: TextUnit
+    fontSize: TextUnit,
+    enabled: Boolean = true
 ) {
 
     val configuration = LocalConfiguration.current
@@ -335,7 +352,7 @@ fun FilterButton(
                 color = if (isActive) Primary50 else Color(0xFFE0E0E0),
                 shape = RoundedCornerShape(12.dp)
             )
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(horizontal = space * 0.5f, vertical = space * 0.3f),
         contentAlignment = Alignment.Center
     ) {
@@ -369,7 +386,8 @@ fun FilterDropDownButton(
     subOptions: List<String>,
     activeFilters: Set<String>,
     onFilterSelected: (String) -> Unit,
-    fontSize: TextUnit
+    fontSize: TextUnit,
+    enabled: Boolean = true
 ) {
     val configuration = LocalConfiguration.current
     val maxWidth = configuration.screenWidthDp.dp
@@ -402,7 +420,7 @@ fun FilterDropDownButton(
                     color = if (hasActiveFilter) Primary else Color(0xFFE0E0E0),
                     shape = RoundedCornerShape(12.dp)
                 )
-                .clickable { expanded = true }
+                .clickable(enabled = enabled) { expanded = true }
                 .padding(horizontal = space * 0.5f, vertical = space * 0.3f),
             contentAlignment = Alignment.Center
         ) {

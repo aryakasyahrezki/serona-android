@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -57,13 +59,21 @@ fun EditProfileField(
     dropdownItems: List<String> = emptyList(),
     onDropdownItemSelected: (String) -> Unit = {},
     fontSize: TextUnit,
-    space: Dp
+    space: Dp,
+    enabled: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     var textFieldWidth by remember { mutableStateOf(0) }
     var textFieldHeight by remember { mutableStateOf(0) }
     val density = LocalDensity.current
+
+    val focusManager = LocalFocusManager.current
+    LaunchedEffect(enabled) {
+        if (!enabled) {
+            focusManager.clearFocus()
+        }
+    }
 
     Column(modifier = modifier) {
 
@@ -85,6 +95,7 @@ fun EditProfileField(
             }
         ) {
             OutlinedTextField(
+                enabled = enabled,
                 value = value,
                 onValueChange = {
                     if (!isDropdown) onValueChange(it)
@@ -129,7 +140,8 @@ fun EditProfileField(
                     focusedBorderColor = Primary,
                     unfocusedBorderColor = Primary,
                     focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledBorderColor = Primary
                 ),
 
                 modifier = Modifier
@@ -137,7 +149,6 @@ fun EditProfileField(
                     .fillMaxWidth()
                     .heightIn(min = space)
                     .onSizeChanged {
-                        // Simpan lebar TextField saat ukurannya berubah
                         textFieldWidth = it.width
                         textFieldHeight = it.height
                     },
