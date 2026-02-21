@@ -25,20 +25,21 @@ class PersonalInfoViewModel @Inject constructor(
     val state: StateFlow<PersonalInfoState> = _state.asStateFlow()
 
     fun selectGender(gender: Gender){
-        _state.value = _state.value.copy(gender = gender)
+        _state.value = _state.value.copy(gender = gender, dobError = null, errorMessage = null)
     }
 
     fun selectCountry(country: String){
-        _state.value = _state.value.copy(country = country)
+        _state.value = _state.value.copy(country = country, dobError = null, errorMessage = null)
     }
 
     fun selectDOB(day: String, month: String, year: String){
-        _state.value = _state.value.copy(day = day, month = month, year = year)
+        _state.value = _state.value.copy(day = day, month = month, year = year, dobError = null, errorMessage = null)
     }
 
     private fun validateForm(): Boolean {
         val currentState = _state.value
         var isValid = true
+
 
         // Cek validitas tanggal menggunakan DateUtils
         val dobError = if (!DateUtils.isValidDate(currentState.day, currentState.month, currentState.year)) {
@@ -50,8 +51,9 @@ class PersonalInfoViewModel @Inject constructor(
         return isValid
     }
 
-    fun submitPersonalInfo(onSuccess: () -> Unit){
-        if (!validateForm()) return
+    fun submitPersonalInfo(onSuccess: () -> Unit) : Boolean{
+        _state.value = _state.value.copy(dobError = null, errorMessage = null)
+        if (!validateForm()) return false
         val currentState = state.value
 
         val request = PersonalInfoRequest(
@@ -94,15 +96,14 @@ class PersonalInfoViewModel @Inject constructor(
                 } else {
                     _state.value = _state.value.copy(errorMessage = errorMsg)
                 }
-//                _state.value = _state.value.copy(
-//                    errorMessage = exception.message ?: "Failed to submit personal info"
-//                )
             }
         }
+
+        return true
     }
 
     fun clearError(){
-        _state.value = _state.value.copy(errorMessage = null)
+        _state.value = _state.value.copy(errorMessage = null, dobError = null)
     }
 
 }

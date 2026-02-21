@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
@@ -58,6 +59,7 @@ import com.serona.app.theme.Primary
 import com.serona.app.theme.Primary50
 import com.serona.app.theme.White
 import com.serona.app.theme.figtreeFontFamily
+import com.serona.app.utils.ResponsiveScale
 
 @Composable
 fun GenderCard(
@@ -134,143 +136,150 @@ fun PersonalInfoTextField(
     var textFieldHeight by remember { mutableStateOf(0) }
     val density = LocalDensity.current
 
-    if (isDropdown) {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded },
-            modifier = modifier
-        ) {
-            Box(contentAlignment = Alignment.CenterStart) {
-                val isCountryField = label == "Choose Your Country"
+    ResponsiveScale(maxFontScale = 1f) {
+        if (isDropdown) {
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                modifier = modifier
+            ) {
+                Box(contentAlignment = Alignment.CenterStart) {
+                    val isCountryField = label == "Choose Your Country"
 
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = {},
-                    readOnly = true,
-                    shape = RoundedCornerShape(15.dp),
-                    label = if (isCountryField) null else {
-                        { Text(
-                            label,
-                            fontSize = fontSize * 0.7f,
+                    OutlinedTextField(
+                        value = value,
+                        onValueChange = {},
+                        readOnly = true,
+                        shape = RoundedCornerShape(15.dp),
+                        label = if (isCountryField) null else {
+                            {
+                                Text(
+                                    label,
+                                    fontSize = fontSize * 0.7f,
+                                    fontFamily = figtreeFontFamily,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Primary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    softWrap = false
+                                )
+                            }
+                        },
+                        textStyle = TextStyle(
+                            fontSize = fontSize * 0.65f,
                             fontFamily = figtreeFontFamily,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Primary
-                        ) }
-                    },
-                    textStyle = TextStyle(
-                        fontSize = fontSize * 0.65f,
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        color = Grey40
-                    ),
+                            fontWeight = FontWeight.Medium,
+                            color = Grey40
+                        ),
 
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor()
-                        .onSizeChanged {
-                            textFieldWidth = it.width
-                            textFieldHeight = it.height
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor()
+                            .onSizeChanged {
+                                textFieldWidth = it.width
+                                textFieldHeight = it.height
+                            },
+
+                        trailingIcon = {
+                            if (isDropdown) {
+                                Icon(
+                                    imageVector = if (expanded)
+                                        androidx.compose.material.icons.Icons.Filled.KeyboardArrowUp
+                                    else
+                                        androidx.compose.material.icons.Icons.Filled.KeyboardArrowDown,
+                                    contentDescription = null,
+                                    tint = MutedLight
+                                )
+                            }
                         },
 
-                    trailingIcon = {
-                        if (isDropdown) {
-                            androidx.compose.material3.Icon(
-                                imageVector = if (expanded)
-                                    androidx.compose.material.icons.Icons.Filled.KeyboardArrowUp
-                                else
-                                    androidx.compose.material.icons.Icons.Filled.KeyboardArrowDown,
-                                contentDescription = null,
-                                tint = MutedLight
-                            )
-                        }
-                    },
-
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedIndicatorColor = Primary50.copy(alpha = 0.4f),
-                        focusedIndicatorColor = Primary50.copy(alpha = 0.5f),
-                        unfocusedLabelColor = Primary50.copy(alpha = 0.8f),
-                        focusedLabelColor = Primary50,
-                        errorContainerColor = Color.Transparent,
-                    )
-                )
-
-                // INI ADALAH PLACEHOLDER/LABEL MANUAL KAMU
-                if (isCountryField) {
-                    AnimatedVisibility(
-                        // Muncul saat kosong, HILANG saat fokus atau expand
-                        visible = value.isEmpty() && !expanded,
-                        enter = fadeIn(),
-                        exit = fadeOut(),
-                        modifier = Modifier.padding(start = 16.dp)
-                    ) {
-                        Text(
-                            text = label, // "Choose Your Country"
-                            fontSize = fontSize * 0.7f, // Sesuaikan ukuran agar sama dengan isi
-                            fontFamily = figtreeFontFamily,
-                            color = Primary,
-                            fontWeight = FontWeight.SemiBold
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedIndicatorColor = Primary50.copy(alpha = 0.4f),
+                            focusedIndicatorColor = Primary50.copy(alpha = 0.5f),
+                            unfocusedLabelColor = Primary50.copy(alpha = 0.8f),
+                            focusedLabelColor = Primary50,
+                            errorContainerColor = Color.Transparent,
                         )
-                    }
-                }
-            }
-
-            if (expanded) {
-                Popup(
-                    alignment = Alignment.TopEnd,
-                    offset = IntOffset(
-                        x = 0,
-                        y = textFieldHeight
-                    ),
-                    onDismissRequest = { expanded = false },
-                    properties = PopupProperties(
-                        focusable = true,
-                        dismissOnBackPress = true,
-                        dismissOnClickOutside = true,
-                        excludeFromSystemGesture = true
                     )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .width(with(density) { textFieldWidth.toDp() })
-                            .heightIn(max = maxHeight * 0.2f)
-                            .shadow(elevation = 8.dp, shape = RoundedCornerShape(15.dp))
-                            .background(
-                                color = White,
-                                shape = RoundedCornerShape(15.dp)
-                            )
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        // Isi menu dengan DropdownMenuItem
-                        dropdownItems.forEach { item ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        item,
-                                        fontSize = fontSize * 0.7f,
-                                        fontFamily = figtreeFontFamily,
-                                        fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal,
-                                        color = Grey40
-                                    )
-                                },
-                                onClick = {
-                                    onDropdownItemSelected(item)
-                                    expanded = false
-                                }
+
+                    // INI ADALAH PLACEHOLDER/LABEL MANUAL KAMU
+                    if (isCountryField) {
+                        AnimatedVisibility(
+                            // Muncul saat kosong, HILANG saat fokus atau expand
+                            visible = value.isEmpty() && !expanded,
+                            enter = fadeIn(),
+                            exit = fadeOut(),
+                            modifier = Modifier.padding(start = 16.dp)
+                        ) {
+                            Text(
+                                text = label, // "Choose Your Country"
+                                fontSize = fontSize * 0.7f, // Sesuaikan ukuran agar sama dengan isi
+                                fontFamily = figtreeFontFamily,
+                                color = Primary,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
                 }
+
+                if (expanded) {
+                    Popup(
+                        alignment = Alignment.TopEnd,
+                        offset = IntOffset(
+                            x = 0,
+                            y = textFieldHeight
+                        ),
+                        onDismissRequest = { expanded = false },
+                        properties = PopupProperties(
+                            focusable = true,
+                            dismissOnBackPress = true,
+                            dismissOnClickOutside = true,
+                            excludeFromSystemGesture = true
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .width(with(density) { textFieldWidth.toDp() })
+                                .heightIn(max = maxHeight * 0.2f)
+                                .shadow(elevation = 8.dp, shape = RoundedCornerShape(15.dp))
+                                .background(
+                                    color = White,
+                                    shape = RoundedCornerShape(15.dp)
+                                )
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            // Isi menu dengan DropdownMenuItem
+                            dropdownItems.forEach { item ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            item,
+                                            fontSize = fontSize * 0.7f,
+                                            fontFamily = figtreeFontFamily,
+                                            fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal,
+                                            color = Grey40
+                                        )
+                                    },
+                                    onClick = {
+                                        onDropdownItemSelected(item)
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
+        } else {
+            OutlinedTextField(
+                value = value,
+                onValueChange = onValueChange,
+                label = { Text(label) },
+                modifier = modifier.fillMaxWidth()
+            )
         }
-    } else {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            label = { Text(label) },
-            modifier = modifier.fillMaxWidth()
-        )
     }
 }
 
