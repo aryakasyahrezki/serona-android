@@ -45,6 +45,7 @@ import com.serona.app.theme.Primary
 import com.serona.app.theme.Primary50
 import com.serona.app.theme.White
 import com.serona.app.theme.figtreeFontFamily
+import com.serona.app.utils.ResponsiveScale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,145 +76,148 @@ fun EditProfileField(
         }
     }
 
-    Column(modifier = modifier) {
+    ResponsiveScale(maxFontScale = 1f) {
+        Column(modifier = modifier) {
 
-        // Title
-        Text(
-            text = title,
-            fontSize = fontSize * 0.5f,
-            fontFamily = figtreeFontFamily,
-            fontWeight = FontWeight.Medium,
-            color = Heading
-        )
+            // Title
+            Text(
+                text = title,
+                fontSize = fontSize * 0.5f,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Medium,
+                color = Heading
+            )
 
-        Spacer(modifier = Modifier.height(space * 0.3f))
+            Spacer(modifier = Modifier.height(space * 0.3f))
 
-        ExposedDropdownMenuBox(
-            expanded = expanded && isDropdown,
-            onExpandedChange = {
-                if (isDropdown) expanded = !expanded
-            }
-        ) {
-            OutlinedTextField(
-                enabled = enabled,
-                value = value,
-                onValueChange = {
-                    if (!isDropdown) onValueChange(it)
-                },
-                readOnly = isDropdown,
-                singleLine = true,
+            ExposedDropdownMenuBox(
+                expanded = expanded && isDropdown,
+                onExpandedChange = {
+                    if (isDropdown) expanded = !expanded
+                }
+            ) {
+                OutlinedTextField(
+                    enabled = enabled,
+                    value = value,
+                    onValueChange = {
+                        if (!isDropdown) onValueChange(it)
+                    },
+                    readOnly = isDropdown,
+                    singleLine = true,
 
-                textStyle = androidx.compose.ui.text.TextStyle(
-                    fontSize = fontSize * 0.5f,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    color = Grey40
-                ),
-
-                placeholder = {
-                    Text(
-                        text = placeholder,
+                    textStyle = androidx.compose.ui.text.TextStyle(
                         fontSize = fontSize * 0.5f,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Medium,
-                        color = MutedLight
-                    )
-                },
-
-
-                trailingIcon = {
-                    if (isDropdown) {
-                        androidx.compose.material3.Icon(
-                            imageVector = if (expanded)
-                                androidx.compose.material.icons.Icons.Filled.KeyboardArrowUp
-                            else
-                                androidx.compose.material.icons.Icons.Filled.KeyboardArrowDown,
-                            contentDescription = null,
-                            tint = Grey40
-                        )
-                    }
-                },
-
-                isError = errorText != null,
-
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Primary,
-                    unfocusedBorderColor = Primary,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledBorderColor = Primary
-                ),
-
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth()
-                    .heightIn(min = space)
-                    .onSizeChanged {
-                        textFieldWidth = it.width
-                        textFieldHeight = it.height
-                    },
-                shape = RoundedCornerShape(15.dp),
-            )
-
-
-            if (expanded) {
-                Popup(
-                    alignment = Alignment.TopEnd,
-                    offset = IntOffset(
-                        x = 0,
-                        y = textFieldHeight
+                        color = Grey40
                     ),
-                    onDismissRequest = { expanded = false },
-                    properties = PopupProperties(
-                        focusable = true,
-                        dismissOnBackPress = true,
-                        dismissOnClickOutside = true,
-                        excludeFromSystemGesture = true
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .width(with(density) { textFieldWidth.toDp() })
-                            .heightIn(max = space * 3.1f)
-                            .shadow(elevation = 8.dp, shape = RoundedCornerShape(15.dp))
-                            .background(
-                                color = White, // Warna latar belakang menu
-                                shape = RoundedCornerShape(15.dp)
-                            )
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        // Isi menu dengan DropdownMenuItem
-                        dropdownItems.forEach { item ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        item,
-                                        fontSize = fontSize * 0.5f,
-                                        fontFamily = figtreeFontFamily,
-                                        fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal,
-                                        color = Grey40
 
-                                    )
-                                },
-                                onClick = {
-                                    onDropdownItemSelected(item)
-                                    expanded = false
-                                }
+                    placeholder = {
+                        Text(
+                            text = placeholder,
+                            fontSize = fontSize * 0.5f,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            color = MutedLight
+                        )
+                    },
+
+
+                    trailingIcon = {
+                        if (isDropdown) {
+                            androidx.compose.material3.Icon(
+                                imageVector = if (expanded)
+                                    androidx.compose.material.icons.Icons.Filled.KeyboardArrowUp
+                                else
+                                    androidx.compose.material.icons.Icons.Filled.KeyboardArrowDown,
+                                contentDescription = null,
+                                tint = Grey40
                             )
+                        }
+                    },
+
+                    isError = errorText != null,
+
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Primary,
+                        unfocusedBorderColor = Primary,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledBorderColor = Primary
+                    ),
+
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .heightIn(min = space)
+                        .onSizeChanged {
+                            textFieldWidth = it.width
+                            textFieldHeight = it.height
+                        },
+                    shape = RoundedCornerShape(15.dp),
+                )
+
+
+                if (expanded) {
+                    Popup(
+                        alignment = Alignment.TopEnd,
+                        offset = IntOffset(
+                            x = 0,
+                            y = textFieldHeight
+                        ),
+                        onDismissRequest = { expanded = false },
+                        properties = PopupProperties(
+                            focusable = true,
+                            dismissOnBackPress = true,
+                            dismissOnClickOutside = true,
+                            excludeFromSystemGesture = true
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .width(with(density) { textFieldWidth.toDp() })
+                                .heightIn(max = space * 3.1f)
+                                .shadow(elevation = 8.dp, shape = RoundedCornerShape(15.dp))
+                                .background(
+                                    color = White, // Warna latar belakang menu
+                                    shape = RoundedCornerShape(15.dp)
+                                )
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            // Isi menu dengan DropdownMenuItem
+                            dropdownItems.forEach { item ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            item,
+                                            fontSize = fontSize * 0.5f,
+                                            fontFamily = figtreeFontFamily,
+                                            fontWeight = if (item == value) FontWeight.SemiBold else FontWeight.Normal,
+                                            color = Grey40
+
+                                        )
+                                    },
+                                    onClick = {
+                                        onDropdownItemSelected(item)
+                                        expanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if (errorText != null) {
-            Spacer(modifier = Modifier.height(space * 0.1f))
-            Text(
-                text = errorText,
-                color = Primary50,
-                fontSize = fontSize * 0.5f,
-                fontFamily = figtreeFontFamily,)
-        }
+            if (errorText != null) {
+                Spacer(modifier = Modifier.height(space * 0.1f))
+                Text(
+                    text = errorText,
+                    color = Primary50,
+                    fontSize = fontSize * 0.5f,
+                    fontFamily = figtreeFontFamily,
+                )
+            }
 
+        }
     }
 }

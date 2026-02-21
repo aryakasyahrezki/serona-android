@@ -33,6 +33,7 @@ import com.serona.app.theme.Primary
 import com.serona.app.theme.White
 import com.serona.app.theme.backButtonGrad
 import com.serona.app.theme.figtreeFontFamily
+import com.serona.app.utils.ResponsiveScale
 
 @Composable
 fun ProfileInfoItem(
@@ -42,26 +43,28 @@ fun ProfileInfoItem(
 ) {
     val space = (fontSize * 0.3f).value.dp
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-    ) {
-        Text(
-            text = title,
-            fontSize = fontSize,
-            color = Heading,
-            fontFamily = figtreeFontFamily,
-            fontWeight = FontWeight.Medium,
-        )
-        Spacer(modifier = Modifier.height(space))
-        Text(
-            text = value,
-            fontSize = fontSize,
-            fontFamily = figtreeFontFamily,
-            fontWeight = FontWeight.Medium,
-            color = OnSecondaryContainer
-        )
+    ResponsiveScale(maxFontScale = 1f) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = title,
+                fontSize = fontSize,
+                color = Heading,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Medium,
+            )
+            Spacer(modifier = Modifier.height(space))
+            Text(
+                text = value,
+                fontSize = fontSize,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Medium,
+                color = OnSecondaryContainer
+            )
+        }
     }
 
     HorizontalDivider(
@@ -80,28 +83,30 @@ fun ProfileMenuItem(
 ) {
     val vertiPadding = (fontSize * 0.5f).value.dp
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(vertical = vertiPadding),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = text,
-            fontSize = fontSize,
-            color = textColor,
-            fontFamily = figtreeFontFamily,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
+    ResponsiveScale(maxFontScale = 1f) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(vertical = vertiPadding),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = text,
+                fontSize = fontSize,
+                color = textColor,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f)
+            )
 
-        Icon(
-            imageVector = Icons.Default.ChevronRight,
-            contentDescription = null,
-            tint = Color.Gray
-        )
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = Color.Gray
+            )
+        }
     }
 }
 
@@ -111,34 +116,36 @@ fun BackButton(
     buttonSize: Dp,
     fontSize: TextUnit
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy((fontSize * 0.3f).value.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable{ onBackClick() }
-    ) {
-        Box(
-            modifier = Modifier
-                .size(buttonSize)
-                .background(
-                    brush = backButtonGrad,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
+    ResponsiveScale(maxFontScale = 1f) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy((fontSize * 0.3f).value.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable { onBackClick() }
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                tint = White,
-                modifier = Modifier.size(buttonSize * 0.6f)
+            Box(
+                modifier = Modifier
+                    .size(buttonSize)
+                    .background(
+                        brush = backButtonGrad,
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = White,
+                    modifier = Modifier.size(buttonSize * 0.6f)
+                )
+            }
+
+            Text(
+                text = "Back",
+                color = Primary,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = fontSize * 0.6
             )
         }
-
-        Text(
-            text = "Back",
-            color = Primary,
-            fontFamily = figtreeFontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = fontSize * 0.6
-        )
     }
 }

@@ -31,6 +31,7 @@ import com.serona.app.theme.*
 import com.serona.app.ui.component.BackButton
 import com.serona.app.ui.navigation.Routes
 import com.serona.app.R
+import com.serona.app.utils.ResponsiveScale
 import com.serona.app.utils.rememberNavigationGuard
 
 /**
@@ -73,204 +74,218 @@ fun ResultScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFFFF0F1))
-                .padding(start = horiPadding, end=horiPadding, top = vertiPadding * 1.14f)
-                .zIndex(2f)
-        ) {
-            BackButton(
-                onBackClick = {
-                    safeAction {
-                        navController.navigate(Routes.SCAN_MENU) {
-                            popUpTo(Routes.SCAN_MENU) {
-                                inclusive = true
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFFFF0F1))
+                    .padding(start = horiPadding, end = horiPadding, top = vertiPadding * 1.14f)
+                    .zIndex(2f)
+            ) {
+                BackButton(
+                    onBackClick = {
+                        safeAction {
+                            navController.navigate(Routes.SCAN_MENU) {
+                                popUpTo(Routes.SCAN_MENU) {
+                                    inclusive = true
+                                }
                             }
                         }
-                    }
-                },
-                buttonSize = buttonSize,
-                fontSize = fontSize * 0.86
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFFFF0F1))
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = horiPadding, vertical = vertiPadding * 1.7f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Beauty Profile",
-                fontSize = baseFontSize * 1.2f,
-                fontWeight = FontWeight.Bold,
-                color = Primary,
-                fontFamily = figtreeFontFamily
-            )
-
-            Spacer(modifier = Modifier.height(maxHeight * 0.02f))
-
-            /** * AVATAR BOX
-             * Displays a specific vector asset based on the combination
-             * of detected face shape and skin tone.
-             */
-            Box(
-                modifier = Modifier
-                    .size(minDimension * 0.4f)
-                    .background(White, RoundedCornerShape(minDimension * 0.05f))
-                    .padding(minDimension * 0.025f),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = getAvatarByResult(decodedShape, decodedTone)),
-                    contentDescription = "Your Face Avatar",
-                    modifier = Modifier.fillMaxSize()
+                    },
+                    buttonSize = buttonSize,
+                    fontSize = fontSize * 0.86
                 )
             }
 
-            Spacer(modifier = Modifier.height(maxHeight * 0.025f))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(if (maxWidth > maxHeight) 0.7f else 1f),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(minDimension * 0.04f),
-                elevation = CardDefaults.cardElevation(4.dp)
-            ) {
-                Column(modifier = Modifier.padding(minDimension * 0.05f, minDimension * 0.035f)) {
-                    Text(
-                        text = "Personalized Analysis",
-                        fontSize = baseFontSize * 0.9f,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Primary,
-                        fontFamily = figtreeFontFamily
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    DetailItem(
-                        label = "Face Shape",
-                        value = decodedShape,
-                        description = getFaceDescription(decodedShape),
-                        baseFontSize = baseFontSize
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        thickness = 0.5.dp,
-                        color = MutedLight
-                    )
-
-                    DetailItem(
-                        label = "Skin Tone",
-                        value = decodedTone,
-                        description = getSkinToneDescription(decodedTone),
-                        baseFontSize = baseFontSize
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(maxHeight * 0.04f))
-
             Column(
-                modifier = Modifier.fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFFFFF0F1))
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = horiPadding, vertical = vertiPadding * 1.7f),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(
-                    onClick = {
-                        safeAction {
-                            navController.navigate(
-                                Routes.navigateToTutorial(
-                                    faceShape = decodedShape,
-                                    skinTone = decodedTone
-                                )
-                            )
-                        }
-                    },
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Beauty Profile",
+                    fontSize = baseFontSize * 1.2f,
+                    fontWeight = FontWeight.Bold,
+                    color = Primary,
+                    fontFamily = figtreeFontFamily
+                )
+
+                Spacer(modifier = Modifier.height(maxHeight * 0.02f))
+
+                /** * AVATAR BOX
+                 * Displays a specific vector asset based on the combination
+                 * of detected face shape and skin tone.
+                 */
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(buttonHeight * 0.8f),
-                    colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                    shape = RoundedCornerShape(12.dp)
+                        .size(minDimension * 0.4f)
+                        .background(White, RoundedCornerShape(minDimension * 0.05f))
+                        .padding(minDimension * 0.025f),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        "See Recommendation",
-                        fontSize = baseFontSize * 0.8f,
-                        fontWeight = FontWeight.Bold,
-                        color = White
+                    Image(
+                        painter = painterResource(
+                            id = getAvatarByResult(
+                                decodedShape,
+                                decodedTone
+                            )
+                        ),
+                        contentDescription = "Your Face Avatar",
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(maxWidth * 0.03f)
+                Spacer(modifier = Modifier.height(maxHeight * 0.025f))
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(if (maxWidth > maxHeight) 0.7f else 1f),
+                    colors = CardDefaults.cardColors(containerColor = White),
+                    shape = RoundedCornerShape(minDimension * 0.04f),
+                    elevation = CardDefaults.cardElevation(4.dp)
                 ) {
-                    OutlinedButton(
-                        onClick = { safeAction { viewModel.saveToProfile() } },
-                        enabled = !state.isSaving,
-                        modifier = Modifier
-                            .weight(0.5f)
-                            .height(buttonHeight * 0.8f),
-                        border = BorderStroke(1.5.dp, Primary),
-                        shape = RoundedCornerShape(12.dp)
+                    Column(
+                        modifier = Modifier.padding(
+                            minDimension * 0.05f,
+                            minDimension * 0.035f
+                        )
                     ) {
                         Text(
-                            "Save to Profile",
-                            fontSize = baseFontSize * 0.8f,
-                            fontWeight = FontWeight.Bold,
-                            color = Primary
+                            text = "Personalized Analysis",
+                            fontSize = baseFontSize * 0.9f,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Primary,
+                            fontFamily = figtreeFontFamily
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        DetailItem(
+                            label = "Face Shape",
+                            value = decodedShape,
+                            description = getFaceDescription(decodedShape),
+                            baseFontSize = baseFontSize
+                        )
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            thickness = 0.5.dp,
+                            color = MutedLight
+                        )
+
+                        DetailItem(
+                            label = "Skin Tone",
+                            value = decodedTone,
+                            description = getSkinToneDescription(decodedTone),
+                            baseFontSize = baseFontSize
                         )
                     }
+                }
 
-                    OutlinedButton(
+                Spacer(modifier = Modifier.height(maxHeight * 0.04f))
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
                         onClick = {
                             safeAction {
-                                navController.navigate(Routes.HOME) {
-                                    popUpTo(Routes.HOME) { inclusive = true }
-                                }
+                                navController.navigate(
+                                    Routes.navigateToTutorial(
+                                        faceShape = decodedShape,
+                                        skinTone = decodedTone
+                                    )
+                                )
                             }
                         },
                         modifier = Modifier
-                            .weight(0.5f)
+                            .fillMaxWidth()
                             .height(buttonHeight * 0.8f),
-                        border = BorderStroke(1.5.dp, Primary),
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = "Back to Home",
+                            "See Recommendation",
                             fontSize = baseFontSize * 0.8f,
-                            color = Primary,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = figtreeFontFamily
+                            color = White
                         )
                     }
-                }
-            }
 
-            Spacer(modifier = Modifier
-                .navigationBarsPadding()
-                .padding(bottom = 16.dp))
-        }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(maxWidth * 0.03f)
+                    ) {
+                        OutlinedButton(
+                            onClick = { safeAction { viewModel.saveToProfile() } },
+                            enabled = !state.isSaving,
+                            modifier = Modifier
+                                .weight(0.5f)
+                                .height(buttonHeight * 0.8f),
+                            border = BorderStroke(1.5.dp, Primary),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                "Save to Profile",
+                                fontSize = baseFontSize * 0.8f,
+                                fontWeight = FontWeight.Bold,
+                                color = Primary
+                            )
+                        }
 
-        if (isNavigating || state.isSaving) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent)
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                awaitPointerEvent()
-                            }
+                        OutlinedButton(
+                            onClick = {
+                                safeAction {
+                                    navController.navigate(Routes.HOME) {
+                                        popUpTo(Routes.HOME) { inclusive = true }
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(0.5f)
+                                .height(buttonHeight * 0.8f),
+                            border = BorderStroke(1.5.dp, Primary),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = "Back to Home",
+                                fontSize = baseFontSize * 0.8f,
+                                color = Primary,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = figtreeFontFamily
+                            )
                         }
                     }
-            )
+                }
+
+                Spacer(
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .padding(bottom = 16.dp)
+                )
+            }
+
+            if (isNavigating || state.isSaving) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent)
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    awaitPointerEvent()
+                                }
+                            }
+                        }
+                )
+            }
         }
     }
 
@@ -286,33 +301,35 @@ fun DetailItem(
     description: String,
     baseFontSize: androidx.compose.ui.unit.TextUnit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = label,
-            fontSize = baseFontSize * 0.6f,
-            color = Grey40.copy(alpha = 0.7f),
-            fontFamily = figtreeFontFamily,
-            style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
-        )
+    ResponsiveScale(maxFontScale = 1f) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = label,
+                fontSize = baseFontSize * 0.6f,
+                color = Grey40.copy(alpha = 0.7f),
+                fontFamily = figtreeFontFamily,
+                style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+            )
 
-        Text(
-            text = value,
-            fontSize = baseFontSize * 0.8f,
-            fontWeight = FontWeight.Bold,
-            color = Black10,
-            fontFamily = figtreeFontFamily
-        )
+            Text(
+                text = value,
+                fontSize = baseFontSize * 0.8f,
+                fontWeight = FontWeight.Bold,
+                color = Black10,
+                fontFamily = figtreeFontFamily
+            )
 
-        Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
-        Text(
-            text = description,
-            fontSize = baseFontSize * 0.68f,
-            color = Grey40,
-            lineHeight = baseFontSize * 1.1f,
-            fontFamily = figtreeFontFamily,
-            textAlign = TextAlign.Justify
-        )
+            Text(
+                text = description,
+                fontSize = baseFontSize * 0.68f,
+                color = Grey40,
+                lineHeight = baseFontSize * 1.1f,
+                fontFamily = figtreeFontFamily,
+                textAlign = TextAlign.Justify
+            )
+        }
     }
 }
 

@@ -43,6 +43,7 @@ import com.serona.app.ui.component.BackButton
 import com.serona.app.ui.navigation.Routes
 import com.serona.app.utils.FileUtils
 import com.serona.app.R
+import com.serona.app.utils.ResponsiveScale
 import com.serona.app.utils.rememberNavigationGuard
 
 /**
@@ -109,211 +110,237 @@ fun FaceScanMenuScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = horiPadding, vertical = vertiPadding)
-                .zIndex(2f)
-        ) {
-            Spacer(modifier = Modifier.height(space * 0.15f))
-
-            BackButton(
-                onBackClick = {
-                    safeAction {
-                        navController.navigate("home") {
-                            popUpTo("home") { inclusive = true }
-                        }
-                    }
-                },
-                buttonSize = buttonSize,
-                fontSize = fontSize * 0.86
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(brush = BgGrad)
-                .statusBarsPadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = horiPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(maxHeight * 0.2f))
-
-            /** * DECORATIVE VISUAL ELEMENTS
-             * Nested circles with Coral tones to represent focal point for scanning.
-             */
-            Box(
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
                 modifier = Modifier
-                    .size(circleSize)
-                    .background(WarmSoftCoral.copy(alpha = 0.28f), CircleShape),
-                contentAlignment = Alignment.Center
+                    .fillMaxSize()
+                    .padding(horizontal = horiPadding, vertical = vertiPadding)
+                    .zIndex(2f)
             ) {
+                Spacer(modifier = Modifier.height(space * 0.15f))
+
+                BackButton(
+                    onBackClick = {
+                        safeAction {
+                            navController.navigate("home") {
+                                popUpTo("home") { inclusive = true }
+                            }
+                        }
+                    },
+                    buttonSize = buttonSize,
+                    fontSize = fontSize * 0.86
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(brush = BgGrad)
+                    .statusBarsPadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = horiPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(maxHeight * 0.2f))
+
+                /** * DECORATIVE VISUAL ELEMENTS
+                 * Nested circles with Coral tones to represent focal point for scanning.
+                 */
                 Box(
                     modifier = Modifier
-                        .size(circleSize * 0.75f)
+                        .size(circleSize)
                         .background(WarmSoftCoral.copy(alpha = 0.28f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(circleSize * 0.5f)
-                            .background(WarmSoftCoral.copy(alpha = 0.38f), CircleShape),
+                            .size(circleSize * 0.75f)
+                            .background(WarmSoftCoral.copy(alpha = 0.28f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ar_on_you),
-                            contentDescription = null,
-                            modifier = Modifier.size(minDimension * 0.15f),
-                            colorFilter = ColorFilter.tint(Secondary)
+                        Box(
+                            modifier = Modifier
+                                .size(circleSize * 0.5f)
+                                .background(WarmSoftCoral.copy(alpha = 0.38f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ar_on_you),
+                                contentDescription = null,
+                                modifier = Modifier.size(minDimension * 0.15f),
+                                colorFilter = ColorFilter.tint(Secondary)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "Face Recognition",
+                    fontSize = titleSize,
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Scan your face to discover your face shape and skin tone",
+                    fontSize = descSize,
+                    fontFamily = figtreeFontFamily,
+                    textAlign = TextAlign.Center,
+                    color = MutedLight,
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    lineHeight = descSize * 1.3f
+                )
+
+                Spacer(modifier = Modifier.height(maxHeight * 0.035f))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f)
+                        .padding(horizontal = horiPadding * 0.5f),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            safeAction {
+                                val permission = ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.CAMERA
+                                )
+                                if (permission == PackageManager.PERMISSION_GRANTED) {
+                                    navController.navigate(Routes.SCAN)
+                                } else {
+                                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            "Scan Now",
+                            fontSize = buttonTextSize,
+                            fontWeight = FontWeight.Bold,
+                            color = White
+                        )
+                    }
+
+                    Button(
+                        onClick = {
+                            safeAction {
+                                galleryLauncher.launch(
+                                    PickVisualMediaRequest(
+                                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                                    )
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            "Upload from Gallery",
+                            fontSize = buttonTextSize,
+                            fontWeight = FontWeight.Bold,
+                            color = White
+                        )
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .height(24.dp)
+                )
+            }
+
+            /**
+             * LOADING OVERLAY
+             * Modal overlay displayed during image processing/uploading to prevent user interaction.
+             */
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.6f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = Primary)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "Analyzing your beauty...",
+                            color = Color.White,
+                            fontFamily = figtreeFontFamily
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = "Face Recognition",
-                fontSize = titleSize,
-                fontFamily = figtreeFontFamily,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = "Scan your face to discover your face shape and skin tone",
-                fontSize = descSize,
-                fontFamily = figtreeFontFamily,
-                textAlign = TextAlign.Center,
-                color = MutedLight,
-                modifier = Modifier.padding(horizontal = 20.dp),
-                lineHeight = descSize * 1.3f
-            )
-
-            Spacer(modifier = Modifier.height(maxHeight * 0.035f))
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f)
-                    .padding(horizontal = horiPadding * 0.5f),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Button(
-                    onClick = {
-                        safeAction {
-                            val permission = ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.CAMERA
+            /**
+             * ERROR HANDLING DIALOG
+             * Informs the user about network or analysis failures with an option to retry.
+             */
+            if (errorMessage != null) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.clearError() },
+                    confirmButton = {
+                        TextButton(onClick = { viewModel.clearError() }) {
+                            Text(
+                                "Try Again",
+                                color = Primary,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = figtreeFontFamily
                             )
-                            if (permission == PackageManager.PERMISSION_GRANTED) {
-                                navController.navigate(Routes.SCAN)
-                            } else {
-                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                            }
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Scan Now", fontSize = buttonTextSize, fontWeight = FontWeight.Bold, color = White)
-                }
-
-                Button(
-                    onClick = {
-                        safeAction {
-                            galleryLauncher.launch(
-                                PickVisualMediaRequest(
-                                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
-                            )
-                        } },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Upload from Gallery", fontSize = buttonTextSize, fontWeight = FontWeight.Bold, color = White)
-                }
+                    title = {
+                        Text(
+                            text = "Analysis Failed",
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = titleSize * 0.8f,
+                            color = Primary
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = errorMessage ?: "",
+                            fontFamily = figtreeFontFamily,
+                            fontSize = descSize,
+                            color = Grey40
+                        )
+                    },
+                    containerColor = White,
+                    shape = RoundedCornerShape(20.dp)
+                )
             }
 
-            Spacer(modifier = Modifier
-                .navigationBarsPadding()
-                .height(24.dp))
-        }
-
-        /**
-         * LOADING OVERLAY
-         * Modal overlay displayed during image processing/uploading to prevent user interaction.
-         */
-        if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.6f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator(color = Primary)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Analyzing your beauty...", color = Color.White, fontFamily = figtreeFontFamily)
-                }
-            }
-        }
-
-        /**
-         * ERROR HANDLING DIALOG
-         * Informs the user about network or analysis failures with an option to retry.
-         */
-        if (errorMessage != null) {
-            AlertDialog(
-                onDismissRequest = { viewModel.clearError() },
-                confirmButton = {
-                    TextButton(onClick = { viewModel.clearError() }) {
-                        Text("Try Again", color = Primary, fontWeight = FontWeight.Bold, fontFamily = figtreeFontFamily)
-                    }
-                },
-                title = {
-                    Text(
-                        text = "Analysis Failed",
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = titleSize * 0.8f,
-                        color = Primary
-                    )
-                },
-                text = {
-                    Text(
-                        text = errorMessage ?: "",
-                        fontFamily = figtreeFontFamily,
-                        fontSize = descSize,
-                        color = Grey40
-                    )
-                },
-                containerColor = White,
-                shape = RoundedCornerShape(20.dp)
-            )
-        }
-
-        if (isNavigating || isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent)
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) { awaitPointerEvent() }
+            if (isNavigating || isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent)
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    awaitPointerEvent()
+                                }
+                            }
                         }
-                    }
-            )
+                )
+            }
         }
     }
 }

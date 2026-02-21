@@ -37,6 +37,7 @@ import com.serona.app.theme.Tertiary
 import com.serona.app.theme.White
 import com.serona.app.theme.figtreeFontFamily
 import com.serona.app.ui.component.BackButton
+import com.serona.app.utils.ResponsiveScale
 
 @Composable
 fun PrivacyPage(
@@ -46,126 +47,144 @@ fun PrivacyPage(
     val faqList by privacyViewModel.faqList.collectAsState()
     val privacyPoints = stringArrayResource(id = com.serona.app.R.array.privacy_points)
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = White)
-    ) {
-        val configuration = LocalConfiguration.current
-        val maxWidth = configuration.screenWidthDp.dp
-        val maxHeight = configuration.screenHeightDp.dp
-
-        val fontSize = (maxWidth * 0.06f).value.sp
-        val iconSize = (maxHeight * 0.03f)
-        val upperBoxHeight = maxHeight * 0.44f
-        val horiPadding = maxWidth * 0.05f
-        val vertiPadding = maxHeight * 0.055f
-        val space = maxHeight * 0.03f
-        val buttonSize = maxWidth * 0.07f
-
+    ResponsiveScale(maxFontScale = 1f) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(upperBoxHeight)
-                .background(BgGrad)
-        )
-
-        Column(
-            modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = horiPadding, vertical = vertiPadding)
+                .background(color = White)
         ) {
-            Spacer(modifier = Modifier.height(space * 0.15f))
+            val configuration = LocalConfiguration.current
+            val maxWidth = configuration.screenWidthDp.dp
+            val maxHeight = configuration.screenHeightDp.dp
 
-            BackButton(
-                onBackClick = { onBackClick() },
-                buttonSize = buttonSize,
-                fontSize = fontSize
+            val fontSize = (maxWidth * 0.06f).value.sp
+            val iconSize = (maxHeight * 0.03f)
+            val upperBoxHeight = maxHeight * 0.44f
+            val horiPadding = maxWidth * 0.05f
+            val vertiPadding = maxHeight * 0.055f
+            val space = maxHeight * 0.03f
+            val buttonSize = maxWidth * 0.07f
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(upperBoxHeight)
+                    .background(BgGrad)
             )
 
-            Spacer(modifier = Modifier.height(space))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = horiPadding, vertical = vertiPadding)
+            ) {
+                Spacer(modifier = Modifier.height(space * 0.15f))
 
-            Column() {
-                Text(
-                    text = "Serona Privacy Explanation",
-                    fontSize = fontSize,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Tertiary
+                BackButton(
+                    onBackClick = { onBackClick() },
+                    buttonSize = buttonSize,
+                    fontSize = fontSize
                 )
 
-                Spacer(modifier = Modifier.height(space * 0.1f))
+                Spacer(modifier = Modifier.height(space))
 
-                Text(
-                    text = "No worries - your privacy is always protected with Serona.\nHere are the key things you should know:",
-                    fontSize = fontSize * 0.53f,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    color = ParagraphGrey
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.3f))
-
-                PrivacyBullet("We do not share or sell your data to anyone", fontSize = fontSize * 0.5f, iconSize = iconSize * 0.7f)
-                PrivacyBullet("Your data is protected with encryption", fontSize = fontSize * 0.5f, iconSize = iconSize * 0.7f)
-                PrivacyBullet("You're free to delete your data at any time", fontSize = fontSize * 0.5f, iconSize = iconSize * 0.7f)
-                PrivacyBullet("We only collect information that is strictly necessary to operate Serona's features", fontSize = fontSize * 0.5f, iconSize = iconSize * 0.7f)
-
-                Spacer(modifier = Modifier.height(space * 0.8f))
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    PrivacyCard(
-                        icon = Icons.Outlined.Lock,
-                        text = "You control your data",
-                        modifier = Modifier.weight(0.3f),
-                        fontSize = fontSize * 0.5f,
-                        iconSize = iconSize * 0.3f
+                Column() {
+                    Text(
+                        text = "Serona Privacy Explanation",
+                        fontSize = fontSize,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Tertiary
                     )
 
-                    Spacer(modifier = Modifier.width(space * 0.3f))
+                    Spacer(modifier = Modifier.height(space * 0.1f))
 
-                    PrivacyCard(
-                        icon = Icons.Outlined.Security,
-                        text = "We protect your privacy",
-                        modifier = Modifier.weight(0.3f),
-                        fontSize = fontSize * 0.5f,
-                        iconSize = iconSize * 0.3f
+                    Text(
+                        text = "No worries - your privacy is always protected with Serona.\nHere are the key things you should know:",
+                        fontSize = fontSize * 0.53f,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = ParagraphGrey
                     )
 
-                    Spacer(modifier = Modifier.width(space * 0.3f))
+                    Spacer(modifier = Modifier.height(space * 0.3f))
 
-                    PrivacyCard(
-                        icon = Icons.Outlined.PersonOutline,
-                        text = "You are the one who decides",
-                        modifier = Modifier.weight(0.3f),
+                    PrivacyBullet(
+                        "We do not share or sell your data to anyone",
                         fontSize = fontSize * 0.5f,
-                        iconSize = iconSize * 0.3f
+                        iconSize = iconSize * 0.7f
                     )
+                    PrivacyBullet(
+                        "Your data is protected with encryption",
+                        fontSize = fontSize * 0.5f,
+                        iconSize = iconSize * 0.7f
+                    )
+                    PrivacyBullet(
+                        "You're free to delete your data at any time",
+                        fontSize = fontSize * 0.5f,
+                        iconSize = iconSize * 0.7f
+                    )
+                    PrivacyBullet(
+                        "We only collect information that is strictly necessary to operate Serona's features",
+                        fontSize = fontSize * 0.5f,
+                        iconSize = iconSize * 0.7f
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.8f))
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        PrivacyCard(
+                            icon = Icons.Outlined.Lock,
+                            text = "You control your data",
+                            modifier = Modifier.weight(0.3f),
+                            fontSize = fontSize * 0.5f,
+                            iconSize = iconSize * 0.3f
+                        )
+
+                        Spacer(modifier = Modifier.width(space * 0.3f))
+
+                        PrivacyCard(
+                            icon = Icons.Outlined.Security,
+                            text = "We protect your privacy",
+                            modifier = Modifier.weight(0.3f),
+                            fontSize = fontSize * 0.5f,
+                            iconSize = iconSize * 0.3f
+                        )
+
+                        Spacer(modifier = Modifier.width(space * 0.3f))
+
+                        PrivacyCard(
+                            icon = Icons.Outlined.PersonOutline,
+                            text = "You are the one who decides",
+                            modifier = Modifier.weight(0.3f),
+                            fontSize = fontSize * 0.5f,
+                            iconSize = iconSize * 0.3f
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(space * 0.5f))
+
+                    Text(
+                        text = "Response to your statement",
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.5f))
                 }
 
-                Spacer(modifier = Modifier.height(space * 0.5f))
-
-                Text(
-                    text = "Response to your statement",
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.5f))
-            }
-
-            LazyColumn() {
-                itemsIndexed(faqList) { index, faq ->
-                    ExpandablePrivacyItem(
-                        faq = faq,
-                        fontSize = fontSize * 0.6f,
-                        iconSize = iconSize,
-                        extraPoints = if (index == 0) privacyPoints.toList() else emptyList()
-                    )
+                LazyColumn() {
+                    itemsIndexed(faqList) { index, faq ->
+                        ExpandablePrivacyItem(
+                            faq = faq,
+                            fontSize = fontSize * 0.6f,
+                            iconSize = iconSize,
+                            extraPoints = if (index == 0) privacyPoints.toList() else emptyList()
+                        )
+                    }
                 }
             }
         }

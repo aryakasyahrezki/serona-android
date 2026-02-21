@@ -69,6 +69,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.Executors
 import com.serona.app.R
+import com.serona.app.utils.ResponsiveScale
 import com.serona.app.utils.rememberNavigationGuard
 
 
@@ -171,62 +172,65 @@ fun ScanScreen(
         }, ContextCompat.getMainExecutor(context))
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        AndroidView(
-            factory = { ctx ->
-                PreviewView(ctx).apply {
-                    implementationMode = PreviewView.ImplementationMode.PERFORMANCE
-                    scaleType = PreviewView.ScaleType.FILL_CENTER
-                }.also { previewView = it }
-            },
-            modifier = Modifier.fillMaxSize(),
-            update = { pv ->
-                // Mirrors the front camera for a more natural user experience
-                pv.scaleX = if (lensFacing == CameraSelector.LENS_FACING_FRONT) -1f else 1f
-            }
-        )
-
-        ScanUIContent(
-            navController = navController,
-            viewModel = viewModel,
-            progress = progress,
-            scanResult = scanResult,
-            showResultBtn = showResultBtn,
-            showPopup = showPopup,
-            maxWidth = maxWidth,
-            maxHeight = maxHeight,
-            minDimension = minDimension,
-            onSwitchCamera = {
-                lensFacing = if (lensFacing == CameraSelector.LENS_FACING_FRONT) {
-                    CameraSelector.LENS_FACING_BACK
-                } else {
-                    CameraSelector.LENS_FACING_FRONT
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            AndroidView(
+                factory = { ctx ->
+                    PreviewView(ctx).apply {
+                        implementationMode = PreviewView.ImplementationMode.PERFORMANCE
+                        scaleType = PreviewView.ScaleType.FILL_CENTER
+                    }.also { previewView = it }
+                },
+                modifier = Modifier.fillMaxSize(),
+                update = { pv ->
+                    // Mirrors the front camera for a more natural user experience
+                    pv.scaleX = if (lensFacing == CameraSelector.LENS_FACING_FRONT) -1f else 1f
                 }
-            },
-            safeAction = safeAction
-        )
-
-        if (showPopup) {
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .background(Black10.copy(alpha = 0.78f))
-                .pointerInput(Unit) {}
             )
-            InstructionDialog(onDismiss = { viewModel.dismissPopup() })
-        }
 
-        if (isNavigating || viewModel.isCurrentlyUploading.value) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                awaitPointerEvent()
+            ScanUIContent(
+                navController = navController,
+                viewModel = viewModel,
+                progress = progress,
+                scanResult = scanResult,
+                showResultBtn = showResultBtn,
+                showPopup = showPopup,
+                maxWidth = maxWidth,
+                maxHeight = maxHeight,
+                minDimension = minDimension,
+                onSwitchCamera = {
+                    lensFacing = if (lensFacing == CameraSelector.LENS_FACING_FRONT) {
+                        CameraSelector.LENS_FACING_BACK
+                    } else {
+                        CameraSelector.LENS_FACING_FRONT
+                    }
+                },
+                safeAction = safeAction
+            )
+
+            if (showPopup) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Black10.copy(alpha = 0.78f))
+                        .pointerInput(Unit) {}
+                )
+                InstructionDialog(onDismiss = { viewModel.dismissPopup() })
+            }
+
+            if (isNavigating || viewModel.isCurrentlyUploading.value) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    awaitPointerEvent()
+                                }
                             }
                         }
-                    }
-            )
+                )
+            }
         }
     }
 }
@@ -268,183 +272,200 @@ fun ScanUIContent(
         label = "shimmerAlpha"
     )
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .padding(horizontal = maxWidth * 0.06f, vertical = maxWidth * 0.03f)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(horizontal = maxWidth * 0.06f, vertical = maxWidth * 0.03f)
             ) {
-                IconButton(
-                    onClick = {
-                        if (!showPopup) {
-                            safeAction {
-                                viewModel.stopScanning()
-                                navController.navigate(Routes.SCAN_MENU) {
-                                    popUpTo(Routes.SCAN_MENU) { inclusive = true }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = {
+                            if (!showPopup) {
+                                safeAction {
+                                    viewModel.stopScanning()
+                                    navController.navigate(Routes.SCAN_MENU) {
+                                        popUpTo(Routes.SCAN_MENU) { inclusive = true }
+                                    }
                                 }
                             }
-                        }
-                    },
-                    modifier = Modifier
-                        .size(minDimension * 0.08f)
-                        .background(White.copy(alpha = 0.2f), CircleShape)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = White,
-                        modifier = Modifier.size(minDimension * 0.06f)
-                    )
+                        },
+                        modifier = Modifier
+                            .size(minDimension * 0.08f)
+                            .background(White.copy(alpha = 0.2f), CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = White,
+                            modifier = Modifier.size(minDimension * 0.06f)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onSwitchCamera,
+                        modifier = Modifier
+                            .size(minDimension * 0.08f)
+                            .background(White.copy(alpha = 0.2f), CircleShape)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_switch_camera),
+                            contentDescription = "Switch Camera",
+                            tint = White,
+                            modifier = Modifier.size(minDimension * 0.06f)
+                        )
+                    }
                 }
 
-                IconButton(
-                    onClick = onSwitchCamera,
-                    modifier = Modifier
-                        .size(minDimension * 0.08f)
-                        .background(White.copy(alpha = 0.2f), CircleShape)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_switch_camera),
-                        contentDescription = "Switch Camera",
-                        tint = White,
-                        modifier = Modifier.size(minDimension * 0.06f)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(maxHeight * 0.02f))
-
-            Text(
-                text = "Face Recognition",
-                fontSize = baseFontSize * 1.4f,
-                fontWeight = FontWeight.Bold,
-                color = White,
-                fontFamily = figtreeFontFamily
-            )
-            Text(
-                text = "Please look at the camera and stay still",
-                fontSize = baseFontSize * 0.7f,
-                color = Color.White.copy(alpha = 0.8f),
-                fontFamily = figtreeFontFamily
-            )
-
-            // Result Preview Card (Visible after successful scan)
-            if (scanResult != null && !showPopup) {
                 Spacer(modifier = Modifier.height(maxHeight * 0.02f))
 
-                Card(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .align(Alignment.CenterHorizontally),
-                    colors = CardDefaults.cardColors(containerColor = White.copy(alpha = 0.9f)),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
+                Text(
+                    text = "Face Recognition",
+                    fontSize = baseFontSize * 1.4f,
+                    fontWeight = FontWeight.Bold,
+                    color = White,
+                    fontFamily = figtreeFontFamily
+                )
+                Text(
+                    text = "Please look at the camera and stay still",
+                    fontSize = baseFontSize * 0.7f,
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontFamily = figtreeFontFamily
+                )
+
+                // Result Preview Card (Visible after successful scan)
+                if (scanResult != null && !showPopup) {
+                    Spacer(modifier = Modifier.height(maxHeight * 0.02f))
+
+                    Card(
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .align(Alignment.CenterHorizontally),
+                        colors = CardDefaults.cardColors(containerColor = White.copy(alpha = 0.9f)),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                     ) {
-                        ResultSummaryItem(label = "Face Shape", value = scanResult.shape ?: "-", minDimension)
-                        Box(modifier = Modifier
-                            .width(1.dp)
-                            .height(24.dp)
-                            .background(Color.LightGray))
-                        ResultSummaryItem(label = "Skintone", value = scanResult.skintone ?: "-", minDimension)
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            ResultSummaryItem(
+                                label = "Face Shape",
+                                value = scanResult.shape ?: "-",
+                                minDimension
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .width(1.dp)
+                                    .height(24.dp)
+                                    .background(Color.LightGray)
+                            )
+                            ResultSummaryItem(
+                                label = "Skintone",
+                                value = scanResult.skintone ?: "-",
+                                minDimension
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        if (!showPopup) {
-            // Face Frame Guide
-            if (maxWidth < maxHeight) {
-                FaceGuideFrame(
-                    modifier = Modifier.align(Alignment.Center),
-                    size = maxWidth * 0.75f
-                )
-            }
-
-            // Bottom Progress & Action UI
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(
-                        bottom = if (maxWidth < maxHeight) maxHeight * 0.06f else 10.dp,
-                        start = maxWidth * 0.1f,
-                        end = maxWidth * 0.1f
+            if (!showPopup) {
+                // Face Frame Guide
+                if (maxWidth < maxHeight) {
+                    FaceGuideFrame(
+                        modifier = Modifier.align(Alignment.Center),
+                        size = maxWidth * 0.75f
                     )
-                    .fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = when {
-                        // Jika progres belum penuh tapi deteksi berhenti (wajah tertutup/hilang)
-                        !isFaceInFrame -> "Face Lost! Move back into frame"
-                        showResultBtn -> "Live Scanning..."
-                        else -> "Hold still, scanning your beauty..."
-                    },
-//                    text = if (showResultBtn) "Live Scanning..." else "Hold still...",
-                    color = Color.White,
-                    fontSize = baseFontSize * 0.8f,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+                }
 
-
-
-                LinearProgressIndicator(
-//                    progress = { if (isFaceInFrame) 1f else 0f },
-                    progress = {
-                        when {
-                            // 1. Jika sudah masuk fase Live Scanning (Hasil sudah pernah muncul)
-                            // Cukup tampilkan 1f jika wajah ada, 0f jika tidak ada.
-                            showResultBtn -> if (isFaceInFrame) 1f else 0f
-
-                            // 2. Jika fase Initial Scan (Belum pernah muncul hasil)
-                            // Gunakan animasi progress yang berjalan pelan dari 0 ke 1.
-                            else -> animatedProgress
-                        }
-                    },
+                // Bottom Progress & Action UI
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .height(minDimension * 0.025f)
-                        .clip(RoundedCornerShape(minDimension * 0.01f))
-                        .alpha(if (isFaceInFrame) shimmerAlpha else 1f),
-                    color = SuccessScan,
-                    trackColor = Color.White.copy(alpha = 0.3f)
-                )
+                        .align(Alignment.BottomCenter)
+                        .padding(
+                            bottom = if (maxWidth < maxHeight) maxHeight * 0.06f else 10.dp,
+                            start = maxWidth * 0.1f,
+                            end = maxWidth * 0.1f
+                        )
+                        .fillMaxWidth(if (maxWidth > maxHeight) 0.6f else 1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = when {
+                            // Jika progres belum penuh tapi deteksi berhenti (wajah tertutup/hilang)
+                            !isFaceInFrame -> "Face Lost! Move back into frame"
+                            showResultBtn -> "Live Scanning..."
+                            else -> "Hold still, scanning your beauty..."
+                        },
+//                    text = if (showResultBtn) "Live Scanning..." else "Hold still...",
+                        color = Color.White,
+                        fontSize = baseFontSize * 0.8f,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
 
-                Spacer(modifier = Modifier.height(maxHeight * 0.03f))
 
-                Button(
-                    onClick = {
-                        if (showResultBtn) {
-                            safeAction {
-                                val shape = scanResult?.shape ?: "Unknown"
-                                val color = scanResult?.skintone ?: "Unknown"
-                                navController.navigate("result/$shape/$color") {
-                                    popUpTo(Routes.SCAN) { inclusive = true }
+
+                    LinearProgressIndicator(
+//                    progress = { if (isFaceInFrame) 1f else 0f },
+                        progress = {
+                            when {
+                                // 1. Jika sudah masuk fase Live Scanning (Hasil sudah pernah muncul)
+                                // Cukup tampilkan 1f jika wajah ada, 0f jika tidak ada.
+                                showResultBtn -> if (isFaceInFrame) 1f else 0f
+
+                                // 2. Jika fase Initial Scan (Belum pernah muncul hasil)
+                                // Gunakan animasi progress yang berjalan pelan dari 0 ke 1.
+                                else -> animatedProgress
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .height(minDimension * 0.025f)
+                            .clip(RoundedCornerShape(minDimension * 0.01f))
+                            .alpha(if (isFaceInFrame) shimmerAlpha else 1f),
+                        color = SuccessScan,
+                        trackColor = Color.White.copy(alpha = 0.3f)
+                    )
+
+                    Spacer(modifier = Modifier.height(maxHeight * 0.03f))
+
+                    Button(
+                        onClick = {
+                            if (showResultBtn) {
+                                safeAction {
+                                    val shape = scanResult?.shape ?: "Unknown"
+                                    val color = scanResult?.skintone ?: "Unknown"
+                                    navController.navigate("result/$shape/$color") {
+                                        popUpTo(Routes.SCAN) { inclusive = true }
+                                    }
                                 }
                             }
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .height(maxHeight * 0.07f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (showResultBtn) Primary else White.copy(alpha = 0.2f),
-                        contentColor = if (showResultBtn) White else Color.Gray
-                    ),
-                    shape = RoundedCornerShape(14.dp),
-                    enabled = true
-                ) {
-                    Text("Analysis Ready - See Result", fontSize = baseFontSize * 0.8f, fontWeight = FontWeight.Bold, color = White)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .height(maxHeight * 0.07f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (showResultBtn) Primary else White.copy(alpha = 0.2f),
+                            contentColor = if (showResultBtn) White else Color.Gray
+                        ),
+                        shape = RoundedCornerShape(14.dp),
+                        enabled = true
+                    ) {
+                        Text(
+                            "Analysis Ready - See Result",
+                            fontSize = baseFontSize * 0.8f,
+                            fontWeight = FontWeight.Bold,
+                            color = White
+                        )
+                    }
                 }
             }
         }
@@ -457,12 +478,26 @@ fun ScanUIContent(
 @Composable
 fun ResultSummaryItem(label: String, value: String, minDimension: Dp) {
     val baseFontSize = (minDimension.value * 0.05f)
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 8.dp)
-    ) {
-        Text(text = label, fontSize = (baseFontSize * 0.6f).sp, color = Black10, fontFamily = figtreeFontFamily, fontWeight = FontWeight.Medium)
-        Text(text = value, fontSize = (baseFontSize * 0.8f).sp, fontWeight = FontWeight.Bold, color = Primary, fontFamily = figtreeFontFamily)
+    ResponsiveScale(maxFontScale = 1f) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            Text(
+                text = label,
+                fontSize = (baseFontSize * 0.6f).sp,
+                color = Black10,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = value,
+                fontSize = (baseFontSize * 0.8f).sp,
+                fontWeight = FontWeight.Bold,
+                color = Primary,
+                fontFamily = figtreeFontFamily
+            )
+        }
     }
 }
 
@@ -531,36 +566,80 @@ fun InstructionDialog(onDismiss: () -> Unit) {
     val minDimension = if (configuration.screenWidthDp < configuration.screenHeightDp) configuration.screenWidthDp.dp else configuration.screenHeightDp.dp
     val baseFontSize = (minDimension.value * 0.05f).sp
 
-    Dialog(onDismissRequest = { }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Card(
-            modifier = Modifier
-                .width(if (configuration.screenWidthDp > configuration.screenHeightDp) configuration.screenWidthDp.dp * 0.7f else configuration.screenWidthDp.dp * 0.9f)
-                .wrapContentHeight()
-                .padding(vertical = 16.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = White)
-        ) {
-            Column(
+    Dialog(
+        onDismissRequest = { },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        ResponsiveScale(maxFontScale = 1f) {
+            Card(
                 modifier = Modifier
-                    .padding(minDimension * 0.06f, minDimension * 0.05f)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .width(if (configuration.screenWidthDp > configuration.screenHeightDp) configuration.screenWidthDp.dp * 0.7f else configuration.screenWidthDp.dp * 0.9f)
+                    .wrapContentHeight()
+                    .padding(vertical = 16.dp),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = White)
             ) {
-                Text(text = "Face Scanning Guide", fontSize = baseFontSize, fontFamily = figtreeFontFamily, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-                Spacer(modifier = Modifier.height(minDimension * 0.01f))
-                Text(text = "Follow these steps below while scanning to get the most accurate results", fontSize = baseFontSize * 0.65f, textAlign = TextAlign.Center, color = Grey40.copy(alpha = 0.8f), lineHeight = baseFontSize * 0.8f)
-                Spacer(modifier = Modifier.height(minDimension * 0.03f))
-                InstructionItem( "Don't make excessive expressions","Keep your face relaxed and natural", R.drawable.scan_guide1)
-                InstructionItem( "Don't cover your face","Avoid glasses, masks, hats, or hair covering your face", R.drawable.scan_guide2)
-                InstructionItem( "Avoid poor lighting","Avoid shadows or dim light on your face", R.drawable.scan_guide3)
-                InstructionItem( "Don't tilt your head","Keep your head straight, don't tilt it", R.drawable.scan_guide4)
-                Spacer(modifier = Modifier.height(minDimension * 0.05f))
-                Button(onClick = onDismiss, modifier = Modifier
-                    .width(minDimension * 0.4f)
-                    .height(minDimension * 0.12f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF04B63)), shape = RoundedCornerShape(8.dp)) {
-                    Text("Start", fontSize = baseFontSize * 0.7f, fontWeight = FontWeight.Bold, color = White)
+                Column(
+                    modifier = Modifier
+                        .padding(minDimension * 0.06f, minDimension * 0.05f)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Face Scanning Guide",
+                        fontSize = baseFontSize,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(minDimension * 0.01f))
+                    Text(
+                        text = "Follow these steps below while scanning to get the most accurate results",
+                        fontSize = baseFontSize * 0.65f,
+                        textAlign = TextAlign.Center,
+                        color = Grey40.copy(alpha = 0.8f),
+                        lineHeight = baseFontSize * 0.8f
+                    )
+                    Spacer(modifier = Modifier.height(minDimension * 0.03f))
+                    InstructionItem(
+                        "Don't make excessive expressions",
+                        "Keep your face relaxed and natural",
+                        R.drawable.scan_guide1
+                    )
+                    InstructionItem(
+                        "Don't cover your face",
+                        "Avoid glasses, masks, hats, or hair covering your face",
+                        R.drawable.scan_guide2
+                    )
+                    InstructionItem(
+                        "Avoid poor lighting",
+                        "Avoid shadows or dim light on your face",
+                        R.drawable.scan_guide3
+                    )
+                    InstructionItem(
+                        "Don't tilt your head",
+                        "Keep your head straight, don't tilt it",
+                        R.drawable.scan_guide4
+                    )
+                    Spacer(modifier = Modifier.height(minDimension * 0.05f))
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .width(minDimension * 0.4f)
+                            .height(minDimension * 0.12f),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF04B63)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            "Start",
+                            fontSize = baseFontSize * 0.7f,
+                            fontWeight = FontWeight.Bold,
+                            color = White
+                        )
+                    }
                 }
             }
+
         }
     }
 }
@@ -572,26 +651,63 @@ fun InstructionItem(title: String, description: String, imageRes: Int) {
     val fontSize = (minDimension.value * 0.05f).sp
     val imgSize = minDimension * 0.15f
 
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = minDimension * 0.025f), verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier.size(imgSize)) {
-            Card(shape = RoundedCornerShape(10.dp), modifier = Modifier
-                .size(imgSize * 0.95f)
-                .align(Alignment.BottomStart)) {
-                Image(painter = painterResource(id = imageRes), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+    ResponsiveScale(maxFontScale = 1f) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = minDimension * 0.025f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(modifier = Modifier.size(imgSize)) {
+                Card(
+                    shape = RoundedCornerShape(10.dp), modifier = Modifier
+                        .size(imgSize * 0.95f)
+                        .align(Alignment.BottomStart)
+                ) {
+                    Image(
+                        painter = painterResource(id = imageRes),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    color = Color.White,
+                    border = androidx.compose.foundation.BorderStroke(0.5.dp, Grey40),
+                    modifier = Modifier
+                        .size(imgSize * 0.3f)
+                        .align(Alignment.TopEnd)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = null,
+                        tint = Primary,
+                        modifier = Modifier.padding(2.dp)
+                    )
+                }
             }
-            Surface(shape = RoundedCornerShape(4.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(0.5.dp, Grey40), modifier = Modifier
-                .size(imgSize * 0.3f)
-                .align(Alignment.TopEnd)) {
-                Icon(imageVector = Icons.Default.Close, contentDescription = null, tint = Primary, modifier = Modifier.padding(2.dp))
+            Spacer(modifier = Modifier.width(minDimension * 0.025f))
+            Column {
+                Text(
+                    text = title,
+                    color = Black10,
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = fontSize * 0.65f,
+                    lineHeight = fontSize * 0.8f,
+                    letterSpacing = fontSize * 0.02f,
+                    modifier = Modifier.padding(start = 0.4.dp)
+                )
+                Spacer(modifier = Modifier.width(minDimension * 0.04f))
+                Text(
+                    text = description,
+                    fontSize = fontSize * 0.6f,
+                    color = Grey40.copy(alpha = 0.9f),
+                    lineHeight = fontSize * 0.7f,
+                    modifier = Modifier.padding(start = 1.dp)
+                )
             }
-        }
-        Spacer(modifier = Modifier.width(minDimension * 0.025f))
-        Column {
-            Text(text = title, color = Black10, fontFamily = figtreeFontFamily, fontWeight = FontWeight.Medium, fontSize = fontSize * 0.65f, lineHeight = fontSize * 0.8f,  letterSpacing = fontSize * 0.02f, modifier = Modifier.padding(start=0.4.dp))
-            Spacer(modifier =  Modifier.width(minDimension * 0.04f))
-            Text(text = description, fontSize = fontSize * 0.6f, color = Grey40.copy(alpha = 0.9f), lineHeight = fontSize * 0.7f, modifier = Modifier.padding(start=1.dp))
         }
     }
 }

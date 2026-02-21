@@ -43,6 +43,8 @@ import com.serona.app.ui.component.AuthPasswordField
 import com.serona.app.ui.component.AuthTextField
 import com.serona.app.ui.navigation.Routes
 import com.serona.app.R
+import com.serona.app.theme.Primary50
+import com.serona.app.utils.ResponsiveScale
 import com.serona.app.utils.rememberNavigationGuard
 
 @Composable
@@ -108,76 +110,78 @@ fun LoginPage(
         }
     }
 
-
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(brush = AuthPageGrad)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ellips_splash_bg),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        Column(
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = topPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .background(brush = AuthPageGrad)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.serona_logo),
-                contentDescription = "Serona Logo"
-            )
-            Text(
-                text = "The art of your own glow",
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                color = Color.White,
-                fontFamily = leagueSpartanFontFamily,
-                fontSize = fontSize * 0.8f,
-                letterSpacing = fontSize * 0.25f
+                painter = painterResource(id = R.drawable.ellips_splash_bg),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
 
-            LoginCard(
-                navController,
-                loginViewModel,
-                onForgotPasswordClick = {
-                    safeAction { forgotPasswordDialogBox = true }
-                },
-                fontSize = fontSize,
-                space = space,
-                safeAction = safeAction
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = topPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.serona_logo),
+                    contentDescription = "Serona Logo"
+                )
+                Text(
+                    text = "The art of your own glow",
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    color = Color.White,
+                    fontFamily = leagueSpartanFontFamily,
+                    fontSize = fontSize * 0.8f,
+                    letterSpacing = fontSize * 0.25f
+                )
 
-            if (forgotPasswordDialogBox) {
-                ForgotPasswordDialog(
-                    viewModel = loginViewModel,
-                    onDismiss = {
-                        forgotPasswordDialogBox = false
-                        resetNavigation()
+                LoginCard(
+                    navController,
+                    loginViewModel,
+                    onForgotPasswordClick = {
+                        forgotPasswordDialogBox = true
                     },
                     fontSize = fontSize,
-                    space = space * 0.6f,
+                    space = space,
                     safeAction = safeAction
                 )
-            }
-        }
 
-        if (isNavigating) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .zIndex(100f)
-                    .background(Color.Transparent)
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                awaitPointerEvent()
+                if (forgotPasswordDialogBox) {
+                    ForgotPasswordDialog(
+                        viewModel = loginViewModel,
+                        onDismiss = {
+                            forgotPasswordDialogBox = false
+                            resetNavigation()
+                        },
+                        fontSize = fontSize,
+                        space = space * 0.6f,
+                        safeAction = safeAction
+                    )
+                }
+            }
+
+            if (isNavigating) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .zIndex(100f)
+                        .background(Color.Transparent)
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    awaitPointerEvent()
+                                }
                             }
                         }
-                    }
-            )
+                )
+            }
         }
     }
 }
@@ -194,112 +198,117 @@ fun LoginCard(
 
     val form = loginViewModel.loginFormState.observeAsState(LoginFormState()).value
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ){
+    ResponsiveScale(maxFontScale = 1f) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .background(
-                    brush = glassColor,
-                    shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
-                )
-                .padding(space * 0.5f)
+                .fillMaxSize()
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = "Login",
-                    fontSize = fontSize,
-                    color = White,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.5f))
-
-                AuthTextField(
-                    value = form.email,
-                    onValueChange = loginViewModel::onEmailChanged,
-                    label = "Email",
-                    error = form.emailError,
-                    fontSize = fontSize,
-                    space = space
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.2f))
-
-                AuthPasswordField(
-                    value = form.password,
-                    onValueChange = loginViewModel::onPasswordChange,
-                    label = "Password",
-                    error = form.passwordError,
-                    fontSize = fontSize,
-                    space = space
-                )
-
-                TextButton(
-                    onClick = onForgotPasswordClick,
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text(
-                        "Forgot Password",
-                        color = Primary,
-                        fontFamily = figtreeFontFamily
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        brush = glassColor,
+                        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
                     )
-                }
-
-                Spacer(modifier = Modifier.height(space * 0.4f))
-
-                Button(
-                    enabled = (form.email != "") && (form.password != ""),
-                    onClick = {
-                        safeAction { loginViewModel.submit() }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE05757)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(space * 0.8f)
+                    .padding(space * 0.5f)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "Login",
+                        fontSize = fontSize,
                         color = White,
-                        fontSize = 16.sp,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.SemiBold
                     )
-                }
 
-                Spacer(modifier = Modifier.height(space * 0.1f))
+                    Spacer(modifier = Modifier.height(space * 0.5f))
 
-                Row() {
-                    Text(
-                        text = "Don’t have an Account ? ",
-                        color = White,
-                        fontSize = 13.sp,
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Medium
+                    AuthTextField(
+                        value = form.email,
+                        onValueChange = loginViewModel::onEmailChanged,
+                        label = "Email",
+                        error = form.emailError,
+                        fontSize = fontSize,
+                        space = space
                     )
 
-                    Text(
-                        text = "Register",
-                        color = Primary,
-                        fontSize = 13.sp,
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.clickable{
-                            safeAction {
-                                navController.navigate("register") {
-                                    popUpTo("login") {
-                                        saveState = true
+                    Spacer(modifier = Modifier.height(space * 0.2f))
+
+                    AuthPasswordField(
+                        value = form.password,
+                        onValueChange = loginViewModel::onPasswordChange,
+                        label = "Password",
+                        error = form.passwordError,
+                        fontSize = fontSize,
+                        space = space
+                    )
+
+                    TextButton(
+                        onClick = onForgotPasswordClick,
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text(
+                            "Forgot Password",
+                            color = Primary,
+                            fontFamily = figtreeFontFamily
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(space * 0.4f))
+
+                    Button(
+                        enabled = (form.email != "") && (form.password != ""),
+                        onClick = {
+                            safeAction { loginViewModel.submit() }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE05757)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(space * 0.8f)
+                    ) {
+                        Text(
+                            text = "Login",
+                            color = White,
+                            fontSize = 16.sp,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(space * 0.1f))
+
+                    Row() {
+                        Text(
+                            text = "Don’t have an Account ? ",
+                            color = White,
+                            fontSize = 13.sp,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        Text(
+                            text = "Register",
+                            color = Primary,
+                            fontSize = 13.sp,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.clickable {
+                                safeAction {
+                                    navController.navigate("register") {
+                                        popUpTo("login") {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -318,111 +327,115 @@ fun ForgotPasswordDialog(
     val state by viewModel.forgotPasswordState
         .observeAsState(ForgotPasswordState.Idle)
 
-    AlertDialog(
-        modifier = Modifier.drawBehind {
-            drawRoundRect(
-                brush = ForgotPasswordBorderGrad,
-                style = Stroke(width = 3.dp.toPx()),
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(28.dp.toPx())
-            )
-        },
-        containerColor = Color(0xFFFFF2F2).copy(alpha = 0.9f),
-        title = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "Forgot Password",
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Primary,
-                    textAlign = TextAlign.Center
+    ResponsiveScale(maxFontScale = 1f) {
+        AlertDialog(
+            modifier = Modifier.drawBehind {
+                drawRoundRect(
+                    brush = ForgotPasswordBorderGrad,
+                    style = Stroke(width = 3.dp.toPx()),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(28.dp.toPx())
                 )
-            }
-        },
-        text = {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ){
-                Column(
+            },
+            containerColor = Color(0xFFFFF2F2).copy(alpha = 0.9f),
+            title = {
+                Box(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "Enter your email to reset your password",
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Normal,
-                        color = Primary
-                    )
-
-                    Spacer(Modifier.height(space * 0.08f))
-
-                    AuthTextField(
-                        value = form.resetEmail,
-                        onValueChange = viewModel::onResetEmailChanged,
-                        label = "Email",
-                        error = form.resetEmailError,
-                        color = Primary,
-                        fontSize = fontSize,
-                        space = space
-                    )
-                }
-
-                if (state is ForgotPasswordState.Success) {
-                    Spacer(Modifier.height(space * 0.08f))
-                    Text(
-                        text = "Email has been sent",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = space * 0.08f),
-                        color = Primary,
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Normal,
-                        textAlign = TextAlign.Start
-                    )
-                }
-            }
-        },
-        confirmButton = {
-            Column{
-                Button(
-                    onClick = { safeAction { viewModel.sendResetPasswordEmail() } },
-                    enabled = state !is ForgotPasswordState.Loading,
-                    colors = ButtonDefaults.buttonColors(containerColor = Primary.copy(alpha = 0.8f)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        "Send Email",
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-
-                TextButton(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    onClick = {
-                        viewModel.resetForgotPasswordState()
-                        onDismiss()
-                    }
-                ) {
-                    Text(
-                        "Cancel",
+                        "Forgot Password",
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.SemiBold,
-                        color = Primary
+                        color = Primary,
+                        textAlign = TextAlign.Center
                     )
                 }
-            }
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Enter your email to reset your password",
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.Normal,
+                            color = Primary
+                        )
 
-        },
-        dismissButton = {},
-        onDismissRequest = {
-            viewModel.resetForgotPasswordState()
-            onDismiss()
-        }
-    )
+                        Spacer(Modifier.height(space * 0.08f))
+
+                        AuthTextField(
+                            value = form.resetEmail,
+                            onValueChange = viewModel::onResetEmailChanged,
+                            label = "Email",
+                            error = form.resetEmailError,
+                            color = Primary,
+                            fontSize = fontSize,
+                            space = space,
+                            valueColor = Primary
+                        )
+                    }
+
+                    if (state is ForgotPasswordState.Success) {
+                        Spacer(Modifier.height(space * 0.08f))
+                        Text(
+                            text = "Email has been sent",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = space * 0.08f),
+                            color = Primary,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Column {
+                    Button(
+                        onClick = { safeAction { viewModel.sendResetPasswordEmail() } },
+                        enabled = state !is ForgotPasswordState.Loading,
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary.copy(alpha = 0.8f)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            "Send Email",
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.SemiBold,
+                            color = White
+                        )
+                    }
+
+                    TextButton(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        onClick = {
+                            viewModel.resetForgotPasswordState()
+                            onDismiss()
+                        }
+                    ) {
+                        Text(
+                            "Cancel",
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Primary
+                        )
+                    }
+                }
+
+            },
+            dismissButton = {},
+            onDismissRequest = {
+                viewModel.resetForgotPasswordState()
+                onDismiss()
+            }
+        )
+    }
 
 }

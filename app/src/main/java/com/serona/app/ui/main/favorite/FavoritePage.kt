@@ -25,6 +25,7 @@ import com.serona.app.ui.component.BackButton
 import com.serona.app.ui.component.EmptyView
 import com.serona.app.ui.component.TutorialCard
 import com.serona.app.ui.component.TutorialSearchBar
+import com.serona.app.utils.ResponsiveScale
 import com.serona.app.utils.rememberNavigationGuard
 
 @Composable
@@ -83,124 +84,130 @@ fun FavoritePage(
         viewModel.refreshFavorites()
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .pointerInput(Unit) {
-            detectTapGestures(onTap = {
-                focusManager.clearFocus() // 2. Lepas focus saat klik di mana saja
-            })
-        }
-    ) {
-        Column(
-            Modifier
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(
+            modifier = Modifier
                 .fillMaxSize()
-                .background(White)
-                .padding(vertical = vertiPadding, horizontal = horiPadding)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        focusManager.clearFocus() // 2. Lepas focus saat klik di mana saja
+                    })
+                }
         ) {
-            BackButton(
-                onBackClick = { safeAction { onBackClick() } },
-                buttonSize = buttonSize,
-                fontSize = fontSize
-            )
-            Spacer(modifier = Modifier.height(space * 0.3f))
-            // Header Section
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = space * 0.6f)
+                Modifier
+                    .fillMaxSize()
+                    .background(White)
+                    .padding(vertical = vertiPadding, horizontal = horiPadding)
             ) {
-                Text(
-                    "Favorite",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Heading,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = figtreeFontFamily,
+                BackButton(
+                    onBackClick = { safeAction { onBackClick() } },
+                    buttonSize = buttonSize,
                     fontSize = fontSize
                 )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    "Here are the article you like!",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = BodyText,
-                    fontFamily = figtreeFontFamily,
-                    fontSize = fontSize * 0.6f
-                )
-            }
-
-            Spacer(modifier = Modifier.height(space * 0.2f))
-            // Search Bar
-            TutorialSearchBar(
-                query = searchQuery,
-                onQueryChange = { searchQuery = it },
-                fontSize = fontSize,
-                enabled = !isNavigating
-            )
-
-            Spacer(modifier = Modifier.height(space * 0.5f))
-            // Favorites List
-            if (favorites.isEmpty()) {
-                EmptyView()
-            } else if (filteredFavorites.isEmpty()) {
-                EmptySearchResultView()
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(bottom = maxHeight * 0.12f),
-                    verticalArrangement = Arrangement.spacedBy(space * 0.5f)
+                Spacer(modifier = Modifier.height(space * 0.3f))
+                // Header Section
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = space * 0.6f)
                 ) {
-                    items(filteredFavorites, key = { it.id }) { tutorial ->
-                        TutorialCard(
-                            tutorial = tutorial,
-                            favViewModel = viewModel
-                        ) {
-                            safeAction { onTutorialClick?.invoke(tutorial.id) }
+                    Text(
+                        "Favorite",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Heading,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = figtreeFontFamily,
+                        fontSize = fontSize
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        "Here are the article you like!",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = BodyText,
+                        fontFamily = figtreeFontFamily,
+                        fontSize = fontSize * 0.6f
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(space * 0.2f))
+                // Search Bar
+                TutorialSearchBar(
+                    query = searchQuery,
+                    onQueryChange = { searchQuery = it },
+                    fontSize = fontSize,
+                    enabled = !isNavigating
+                )
+
+                Spacer(modifier = Modifier.height(space * 0.5f))
+                // Favorites List
+                if (favorites.isEmpty()) {
+                    EmptyView()
+                } else if (filteredFavorites.isEmpty()) {
+                    EmptySearchResultView()
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(bottom = maxHeight * 0.12f),
+                        verticalArrangement = Arrangement.spacedBy(space * 0.5f)
+                    ) {
+                        items(filteredFavorites, key = { it.id }) { tutorial ->
+                            TutorialCard(
+                                tutorial = tutorial,
+                                favViewModel = viewModel
+                            ) {
+                                safeAction { onTutorialClick?.invoke(tutorial.id) }
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if (isNavigating) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent)
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) { awaitPointerEvent() }
+            if (isNavigating) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent)
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    awaitPointerEvent()
+                                }
+                            }
                         }
-                    }
-            )
+                )
+            }
         }
     }
-
 }
 
 
 
 @Composable
 fun EmptySearchResultView() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(32.dp)
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                "No Tutorials!",
-                style = MaterialTheme.typography.bodyLarge,
-                color = BodyText,
-                fontFamily = figtreeFontFamily
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                "Try again with other keywords",
-                style = MaterialTheme.typography.bodyMedium,
-                color = ParagraphLight,
-                fontFamily = figtreeFontFamily
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(32.dp)
+            ) {
+                Text(
+                    "No Tutorials!",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = BodyText,
+                    fontFamily = figtreeFontFamily
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Try again with other keywords",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = ParagraphLight,
+                    fontFamily = figtreeFontFamily
+                )
+            }
         }
     }
 }

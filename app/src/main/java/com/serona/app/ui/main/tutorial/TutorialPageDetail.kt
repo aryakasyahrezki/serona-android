@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.serona.app.theme.*
 import com.serona.app.ui.component.*
 import com.serona.app.ui.main.favorite.FavoriteViewModel
+import com.serona.app.utils.ResponsiveScale
 
 @Composable
 fun TutorialDetailPage(
@@ -68,95 +69,97 @@ fun TutorialDetailPage(
         return
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(White)
-            .padding(vertical = vertiPadding, horizontal = horiPadding),
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .background(White),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+    ResponsiveScale(maxFontScale = 1f) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(White)
+                .padding(vertical = vertiPadding, horizontal = horiPadding),
         ) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .background(White),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
 
-            BackButton(
-                onBackClick = { onBackClick() },
-                buttonSize = buttonSize,
-                fontSize = fontSize
-            )
-
-            tutorial?.let { tut ->
-
-                val favIcon: ImageVector =
-                    if (isFavorite) Icons.Filled.Favorite
-                    else Icons.Outlined.FavoriteBorder
-
-                Icon(
-                    imageVector = favIcon,
-                    contentDescription = "Favorite",
-                    tint = if (isFavorite) Color(0xFFDC143C) else BodyText,
-                    modifier = Modifier
-                        .size(iconSize)
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            favViewModel.toggleFavorite(tut)
-                        }
+                BackButton(
+                    onBackClick = { onBackClick() },
+                    buttonSize = buttonSize,
+                    fontSize = fontSize
                 )
+
+                tutorial?.let { tut ->
+
+                    val favIcon: ImageVector =
+                        if (isFavorite) Icons.Filled.Favorite
+                        else Icons.Outlined.FavoriteBorder
+
+                    Icon(
+                        imageVector = favIcon,
+                        contentDescription = "Favorite",
+                        tint = if (isFavorite) Color(0xFFDC143C) else BodyText,
+                        modifier = Modifier
+                            .size(iconSize)
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ) {
+                                favViewModel.toggleFavorite(tut)
+                            }
+                    )
+                }
             }
-        }
 
 
-        Spacer(modifier = Modifier.height(space))
+            Spacer(modifier = Modifier.height(space))
 
-        // Content
-        LazyColumn(
+            // Content
+            ResponsiveScale(maxFontScale = 1f) {
+                LazyColumn(
 //            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(space * 0.3f)
-        ) {
-            // Tutorial Info
-            tutorial?.let { tut ->
-                // Category Tags
-                item {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(space * 0.4f)
-                    ) {
-                        CategoryChip(tut.main_category, isPrimary = true)
-                        CategoryChip(tut.sub_category, isPrimary = false)
+                    verticalArrangement = Arrangement.spacedBy(space * 0.3f)
+                ) {
+                    // Tutorial Info
+                    tutorial?.let { tut ->
+                        // Category Tags
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(space * 0.4f)
+                            ) {
+                                CategoryChip(tut.main_category, isPrimary = true)
+                                CategoryChip(tut.sub_category, isPrimary = false)
+                            }
+                        }
+
+                        // Title
+                        item {
+                            Text(
+                                text = tut.title,
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Heading,
+                                fontFamily = figtreeFontFamily,
+                                fontSize = fontSize
+                            )
+                        }
+
+                        // Description
+                        item {
+                            Text(
+                                text = tut.description,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = BodyText,
+                                lineHeight = fontSize,
+                                fontFamily = figtreeFontFamily,
+                                fontSize = fontSize * 0.6f
+                            )
+                        }
                     }
-                }
 
-                // Title
-                item {
-                    Text(
-                        text = tut.title,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Heading,
-                        fontFamily = figtreeFontFamily,
-                        fontSize = fontSize
-                    )
-                }
-
-                // Description
-                item {
-                    Text(
-                        text = tut.description,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = BodyText,
-                        lineHeight = fontSize,
-                        fontFamily = figtreeFontFamily,
-                        fontSize = fontSize* 0.6f
-                    )
-                }
-            }
-
-            // Steps Section
-            if (steps.isNotEmpty()) {
+                    // Steps Section
+                    if (steps.isNotEmpty()) {
 //                item {
 //                    Spacer(Modifier.height(8.dp))
 //                    Text(
@@ -168,24 +171,26 @@ fun TutorialDetailPage(
 //                    )
 //                }
 
-                items(steps) { step ->
-                    TutorialStepCard(
-                        stepNumber = step.step_number,
-                        title = step.title,
-                        description = step.description,
-                        imageUrl = step.image_url,
-                        hex = step.hex
-                    )
-                }
-            } else {
-                item {
-                    Text(
-                        "No content available for this tutorial.",
-                        color = BodyText,
-                        modifier = Modifier.padding(vertical = space * 0.8f),
-                        fontFamily = figtreeFontFamily,
-                        fontSize = fontSize * 0.6f
-                    )
+                        items(steps) { step ->
+                            TutorialStepCard(
+                                stepNumber = step.step_number,
+                                title = step.title,
+                                description = step.description,
+                                imageUrl = step.image_url,
+                                hex = step.hex
+                            )
+                        }
+                    } else {
+                        item {
+                            Text(
+                                "No content available for this tutorial.",
+                                color = BodyText,
+                                modifier = Modifier.padding(vertical = space * 0.8f),
+                                fontFamily = figtreeFontFamily,
+                                fontSize = fontSize * 0.6f
+                            )
+                        }
+                    }
                 }
             }
         }

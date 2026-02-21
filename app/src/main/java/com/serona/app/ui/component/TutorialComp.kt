@@ -37,6 +37,8 @@ import coil.compose.AsyncImage
 import com.serona.app.data.model.Tutorial
 import com.serona.app.theme.*
 import com.serona.app.ui.main.favorite.FavoriteViewModel
+import com.serona.app.utils.ResponsiveScale
+
 //import com.example.serona.ui.main.tutorial.parseColorSafely
 
 /* -----------------------------------------------------
@@ -62,119 +64,121 @@ fun TutorialCard(
     val space = maxHeight * 0.03f
     val buttonSize = maxWidth * 0.07f
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Grey30)
-    ) {
-        Box(
+    ResponsiveScale(maxFontScale = 1f) {
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(space * 0.05f)
+                .clickable(onClick = onClick),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Grey30)
         ) {
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(space * 0.2f),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(space * 0.05f)
             ) {
-                // Image Section
-                Box(
+                Row(
                     modifier = Modifier
-//                        .size(100.dp)
-                        .width(maxWidth * 0.18f)
-                        .height(maxHeight * 0.11f)
-                        .clip(RoundedCornerShape(8.dp))
+                        .fillMaxWidth()
+                        .padding(space * 0.2f),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    AsyncImage(
-                        model = tutorial.image_url,
-                        contentDescription = tutorial.title,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-
-                Spacer(Modifier.width(space * 0.3f))
-
-                // Content Section
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-//                    .fillMaxHeight()
-                ) {
-                    // Tag
-                    Text(
-                        text = tutorial.sub_category,
-                        color = White,
-                        fontSize = fontSize * 0.4f,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = figtreeFontFamily,
-                        lineHeight = fontSize * 0.5f,
+                    // Image Section
+                    Box(
                         modifier = Modifier
-                            .background(
-                                color = Color(0xFFDC143C), // Dark red/maroon color
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            .padding(horizontal = space * 0.3f)
-                    )
+//                        .size(100.dp)
+                            .width(maxWidth * 0.18f)
+                            .height(maxHeight * 0.11f)
+                            .clip(RoundedCornerShape(8.dp))
+                    ) {
+                        AsyncImage(
+                            model = tutorial.image_url,
+                            contentDescription = tutorial.title,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
 
-                    Spacer(Modifier.height(space * 0.2f))
+                    Spacer(Modifier.width(space * 0.3f))
 
-                    // Title
-                    Text(
-                        text = tutorial.title,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = fontSize * 0.6f,
-                        color = Color.Black,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        lineHeight = fontSize * 0.6f,
-                        fontFamily = figtreeFontFamily
-                    )
+                    // Content Section
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+//                    .fillMaxHeight()
+                    ) {
+                        // Tag
+                        Text(
+                            text = tutorial.sub_category,
+                            color = White,
+                            fontSize = fontSize * 0.4f,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = figtreeFontFamily,
+                            lineHeight = fontSize * 0.5f,
+                            modifier = Modifier
+                                .background(
+                                    color = Color(0xFFDC143C), // Dark red/maroon color
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .padding(horizontal = space * 0.3f)
+                        )
 
-                    Spacer(Modifier.height(space * 0.1f))
+                        Spacer(Modifier.height(space * 0.2f))
 
-                    // Description
-                    Text(
-                        text = tutorial.description,
-                        fontSize = fontSize * 0.5f,
-                        fontFamily = figtreeFontFamily,
-                        color = Color(0xFF666666),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        lineHeight = fontSize * 0.6f
-                    )
+                        // Title
+                        Text(
+                            text = tutorial.title,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = fontSize * 0.6f,
+                            color = Color.Black,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = fontSize * 0.6f,
+                            fontFamily = figtreeFontFamily
+                        )
 
-                    Spacer(Modifier.height(space * 0.1f))
+                        Spacer(Modifier.height(space * 0.1f))
 
-                    Text(
-                        text = "Read more",
-                        color = Color(0xFFDC143C),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = fontSize * 0.5f,
-                        fontFamily = figtreeFontFamily
+                        // Description
+                        Text(
+                            text = tutorial.description,
+                            fontSize = fontSize * 0.5f,
+                            fontFamily = figtreeFontFamily,
+                            color = Color(0xFF666666),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = fontSize * 0.6f
+                        )
+
+                        Spacer(Modifier.height(space * 0.1f))
+
+                        Text(
+                            text = "Read more",
+                            color = Color(0xFFDC143C),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = fontSize * 0.5f,
+                            fontFamily = figtreeFontFamily
+                        )
+                    }
+
+                    Spacer(Modifier.width(space * 0.05f))
+
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        tint = Color(0xFFDC143C),
+                        modifier = Modifier
+                            .align(Alignment.Top)
+                            .padding(space * 0.1f)
+                            .size(24.dp)
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ) {
+                                favViewModel.toggleFavorite(tutorial)
+                            }
                     )
                 }
-
-                Spacer(Modifier.width(space * 0.05f))
-
-                Icon(
-                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    tint = Color(0xFFDC143C),
-                    modifier = Modifier
-                        .align(Alignment.Top)
-                        .padding(space * 0.1f)
-                        .size(24.dp)
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            favViewModel.toggleFavorite(tutorial)
-                        }
-                )
             }
         }
     }
@@ -200,14 +204,16 @@ fun LoadingView() {
 
 @Composable
 fun SectionTitle(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleLarge,
-        color = Heading,
-        fontWeight = FontWeight.SemiBold,
-        fontFamily = figtreeFontFamily,
+    ResponsiveScale(maxFontScale = 1f) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            color = Heading,
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = figtreeFontFamily,
 //        modifier = Modifier.padding(vertical = 4.dp)
-    )
+        )
+    }
 }
 
 /* -----------------------------------------------------
@@ -229,47 +235,49 @@ fun TutorialSearchBar(
         }
     }
 
-    OutlinedTextField(
-        enabled = enabled,
-        value = query,
-        onValueChange = onQueryChange,
-        modifier = Modifier
-            .fillMaxWidth(),
+    ResponsiveScale(maxFontScale = 1f) {
+        OutlinedTextField(
+            enabled = enabled,
+            value = query,
+            onValueChange = onQueryChange,
+            modifier = Modifier
+                .fillMaxWidth(),
 //            .padding(horizontal = 8.dp),
-        placeholder = {
-            Text(
-                "Search",
-                color = ParagraphLight,
+            placeholder = {
+                Text(
+                    "Search",
+                    color = ParagraphLight,
+                    fontFamily = figtreeFontFamily,
+                    fontSize = fontSize * 0.6f
+                )
+            },
+
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = fontSize * 0.6f,
                 fontFamily = figtreeFontFamily,
-                fontSize = fontSize * 0.6f
-            )
-        },
+                fontWeight = FontWeight.Medium,
+                color = ParagraphLight
+            ),
 
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = fontSize * 0.6f,
-            fontFamily = figtreeFontFamily,
-            fontWeight = FontWeight.Medium,
-            color = ParagraphLight
-        ),
-
-        singleLine = true,
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search",
-                tint = BodyText
+            singleLine = true,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = BodyText
+                )
+            },
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Primary,
+                unfocusedBorderColor = Grey20,
+                focusedContainerColor = White,
+                unfocusedContainerColor = White,
+                disabledContainerColor = White,
+                disabledBorderColor = Grey20,
             )
-        },
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Primary,
-            unfocusedBorderColor = Grey20,
-            focusedContainerColor = White,
-            unfocusedContainerColor = White,
-            disabledContainerColor = White,
-            disabledBorderColor = Grey20,
         )
-    )
+    }
 }
 
 /* -----------------------------------------------------
@@ -291,35 +299,38 @@ fun FilterRow(
     val maxHeight = configuration.screenHeightDp.dp
 
     val space = maxHeight * 0.03f
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth(),
-//            .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(space * 0.2f)
-    ) {
-        // Filters button with icon
-        item {
-            FilterButton(
-                text = "Filters",
-                isActive = isFilterActive,
-                showIcon = true,
-                onClick = { /* TODO: Show filter dialog */ },
-                fontSize = fontSize,
-                enabled = enabled
-            )
-        }
 
-        // Main category filters with dropdown arrow
-        items(mainCategoryOptions.size) { index ->
-            val category = mainCategoryOptions[index]
-            FilterDropDownButton(
-                categoryName = category,
-                subOptions = subCategoryOptions[category] ?: emptyList(),
-                activeFilters = activeFilters,
-                onFilterSelected = onFilterSelected,
-                fontSize = fontSize,
-                enabled = enabled
-            )
+    ResponsiveScale(maxFontScale = 1f) {
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth(),
+//            .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(space * 0.2f)
+        ) {
+            // Filters button with icon
+            item {
+                FilterButton(
+                    text = "Filters",
+                    isActive = isFilterActive,
+                    showIcon = true,
+                    onClick = { /* TODO: Show filter dialog */ },
+                    fontSize = fontSize,
+                    enabled = enabled
+                )
+            }
+
+            // Main category filters with dropdown arrow
+            items(mainCategoryOptions.size) { index ->
+                val category = mainCategoryOptions[index]
+                FilterDropDownButton(
+                    categoryName = category,
+                    subOptions = subCategoryOptions[category] ?: emptyList(),
+                    activeFilters = activeFilters,
+                    onFilterSelected = onFilterSelected,
+                    fontSize = fontSize,
+                    enabled = enabled
+                )
+            }
         }
     }
 }
@@ -341,41 +352,43 @@ fun FilterButton(
     val buttonSize = maxWidth * 0.07f
     val space = maxHeight * 0.03f
 
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(
-                if (isActive) Color(0xFFFFF0F5) else White
-            )
-            .border(
-                width = 1.dp,
-                color = if (isActive) Primary50 else Color(0xFFE0E0E0),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = space * 0.5f, vertical = space * 0.3f),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(space * 0.2f)
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    if (isActive) Color(0xFFFFF0F5) else White
+                )
+                .border(
+                    width = 1.dp,
+                    color = if (isActive) Primary50 else Color(0xFFE0E0E0),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .clickable(enabled = enabled, onClick = onClick)
+                .padding(horizontal = space * 0.5f, vertical = space * 0.3f),
+            contentAlignment = Alignment.Center
         ) {
-            if (text == "Filters" && showIcon) {
-                Icon(
-                    imageVector = Icons.Default.FilterList,
-                    contentDescription = "Filter",
-                    tint = Primary,
-                    modifier = Modifier.size(iconSize * 0.8f)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(space * 0.2f)
+            ) {
+                if (text == "Filters" && showIcon) {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = "Filter",
+                        tint = Primary,
+                        modifier = Modifier.size(iconSize * 0.8f)
+                    )
+                }
+
+                Text(
+                    text = text,
+                    color = if (isActive) Primary else Color(0xFF666666),
+                    fontSize = fontSize * 0.6f,
+                    fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal,
+                    fontFamily = figtreeFontFamily
                 )
             }
-
-            Text(
-                text = text,
-                color = if (isActive) Primary else Color(0xFF666666),
-                fontSize = fontSize * 0.6f,
-                fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal,
-                fontFamily = figtreeFontFamily
-            )
         }
     }
 }
@@ -405,42 +418,44 @@ fun FilterDropDownButton(
 
     Box {
         // Main category button
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(
-                    if (hasActiveFilter) Color(0xFFFFF0F5) else White
-                )
-                .onSizeChanged() {
-                    // 2. Tangkap lebar tombol saat ukurannya berubah
-                    buttonWidth = it.width
-                }
-                .border(
-                    width = 1.dp,
-                    color = if (hasActiveFilter) Primary else Color(0xFFE0E0E0),
-                    shape = RoundedCornerShape(12.dp)
-                )
-                .clickable(enabled = enabled) { expanded = true }
-                .padding(horizontal = space * 0.5f, vertical = space * 0.3f),
-            contentAlignment = Alignment.Center
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+        ResponsiveScale(maxFontScale = 1f) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        if (hasActiveFilter) Color(0xFFFFF0F5) else White
+                    )
+                    .onSizeChanged() {
+                        // 2. Tangkap lebar tombol saat ukurannya berubah
+                        buttonWidth = it.width
+                    }
+                    .border(
+                        width = 1.dp,
+                        color = if (hasActiveFilter) Primary else Color(0xFFE0E0E0),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .clickable(enabled = enabled) { expanded = true }
+                    .padding(horizontal = space * 0.5f, vertical = space * 0.3f),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = categoryName,
-                    color = if (hasActiveFilter) Primary else Color(0xFF666666),
-                    fontSize = fontSize * 0.6f,
-                    fontWeight = if (hasActiveFilter) FontWeight.SemiBold else FontWeight.Normal,
-                    fontFamily = figtreeFontFamily
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = categoryName,
+                        color = if (hasActiveFilter) Primary else Color(0xFF666666),
+                        fontSize = fontSize * 0.6f,
+                        fontWeight = if (hasActiveFilter) FontWeight.SemiBold else FontWeight.Normal,
+                        fontFamily = figtreeFontFamily
+                    )
 
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Dropdown",
-                    tint = if (hasActiveFilter) Primary else Color(0xFF666666),
-                    modifier = Modifier.size(iconSize * 0.8f)
-                )
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Dropdown",
+                        tint = if (hasActiveFilter) Primary else Color(0xFF666666),
+                        modifier = Modifier.size(iconSize * 0.8f)
+                    )
+                }
             }
         }
 
@@ -456,28 +471,31 @@ fun FilterDropDownButton(
             subOptions.forEach { subOption ->
                 val isSelected = activeFilters.contains(subOption)
 
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = subOption,
-                            color = if (isSelected) Primary else Color(0xFF333333),
-                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                            fontSize = fontSize * 0.6f,
-                            fontFamily = figtreeFontFamily,
-                            modifier = Modifier.fillMaxWidth()
+                ResponsiveScale(maxFontScale = 1f) {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = subOption,
+                                color = if (isSelected) Primary else Color(0xFF333333),
+                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                                fontSize = fontSize * 0.6f,
+                                fontFamily = figtreeFontFamily,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        },
+                        onClick = {
+                            onFilterSelected(subOption) // Toggle filter
+                            expanded = false
+                        },
+                        modifier = Modifier.background(
+                            if (isSelected) Color(0xFFFFF0F5) else White
                         )
-                    },
-                    onClick = {
-                        onFilterSelected(subOption) // Toggle filter
-                        expanded = false
-                    },
-                    modifier = Modifier.background(
-                        if (isSelected) Color(0xFFFFF0F5) else White
                     )
-                )
+                }
             }
         }
     }
+
 }
 
 /* -----------------------------------------------------
@@ -497,33 +515,35 @@ fun ActiveFilterChip(
     val buttonSize = maxWidth * 0.07f
     val space = maxHeight * 0.03f
 
-    Box(
-        modifier = Modifier
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(
+            modifier = Modifier
 //            .height(32.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFFFF0F5))
-            .padding(horizontal = space * 0.4f, vertical = space * 0.3f),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(space * 0.2f)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFFFFF0F5))
+                .padding(horizontal = space * 0.4f, vertical = space * 0.3f),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = text,
-                color = Primary,
-                fontSize = fontSize * 0.5f,
-                fontWeight = FontWeight.Medium,
-                fontFamily = figtreeFontFamily
-            )
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Remove filter",
-                tint = Primary,
-                modifier = Modifier
-                    .size(iconSize * 0.5f)
-                    .clickable(onClick = onRemove)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(space * 0.2f)
+            ) {
+                Text(
+                    text = text,
+                    color = Primary,
+                    fontSize = fontSize * 0.5f,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = figtreeFontFamily
+                )
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Remove filter",
+                    tint = Primary,
+                    modifier = Modifier
+                        .size(iconSize * 0.5f)
+                        .clickable(onClick = onRemove)
+                )
+            }
         }
     }
 }
@@ -538,27 +558,29 @@ fun EmptyView() {
     val buttonSize = maxWidth * 0.07f
     val space = maxHeight * 0.03f
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                "No Tutorials!",
-                style = MaterialTheme.typography.bodyLarge,
-                color = BodyText,
-                fontFamily = figtreeFontFamily
-            )
-            Spacer(Modifier.height(space * 0.5f))
-            Text(
-                "Try again with other keywords",
-                style = MaterialTheme.typography.bodyMedium,
-                color = ParagraphLight,
-                fontFamily = figtreeFontFamily
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    "No Tutorials!",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = BodyText,
+                    fontFamily = figtreeFontFamily
+                )
+                Spacer(Modifier.height(space * 0.5f))
+                Text(
+                    "Try again with other keywords",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = ParagraphLight,
+                    fontFamily = figtreeFontFamily
+                )
+            }
         }
     }
 }
@@ -576,18 +598,20 @@ fun CategoryChip(
     val buttonSize = maxWidth * 0.07f
     val space = maxHeight * 0.03f
 
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = if (isPrimary) PrimaryContainer else SecondaryContainer
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = space * 0.5f, vertical = space * 0.1f),
-            color = if (isPrimary) Primary else Tertiary,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium,
-            fontFamily = figtreeFontFamily
-        )
+    ResponsiveScale(maxFontScale = 1f) {
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = if (isPrimary) PrimaryContainer else SecondaryContainer
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.padding(horizontal = space * 0.5f, vertical = space * 0.1f),
+                color = if (isPrimary) Primary else Tertiary,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium,
+                fontFamily = figtreeFontFamily
+            )
+        }
     }
 }
 
@@ -634,150 +658,155 @@ fun TutorialStepCard(
     ) {
 
         // Step Card Content
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colorStops = arrayOf(
-                                0.0f to Primary,                // kiri
-                                0.02f to Primary,
-                                0.02f to Color.White,           // batas keras
-                                1.0f to Color.White
+        ResponsiveScale(maxFontScale = 1f) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colorStops = arrayOf(
+                                    0.0f to Primary,                // kiri
+                                    0.02f to Primary,
+                                    0.02f to Color.White,           // batas keras
+                                    1.0f to Color.White
+                                )
                             )
                         )
-                    )
-                    .padding(space * 0.3f)
-            ) {
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                        .padding(space * 0.3f)
                 ) {
-                    //disini
-                    // =========================
-                    // 🔴 VERSION 1: COLOR (HORIZONTAL)
-                    // =========================
-                    if (parsedColor != null && imageUrl.isNullOrEmpty()) {
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(space * 0.5f),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            // Color circle + step badge
-                            Box {
-                                Box(
-                                    modifier = Modifier
-                                        .size(iconSize * 2.3f)
-                                        .clip(CircleShape)
-                                        .background(parsedColor)
-                                )
-                            }
-
-                            Spacer(Modifier.width(space * 0.4f))
-
-                            Column(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text(
-                                    text = title,
-                                    fontSize = fontSize * 0.6f,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = Heading,
-                                    fontFamily = figtreeFontFamily
-                                )
-
-                            Text(
-                                text = description,
-                                fontSize = fontSize * 0.5f,
-                                lineHeight = fontSize * 0.5f,
-                                color = BodyText,
-                                fontFamily = figtreeFontFamily
-                            )
-                        }
-                    }
-                }
-
-                // =========================
-                // 🔵 VERSION 2: IMAGE (VERTICAL)
-                // =========================
-                else if (!imageUrl.isNullOrEmpty()) {
 
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(space * 0.5f)
                     ) {
+                        //disini
+                        // =========================
+                        // 🔴 VERSION 1: COLOR (HORIZONTAL)
+                        // =========================
+                        if (parsedColor != null && imageUrl.isNullOrEmpty()) {
 
-                        // Step number + title
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
+                            Row(
                                 modifier = Modifier
-                                    .size(iconSize)
-                                    .clip(CircleShape)
-                                    .background(Primary),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .padding(space * 0.5f),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = stepNumber.toString(),
-                                    color = White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = fontSize * 0.6f,
-                                    fontFamily = figtreeFontFamily,
+
+                                // Color circle + step badge
+                                Box {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(iconSize * 2.3f)
+                                            .clip(CircleShape)
+                                            .background(parsedColor)
+                                    )
+                                }
+
+                                Spacer(Modifier.width(space * 0.4f))
+
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = title,
+                                        fontSize = fontSize * 0.6f,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Heading,
+                                        fontFamily = figtreeFontFamily
+                                    )
+
+                                    Text(
+                                        text = description,
+                                        fontSize = fontSize * 0.5f,
+                                        lineHeight = fontSize * 0.5f,
+                                        color = BodyText,
+                                        fontFamily = figtreeFontFamily
+                                    )
+                                }
+                            }
+                        }
+
+                        // =========================
+                        // 🔵 VERSION 2: IMAGE (VERTICAL)
+                        // =========================
+                        else if (!imageUrl.isNullOrEmpty()) {
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(space * 0.5f)
+                            ) {
+
+                                // Step number + title
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(iconSize)
+                                            .clip(CircleShape)
+                                            .background(Primary),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = stepNumber.toString(),
+                                            color = White,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = fontSize * 0.6f,
+                                            fontFamily = figtreeFontFamily,
 //                                lineHeight = 13.sp
+                                        )
+                                    }
+
+                                    Spacer(Modifier.width(space * 0.5f))
+
+                                    Text(
+                                        text = title,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Heading,
+                                        fontFamily = figtreeFontFamily
+                                    )
+                                }
+
+                                Spacer(Modifier.height(space * 0.3f))
+
+                                // Image
+                                AsyncImage(
+                                    model = imageUrl,
+                                    contentDescription = title,
+                                    modifier = Modifier
+                                        .wrapContentSize()
+                                        .clip(RoundedCornerShape(8.dp))
+//                                    .width(maxWidth * 0.7f)
+                                        .height(maxHeight * 0.2f)
+                                        .sizeIn(
+                                            maxWidth = maxWidth * 0.8f,
+                                            maxHeight = maxHeight * 0.5f
+                                        )
+                                        .align(Alignment.CenterHorizontally),
+                                    contentScale = ContentScale.Fit
+                                )
+
+                                Spacer(Modifier.height(space * 0.5f))
+
+                                // Description
+                                Text(
+                                    text = description,
+                                    fontSize = fontSize * 0.5f,
+                                    lineHeight = fontSize * 0.6f,
+                                    color = Heading,
+                                    fontFamily = figtreeFontFamily
                                 )
                             }
-
-                            Spacer(Modifier.width(space * 0.5f))
-
-                            Text(
-                                text = title,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Heading,
-                                fontFamily = figtreeFontFamily
-                            )
-                        }
-
-                            Spacer(Modifier.height(space * 0.3f))
-
-                            // Image
-                            AsyncImage(
-                                model = imageUrl,
-                                contentDescription = title,
-                                modifier = Modifier
-                                    .wrapContentSize()
-                                    .clip(RoundedCornerShape(8.dp))
-//                                    .width(maxWidth * 0.7f)
-                                    .height(maxHeight * 0.2f)
-                                    .sizeIn(maxWidth = maxWidth * 0.8f, maxHeight = maxHeight * 0.5f)
-                                    .align(Alignment.CenterHorizontally),
-                                contentScale = ContentScale.Fit
-                            )
-
-                        Spacer(Modifier.height(space * 0.5f))
-
-                            // Description
-                            Text(
-                                text = description,
-                                fontSize = fontSize * 0.5f,
-                                lineHeight = fontSize * 0.6f,
-                                color = Heading,
-                                fontFamily = figtreeFontFamily
-                            )
                         }
                     }
-                }
 
+                }
             }
         }
     }

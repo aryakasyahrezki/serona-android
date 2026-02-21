@@ -37,6 +37,7 @@ import com.serona.app.ui.auth.AuthState
 import com.serona.app.ui.auth.AuthViewModel
 import com.serona.app.ui.component.BottomWaveShape
 import com.serona.app.ui.navigation.Routes
+import com.serona.app.utils.ResponsiveScale
 import kotlinx.coroutines.delay
 
 
@@ -70,73 +71,75 @@ fun SplashFullBackground(
     val screenHeight = screenHeightDp()
     val screenWidth = screenWidthDp()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(modifier = Modifier.fillMaxSize()) {
 
-        // IMAGE BACKGROUND
-        Image(
-            painter = painterResource(id = R.drawable.splash_page_bg),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.95f), // 👈 image hanya 75% layar
-            contentScale = ContentScale.FillWidth,
-            alignment = Alignment.TopCenter
-        )
+            // IMAGE BACKGROUND
+            Image(
+                painter = painterResource(id = R.drawable.splash_page_bg),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.95f), // 👈 image hanya 75% layar
+                contentScale = ContentScale.FillWidth,
+                alignment = Alignment.TopCenter
+            )
 
-        // SOFT PINK OVERLAY
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        0.0f to Color(0xFFEF4E5E).copy(0.3f),
-                        0.34f to Color(0xFFF45E70).copy(0.1f),
-                        0.50f to Color(0xFFF66779).copy(0.2f),
-                        0.79f to Color(0xFFFD7F94).copy(0.15f),
-                        0.99f to Color(0xFFFFB2BF).copy(0.15f)
+            // SOFT PINK OVERLAY
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            0.0f to Color(0xFFEF4E5E).copy(0.3f),
+                            0.34f to Color(0xFFF45E70).copy(0.1f),
+                            0.50f to Color(0xFFF66779).copy(0.2f),
+                            0.79f to Color(0xFFFD7F94).copy(0.15f),
+                            0.99f to Color(0xFFFFB2BF).copy(0.15f)
+                        )
                     )
-                )
-        )
+            )
 
-        // BOTTOM WHITE SHAPE
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height((screenHeight * 0.28).dp)
-                .background(
-                    brush = Brush.verticalGradient(
-                        0f to White10,
-                        1f to Color(0xFFFFE5E5)
+            // BOTTOM WHITE SHAPE
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height((screenHeight * 0.28).dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            0f to White10,
+                            1f to Color(0xFFFFE5E5)
+                        ),
+                        shape = BottomWaveShape()
+                    )
+                    .padding(
+                        horizontal = (screenWidth * 0.08).dp,
+                        vertical = 24.dp
                     ),
-                    shape = BottomWaveShape()
+                horizontalAlignment = Alignment.Start
+            ) {
+
+                Text(
+                    text = "Hello,\nGorgeous !",
+                    fontSize = scaleFont(32f).sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = montserratFontFamily,
+                    color = Tertiary,
+                    lineHeight = scaleFont(36f).sp
                 )
-                .padding(
-                    horizontal = (screenWidth * 0.08).dp,
-                    vertical = 24.dp
-                ),
-            horizontalAlignment = Alignment.Start
-        ) {
 
-            Text(
-                text = "Hello,\nGorgeous !",
-                fontSize = scaleFont(32f).sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = montserratFontFamily,
-                color = Tertiary,
-                lineHeight = scaleFont(36f).sp
-            )
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = "Your space to explore beauty, express yourself, and shine every day.",
-                fontSize = scaleFont(14f).sp,
-                fontWeight = FontWeight.Medium,
-                fontFamily = montserratFontFamily,
-                color = Primary,
-                lineHeight = scaleFont(20f).sp
-            )
+                Text(
+                    text = "Your space to explore beauty, express yourself, and shine every day.",
+                    fontSize = scaleFont(14f).sp,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = montserratFontFamily,
+                    color = Primary,
+                    lineHeight = scaleFont(20f).sp
+                )
+            }
         }
     }
 

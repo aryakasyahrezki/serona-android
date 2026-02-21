@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -50,6 +51,7 @@ import com.serona.app.theme.Primary
 import com.serona.app.theme.Primary70
 import com.serona.app.theme.WarmRedPinkSoft
 import com.serona.app.theme.montserratFontFamily
+import com.serona.app.utils.ResponsiveScale
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -121,31 +123,33 @@ fun LandingPageCarousel(
         }
 
         // --- Button for ThirdLandingPage ---
-        AnimatedVisibility(
-            visible = pagerState.currentPage == 2,
-            modifier = Modifier.align(Alignment.BottomCenter),
-            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
-            exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
-        ) {
-            Button(
-                onClick = {
-                    navController.navigate("login"){
-                        popUpTo("landing") { inclusive = true }
-                    }
-                }, //ini nanti ke LoginPage
-                modifier = Modifier
-                    .padding(bottom = 50.dp)
-                    .width(170.dp)
-                    .height(45.dp),
-                shape = RoundedCornerShape(30.dp),
-                colors = ButtonDefaults.buttonColors(Primary70)
+        ResponsiveScale(maxFontScale = 1f) {
+            AnimatedVisibility(
+                visible = pagerState.currentPage == 2,
+                modifier = Modifier.align(Alignment.BottomCenter),
+                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+                exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
             ) {
-                Text(
-                    "Start",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
+                Button(
+                    onClick = {
+                        navController.navigate("login") {
+                            popUpTo("landing") { inclusive = true }
+                        }
+                    }, //ini nanti ke LoginPage
+                    modifier = Modifier
+                        .padding(bottom = 50.dp)
+                        .width(170.dp)
+                        .height(45.dp),
+                    shape = RoundedCornerShape(30.dp),
+                    colors = ButtonDefaults.buttonColors(Primary70)
+                ) {
+                    Text(
+                        "Start",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                }
             }
         }
     }
@@ -166,51 +170,56 @@ fun LandingPageTemplate(
     val titleSize = (maxWidth * 0.085f).value.sp
     val subtitleSize = (maxWidth * 0.035f).value.sp
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(imageRes),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            alignment = Alignment.TopCenter,
-            modifier = Modifier
-                .fillMaxSize()
-                .scale(scaleImage)
-        )
-
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(gradient)
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxHeight(0.26f)
-                .align(Alignment.BottomStart)
-                .padding(24.dp, bottom = 30.dp)
-        ) {
-            Text(text = title1,
-                fontSize = titleSize,
-                fontFamily = montserratFontFamily,
-                fontWeight =  FontWeight.Bold,
-                color = OnPrimary
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(imageRes),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .scale(scaleImage)
             )
-            Text(text = title2,
-                fontSize = titleSize,
-                fontFamily = montserratFontFamily,
-                fontWeight =  FontWeight.Bold,
-                color = Primary70
-            )
-            Text(
-                text = subtitle,
-                fontSize = subtitleSize,
-                fontFamily = montserratFontFamily,
-                fontWeight =  FontWeight.Medium,
-                color = OnPrimary.copy(alpha = 0.9922f),
-                lineHeight = 17.sp,
-                modifier = Modifier.widthIn(max = 300.dp)
 
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(gradient)
             )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight(0.28f)
+                    .align(Alignment.BottomStart)
+                    .padding(24.dp, bottom = 30.dp)
+            ) {
+                Text(
+                    text = title1,
+                    fontSize = titleSize,
+                    fontFamily = montserratFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    color = OnPrimary
+                )
+                Text(
+                    text = title2,
+                    fontSize = titleSize,
+                    fontFamily = montserratFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    color = Primary70
+                )
+                Text(
+                    text = subtitle,
+                    fontSize = subtitleSize,
+                    fontFamily = montserratFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    color = OnPrimary.copy(alpha = 0.9922f),
+                    lineHeight = 17.sp,
+                    modifier = Modifier.widthIn(max = 300.dp)
+
+                )
+
+            }
         }
     }
 }
@@ -261,5 +270,6 @@ fun ThirdLandingPage() {
         title1 = "Start Your",
         title2 = "Beauty Journey",
         subtitle = "Scan, match, and discover your best makeup style"
+
     )
 }

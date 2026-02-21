@@ -57,6 +57,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -98,6 +99,7 @@ import com.serona.app.ui.component.ScannedInfoCard
 import com.serona.app.ui.component.eventCard
 import com.serona.app.ui.component.guideCard
 import com.serona.app.ui.navigation.Routes
+import com.serona.app.utils.ResponsiveScale
 import com.serona.app.utils.rememberNavigationGuard
 
 @Composable
@@ -114,7 +116,7 @@ fun HomePage(
 
     val horiPadding = screenWidth * 0.05f
     val vertiPadding = screenHeight * 0.08f
-    val fontSize = (screenWidth * 0.052f).value.sp
+    val fontSize = (screenWidth * 0.054f).value.sp
     val iconSize = screenWidth * 0.05f
     val space = (screenHeight * 0.04f)
     val topContentSize = screenWidth * 0.25f
@@ -134,392 +136,399 @@ fun HomePage(
     }
 
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(White)
-            .padding(top = vertiPadding)
-    ) {
+    ResponsiveScale(maxFontScale = 1f) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = horiPadding)
+                .background(White)
+                .padding(top = vertiPadding)
         ) {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState())
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = horiPadding)
             ) {
-                Text(
-                    text = "Hi, ${state.userName}!",
-                    fontSize = fontSize,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Heading
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.3f))
-
-                Text(
-                    text = "This is your personalized makeup preview, designed perfectly " +
-                            "to match your facial features",
-                    fontSize = fontSize * 0.57,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    color = BodyText,
-                    lineHeight = fontSize * 0.9f
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.5f))
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(space * 0.5f),
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
                 ) {
+                    Text(
+                        text = "Hi, ${state.userName}!",
+                        fontSize = fontSize,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Heading
+                    )
 
-                    ScannedInfoCard(
-                        header = state.faceHeader,
-                        body = state.faceBody,
-                        fontSize = fontSize * 0.55f,
-                        modifier = Modifier.weight(0.5f),
-                        bgColor = Primary,
-                        textColor = White,
-                        screenHeight = screenHeight
+                    Spacer(modifier = Modifier.height(space * 0.3f))
+
+                    Text(
+                        text = "This is your personalized makeup preview, designed perfectly " +
+                                "to match your facial features",
+                        fontSize = fontSize * 0.57,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = BodyText,
+                        lineHeight = fontSize * 0.9f
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.5f))
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(space * 0.5f),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Box(
-                            modifier = Modifier.size(topContentSize), // Tetap seukuran lingkaran kanan
-                            contentAlignment = Alignment.Center
+
+                        ScannedInfoCard(
+                            header = state.faceHeader,
+                            body = state.faceBody,
+                            fontSize = fontSize * 0.55f,
+                            modifier = Modifier.weight(0.5f),
+                            bgColor = Primary,
+                            textColor = White,
+                            screenHeight = screenHeight
                         ) {
-                            Image(
-                                painter = painterResource(if (state.hasScanned) R.drawable.face_shape_filled else R.drawable.face_shape_null),
-                                contentDescription = null,
+                            Box(
+                                modifier = Modifier.size(topContentSize), // Tetap seukuran lingkaran kanan
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(if (state.hasScanned) R.drawable.face_shape_filled else R.drawable.face_shape_null),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(topContentSize)
+                                        .scale(1.23f)
+                                        .zIndex(1f),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
+                        }
+
+                        ScannedInfoCard(
+                            header = state.skinHeader,
+                            body = state.skinBody,
+                            fontSize = fontSize * 0.55f,
+                            modifier = Modifier.weight(0.5f),
+                            bgColor = PrimaryContainer,
+                            textColor = OnPrimaryContainer,
+                            screenHeight = screenHeight
+                        ) {
+                            Box(
                                 modifier = Modifier
                                     .size(topContentSize)
-                                    .scale(1.23f)
-                                    .zIndex(1f),
-                                contentScale = ContentScale.Fit
+                                    .shadow(
+                                        elevation = if (state.hasScanned) 10.dp else 0.dp,
+                                        shape = CircleShape,
+                                        ambientColor = Color.Black.copy(alpha = 0.6f)
+                                    )
+                                    .clip(CircleShape)
+                                    .drawBehind() {
+                                        val width = size.width
+                                        val height = size.height
+                                        val mainRadius = (size.minDimension / 2) * 0.95f
+
+                                        // 1. DROP SHADOW (Gunakan RadialGradient agar terlihat halus/blur)
+                                        drawCircle(
+                                            brush = Brush.radialGradient(
+                                                colors = listOf(
+                                                    Color.Black.copy(alpha = 0.2f),
+                                                    Color.Transparent
+                                                ),
+                                                center = Offset(
+                                                    width * 0.5f,
+                                                    height * 0.65f
+                                                ), // Titik pusat bayangan
+                                                radius = mainRadius * 1.2f
+                                            ),
+                                            radius = mainRadius * 1.2f,
+                                            center = Offset(width * 0.65f, height * 0.9f)
+                                        )
+
+                                        if (state.hasScanned) {
+                                            drawCircle(
+                                                color = state.skinColor,
+                                                radius = mainRadius,
+                                                center = Offset(width * 0.5f, height * 0.5f)
+                                            )
+
+
+                                            rotate(
+                                                degrees = 50f,
+                                                pivot = Offset(width * 0.7f, height * 0.3f)
+                                            ) {
+                                                drawOval(
+                                                    brush = Brush.radialGradient(
+                                                        colors = listOf(
+                                                            Color.White.copy(alpha = 0.5f),
+                                                            Color.Transparent
+                                                        ),
+                                                        center = Offset(
+                                                            width * 0.7f,
+                                                            height * 0.3f
+                                                        ),
+                                                        radius = width * 0.25f
+                                                    ),
+                                                    topLeft = Offset(width * 0.55f, height * 0.2f),
+                                                    size = Size(width * 0.4f, height * 0.12f)
+                                                )
+                                            }
+
+                                        } else {
+                                            val graySphereBrush = Brush.radialGradient(
+                                                colors = listOf(
+                                                    Color.White,
+                                                    Color(0xFFFFFFFF),
+                                                    Color(0xFFE7E7E7)
+                                                ),
+                                                center = Offset(width * 0.45f, height * 0.45f),
+                                                radius = width * 0.6f
+                                            )
+                                            drawCircle(brush = graySphereBrush)
+                                        }
+                                    }
                             )
                         }
                     }
 
-                    ScannedInfoCard(
-                        header = state.skinHeader,
-                        body = state.skinBody,
-                        fontSize = fontSize * 0.55f,
-                        modifier = Modifier.weight(0.5f),
-                        bgColor = PrimaryContainer,
-                        textColor = OnPrimaryContainer,
-                        screenHeight = screenHeight
+                    Spacer(modifier = Modifier.height(space))
+
+                    Text(
+                        text = state.guideTitle,
+                        fontSize = fontSize * 0.9f,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Heading
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.3f))
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(space * 0.3f)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(topContentSize)
-                                .shadow(
-                                    elevation = if (state.hasScanned) 10.dp else 0.dp,
-                                    shape = CircleShape,
-                                    ambientColor = Color.Black.copy(alpha = 0.6f)
-                                )
-                                .clip(CircleShape)
-                                .drawBehind() {
-                                    val width = size.width
-                                    val height = size.height
-                                    val mainRadius = (size.minDimension / 2) * 0.95f
+                        state.guideItems.forEach { item ->
+                            guideCard(
+                                Header = item.header,
+                                Body = item.body,
+                                fontSize = fontSize * 0.6f,
+                                iconSize = iconSize,
+                                boxColor = if (!state.hasScanned) PrimaryContainer else Color(
+                                    0xFFFEDCC1
+                                ),
+                                icon = item.iconVector,
+                                imageRes = item.imageRes,
+                                imageSize = if (!state.hasScanned) 0.6f else 1f,
+                                screenHeight = screenHeight,
+                                screenWidth = screenWidth
+                            )
+                        }
+                    }
 
-                                    // 1. DROP SHADOW (Gunakan RadialGradient agar terlihat halus/blur)
-                                    drawCircle(
-                                        brush = Brush.radialGradient(
-                                            colors = listOf(
-                                                Color.Black.copy(alpha = 0.2f),
-                                                Color.Transparent
-                                            ),
-                                            center = Offset(
-                                                width * 0.5f,
-                                                height * 0.65f
-                                            ), // Titik pusat bayangan
-                                            radius = mainRadius * 1.2f
-                                        ),
-                                        radius = mainRadius * 1.2f,
-                                        center = Offset(width * 0.65f, height * 0.9f)
-                                    )
+                    Spacer(modifier = Modifier.height(space))
 
-                                    if (state.hasScanned) {
-                                        drawCircle(
-                                            color = state.skinColor,
-                                            radius = mainRadius,
-                                            center = Offset(width * 0.5f, height * 0.5f)
-                                        )
+                    Text(
+                        text = "Choose Your Event",
+                        fontSize = fontSize,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Heading
+                    )
 
+                    Spacer(modifier = Modifier.height(space * 0.3f))
 
-                                        rotate(
-                                            degrees = 50f,
-                                            pivot = Offset(width * 0.7f, height * 0.3f)
-                                        ) {
-                                            drawOval(
-                                                brush = Brush.radialGradient(
-                                                    colors = listOf(
-                                                        Color.White.copy(alpha = 0.5f),
-                                                        Color.Transparent
-                                                    ),
-                                                    center = Offset(width * 0.7f, height * 0.3f),
-                                                    radius = width * 0.25f
-                                                ),
-                                                topLeft = Offset(width * 0.55f, height * 0.2f),
-                                                size = Size(width * 0.4f, height * 0.12f)
-                                            )
-                                        }
+                    Text(
+                        text = "Get the best makeup style recommendations for every occasion",
+                        fontSize = fontSize * 0.57,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = BodyText,
+                        lineHeight = fontSize * 0.9f
+                    )
 
-                                    } else {
-                                        val graySphereBrush = Brush.radialGradient(
-                                            colors = listOf(
-                                                Color.White,
-                                                Color(0xFFFFFFFF),
-                                                Color(0xFFE7E7E7)
-                                            ),
-                                            center = Offset(width * 0.45f, height * 0.45f),
-                                            radius = width * 0.6f
-                                        )
-                                        drawCircle(brush = graySphereBrush)
+                    Spacer(modifier = Modifier.height(space * 0.3f))
+
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        eventCard(
+                            label = "Office",
+                            fontSize = fontSize * 0.72f,
+                            iconTint = OfficeLogo,
+                            textColor = OfficeText,
+                            crcColor = OfficeCrc,
+                            bgColor = OfficeBg,
+                            icon = Icons.Outlined.Apartment,
+                            screenHeight = screenHeight,
+                            screenWidth = screenWidth,
+                            onClick = {
+                                safeAction {
+                                    navController.navigate(
+                                        Routes.navigateToTutorial(occasion = "Office")
+                                    ) {
+                                        launchSingleTop = true
                                     }
                                 }
+                            }
                         )
-                    }
-                }
 
-                Spacer(modifier = Modifier.height(space))
-
-                Text(
-                    text = state.guideTitle,
-                    fontSize = fontSize * 0.9f,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Heading
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.3f))
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(space * 0.3f)
-                ) {
-                    state.guideItems.forEach { item ->
-                        guideCard(
-                            Header = item.header,
-                            Body = item.body,
-                            fontSize = fontSize * 0.6f,
-                            iconSize = iconSize,
-                            boxColor = if (!state.hasScanned) PrimaryContainer else Color(0xFFFEDCC1),
-                            icon = item.iconVector,
-                            imageRes = item.imageRes,
-                            imageSize = if (!state.hasScanned) 0.6f else 1f,
+                        eventCard(
+                            label = "Casual",
+                            fontSize = fontSize * 0.72f,
+                            iconTint = CasualLogo,
+                            textColor = CasualText,
+                            crcColor = CasualCrc,
+                            bgColor = CasualBg,
+                            icon = Icons.Outlined.Groups,
                             screenHeight = screenHeight,
-                            screenWidth = screenWidth
+                            screenWidth = screenWidth,
+                            onClick = {
+                                safeAction {
+                                    navController.navigate(
+                                        Routes.navigateToTutorial(occasion = "Casual")
+                                    ) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+                        )
+
+                        eventCard(
+                            label = "Festival",
+                            fontSize = fontSize * 0.72f,
+                            iconTint = FestLogo,
+                            textColor = FestText,
+                            crcColor = FestCrc,
+                            bgColor = FestBg,
+                            icon = Icons.Outlined.Attractions,
+                            screenHeight = screenHeight,
+                            screenWidth = screenWidth,
+                            onClick = {
+                                safeAction {
+                                    navController.navigate(
+                                        Routes.navigateToTutorial(occasion = "Festival")
+                                    ) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+                        )
+
+                        eventCard(
+                            label = "Party",
+                            fontSize = fontSize * 0.72f,
+                            iconTint = PartyLogo,
+                            textColor = PartyText,
+                            crcColor = PartyCrc,
+                            bgColor = PartyBg,
+                            icon = Icons.Outlined.Celebration,
+                            screenHeight = screenHeight,
+                            screenWidth = screenWidth,
+                            onClick = {
+                                safeAction {
+                                    navController.navigate(
+                                        Routes.navigateToTutorial(occasion = "Party")
+                                    ) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+                        )
+
+                        eventCard(
+                            label = "Wedding",
+                            fontSize = fontSize * 0.72f,
+                            iconTint = WedLogo,
+                            textColor = WedText,
+                            crcColor = WedCrc,
+                            bgColor = WedBg,
+                            icon = Icons.Outlined.Church,
+                            screenHeight = screenHeight,
+                            screenWidth = screenWidth,
+                            onClick = {
+                                safeAction {
+                                    navController.navigate(
+                                        Routes.navigateToTutorial(occasion = "Wedding")
+                                    ) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
                         )
                     }
-                }
 
-                Spacer(modifier = Modifier.height(space))
-
-                Text(
-                    text = "Choose Your Event",
-                    fontSize = fontSize,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Heading
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.3f))
-
-                Text(
-                    text = "Get the best makeup style recommendations for every occasion",
-                    fontSize = fontSize * 0.57,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    color = BodyText,
-                    lineHeight = fontSize * 0.9f
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.3f))
-
-                Row(
-                    modifier = Modifier.horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    eventCard(
-                        label = "Office",
-                        fontSize = fontSize * 0.72f,
-                        iconTint = OfficeLogo,
-                        textColor = OfficeText,
-                        crcColor = OfficeCrc,
-                        bgColor = OfficeBg,
-                        icon = Icons.Outlined.Apartment,
-                        screenHeight = screenHeight,
-                        screenWidth = screenWidth,
-                        onClick = {
-                            safeAction{
-                                navController.navigate(
-                                    Routes.navigateToTutorial(occasion = "Office")
-                                ){
-                                    launchSingleTop = true
-                                }
-                            }
-                        }
-                    )
-
-                    eventCard(
-                        label = "Casual",
-                        fontSize = fontSize * 0.72f,
-                        iconTint = CasualLogo,
-                        textColor = CasualText,
-                        crcColor = CasualCrc,
-                        bgColor = CasualBg,
-                        icon = Icons.Outlined.Groups,
-                        screenHeight = screenHeight,
-                        screenWidth = screenWidth,
-                        onClick = {
-                            safeAction{
-                                navController.navigate(
-                                    Routes.navigateToTutorial(occasion = "Casual")
-                                ){
-                                    launchSingleTop = true
-                                }
-                            }
-                        }
-                    )
-
-                    eventCard(
-                        label = "Festival",
-                        fontSize = fontSize * 0.72f,
-                        iconTint = FestLogo,
-                        textColor = FestText,
-                        crcColor = FestCrc,
-                        bgColor = FestBg,
-                        icon = Icons.Outlined.Attractions,
-                        screenHeight = screenHeight,
-                        screenWidth = screenWidth,
-                        onClick = {
-                            safeAction{
-                                navController.navigate(
-                                    Routes.navigateToTutorial(occasion = "Festival")
-                                ){
-                                    launchSingleTop = true
-                                }
-                            }
-                        }
-                    )
-
-                    eventCard(
-                        label = "Party",
-                        fontSize = fontSize * 0.72f,
-                        iconTint = PartyLogo,
-                        textColor = PartyText,
-                        crcColor = PartyCrc,
-                        bgColor = PartyBg,
-                        icon = Icons.Outlined.Celebration,
-                        screenHeight = screenHeight,
-                        screenWidth = screenWidth,
-                        onClick = {
-                            safeAction{
-                                navController.navigate(
-                                    Routes.navigateToTutorial(occasion = "Party")
-                                ){
-                                    launchSingleTop = true
-                                }
-                            }
-                        }
-                    )
-
-                    eventCard(
-                        label = "Wedding",
-                        fontSize = fontSize * 0.72f,
-                        iconTint = WedLogo,
-                        textColor = WedText,
-                        crcColor = WedCrc,
-                        bgColor = WedBg,
-                        icon = Icons.Outlined.Church,
-                        screenHeight = screenHeight,
-                        screenWidth = screenWidth,
-                        onClick = {
-                            safeAction {
-                                navController.navigate(
-                                    Routes.navigateToTutorial(occasion = "Wedding")
-                                ) {
-                                    launchSingleTop = true
-                                }
-                            }
-                        }
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(fabSize * 2f))
-            }
-        }
-    }
-
-    if (state.showScanTooltip) {
-        Box(
-            modifier = Modifier
-                .width(screenWidth)
-                .height(screenHeight)
-                .background(Color.Black.copy(alpha = 0.6f))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) {
-                    // Opsional: Kalau mau klik di luar tooltip menutup tooltipnya
-                    homeViewModel.dismissTooltip()
-                }
-        )
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(fabSize)
-            .background(Color.Transparent)
-            .zIndex(2f),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-            if (state.showScanTooltip) {
-                ScanTooltip(
-                    text = "Click here to scan your face",
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Box(
-                    modifier = Modifier
-                        .size(fabSize)
-                        .background(Primary, CircleShape)
-                        .clickable() {
-                            safeAction {
-                                homeViewModel.dismissTooltip()
-                                navController.navigate("scan")
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ar_on_you),
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(iconSize *1.25f)
-                    )
+                    Spacer(modifier = Modifier.height(fabSize * 2f))
                 }
             }
         }
 
-    }
+        if (state.showScanTooltip) {
+            Box(
+                modifier = Modifier
+                    .width(screenWidth)
+                    .height(screenHeight)
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        // Opsional: Kalau mau klik di luar tooltip menutup tooltipnya
+                        homeViewModel.dismissTooltip()
+                    }
+            )
+        }
 
-    if (isNavigating) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .zIndex(10f) // Pastikan di atas segalanya
-                .pointerInput(Unit) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            awaitPointerEvent()
-                        }
+                .padding(fabSize)
+                .background(Color.Transparent)
+                .zIndex(2f),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                if (state.showScanTooltip) {
+                    ScanTooltip(
+                        text = "Click here to scan your face",
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .size(fabSize)
+                            .background(Primary, CircleShape)
+                            .clickable() {
+                                safeAction {
+                                    homeViewModel.dismissTooltip()
+                                    navController.navigate("scan")
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ar_on_you),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(iconSize * 1.25f)
+                        )
                     }
                 }
-        )
+            }
+
+        }
+
+        if (isNavigating) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(10f) // Pastikan di atas segalanya
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    }
+            )
+        }
     }
 }
 
@@ -531,95 +540,100 @@ fun ScanDialog(
     height: Dp,
     space: Dp
 ) {
-    Dialog (
-        onDismissRequest = { homeViewModel.dismissScanDialog() }
-    ) {
-        Card (
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = White),
-            modifier = Modifier
-                .width(width * 1.2f)
-                .height(height * 0.48f)
-                .padding(5.dp)
+    ResponsiveScale(maxFontScale = 1f) {
+        Dialog(
+            onDismissRequest = { homeViewModel.dismissScanDialog() }
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(20.dp),
-
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = White),
+                modifier = Modifier
+                    .width(width * 1.2f)
+                    .height(height * 0.48f)
+                    .padding(5.dp)
             ) {
-                Image(
-                    painter = painterResource(R.drawable.scan_your_face_first),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize(0.4f)
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(20.dp),
 
-                Text(
-                    "Scan Your Face First",
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = figtreeFontFamily,
-                    textAlign = TextAlign.Center,
-                    color = Heading,
-                    fontSize = fontSize * 0.9f
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.2f))
-
-                Text(
-                    "To receive personalized recommendations, please scan your face first.",
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = figtreeFontFamily,
-                    textAlign = TextAlign.Center,
-                    fontSize = fontSize * 0.6f
-                )
-
-                Spacer(modifier = Modifier.height(space * 1.5f))
-
-                Row {
-                    TextButton(
-                        onClick = { homeViewModel.dismissScanDialog() },
-                        modifier = Modifier
-                            .weight(0.8f)
-                            .height(48.dp)
-                            .border(
-                                width = 0.8f.dp,
-                                color = ParagraphLight,
-                                shape = RoundedCornerShape(12.dp)
-                            ),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = ParagraphLight
-                        )
                     ) {
-                        Text(
-                            text = "Skip",
-                            fontFamily = figtreeFontFamily,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = fontSize * 0.65f
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(space * 0.2f))
-
-                    Button(
-                        onClick = { homeViewModel.triggerScanTooltip() },
+                    Image(
+                        painter = painterResource(R.drawable.scan_your_face_first),
+                        contentDescription = null,
                         modifier = Modifier
-                            .weight(1f) // KUNCI: Membuat lebar tombol sama besar
-                            .height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Primary // Warna merah/pink sesuai tema kamu
-                        )
-                    ) {
-                        Text(
-                            text = "Scan Your Face",
-                            fontFamily = figtreeFontFamily,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = fontSize * 0.65f,
-                            textAlign = TextAlign.Center,
-                            color = White
-                        )
+                            .fillMaxSize(0.4f)
+                    )
+
+                    Text(
+                        "Scan Your Face First",
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = figtreeFontFamily,
+                        textAlign = TextAlign.Center,
+                        color = Heading,
+                        fontSize = fontSize * 0.9f
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.2f))
+
+                    Text(
+                        "To receive personalized recommendations, please scan your face first.",
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = figtreeFontFamily,
+                        textAlign = TextAlign.Center,
+                        fontSize = fontSize * 0.6f
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 1.5f))
+
+                    Row {
+                        TextButton(
+                            onClick = { homeViewModel.dismissScanDialog() },
+                            modifier = Modifier
+                                .weight(0.8f)
+                                .height(48.dp)
+                                .border(
+                                    width = 0.8f.dp,
+                                    color = ParagraphLight,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent,
+                                contentColor = ParagraphLight
+                            )
+                        ) {
+                            Text(
+                                text = "Skip",
+                                fontFamily = figtreeFontFamily,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = fontSize * 0.65f
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(space * 0.2f))
+
+                        Button(
+                            onClick = { homeViewModel.triggerScanTooltip() },
+                            modifier = Modifier
+                                .weight(1f) // KUNCI: Membuat lebar tombol sama besar
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Primary // Warna merah/pink sesuai tema kamu
+                            )
+                        ) {
+                            Text(
+                                text = "Scan Your Face",
+                                fontFamily = figtreeFontFamily,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = fontSize * 0.65f,
+                                textAlign = TextAlign.Center,
+                                color = White,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                softWrap = false
+                            )
+                        }
                     }
                 }
             }
@@ -632,37 +646,39 @@ fun ScanTooltip(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        Box(
-            modifier = Modifier
-                .background(Color.White, RoundedCornerShape(12.dp))
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+    ResponsiveScale(maxFontScale = 1f) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
         ) {
-            Text(
-                text = text,
-                color = Color.Black,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                fontFamily = figtreeFontFamily
+            Box(
+                modifier = Modifier
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = text,
+                    color = Color.Black,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = figtreeFontFamily
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(16.dp, 8.dp)
+                    .drawBehind() {
+                        val path = Path().apply {
+                            moveTo(0f, 0f)
+                            lineTo(size.width, 0f)
+                            lineTo(size.width / 2, size.height)
+                            close()
+                        }
+                        drawPath(path, Color.White)
+                    }
             )
         }
-
-        Box(
-            modifier = Modifier
-                .size(16.dp, 8.dp)
-                .drawBehind() {
-                    val path = Path().apply {
-                        moveTo(0f, 0f)
-                        lineTo(size.width, 0f)
-                        lineTo(size.width / 2, size.height)
-                        close()
-                    }
-                    drawPath(path, Color.White)
-                }
-        )
     }
 }
 

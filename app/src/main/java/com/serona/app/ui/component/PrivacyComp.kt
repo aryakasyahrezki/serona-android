@@ -42,6 +42,7 @@ import com.serona.app.theme.Heading
 import com.serona.app.theme.ParagraphGrey
 import com.serona.app.theme.Tertiary
 import com.serona.app.theme.figtreeFontFamily
+import com.serona.app.utils.ResponsiveScale
 
 @Composable
 fun ExpandablePrivacyItem(
@@ -52,87 +53,91 @@ fun ExpandablePrivacyItem(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = !expanded }
-            .padding(vertical = 5.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+    ResponsiveScale(maxFontScale = 1f) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .padding(vertical = 5.dp)
         ) {
-            Text(
-                text = faq.question,
-                fontSize = fontSize,
-                modifier = Modifier.weight(1f),
-                fontFamily = figtreeFontFamily,
-                fontWeight = FontWeight.Normal
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = faq.question,
+                    fontSize = fontSize,
+                    modifier = Modifier.weight(1f),
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.Normal
+                )
 
-            Icon(
-                imageVector = if (expanded)
-                    Icons.Default.KeyboardArrowUp
-                else
-                    Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                tint = Tertiary,
-                modifier = Modifier.size(iconSize)
-            )
-        }
+                Icon(
+                    imageVector = if (expanded)
+                        Icons.Default.KeyboardArrowUp
+                    else
+                        Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = Tertiary,
+                    modifier = Modifier.size(iconSize)
+                )
+            }
 
-        if (expanded) {
-            Spacer(modifier = Modifier.height((fontSize).value.dp))
-
-            Text(
-                text = faq.answer,
-                fontSize = fontSize,
-                color = Heading,
-                lineHeight = fontSize,
-                fontFamily = figtreeFontFamily,
-                fontWeight = FontWeight.Normal
-            )
-
-            if (extraPoints.isNotEmpty()) {
+            if (expanded) {
                 Spacer(modifier = Modifier.height((fontSize).value.dp))
-                Column(verticalArrangement = Arrangement.spacedBy((fontSize).value.dp)) {
-                    extraPoints.forEachIndexed { index, point ->
-                        NumberedBullet(
-                            number = (index + 1).toString(),
-                            text = point,
-                            fontSize = fontSize
-                        )
+
+                Text(
+                    text = faq.answer,
+                    fontSize = fontSize,
+                    color = Heading,
+                    lineHeight = fontSize,
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.Normal
+                )
+
+                if (extraPoints.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height((fontSize).value.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy((fontSize).value.dp)) {
+                        extraPoints.forEachIndexed { index, point ->
+                            NumberedBullet(
+                                number = (index + 1).toString(),
+                                text = point,
+                                fontSize = fontSize
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        HorizontalDivider(
-            modifier = Modifier.padding((fontSize * 0.4f).value.dp),
-            color = Grey30
-        )
+            HorizontalDivider(
+                modifier = Modifier.padding((fontSize * 0.4f).value.dp),
+                color = Grey30
+            )
+        }
     }
 }
 
 @Composable
 fun PrivacyBullet(text: String, fontSize: TextUnit, iconSize: Dp) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Default.Check,
-            contentDescription = null,
-            tint = Tertiary,
-            modifier = Modifier.size(iconSize)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text,
-            fontSize = fontSize,
-            fontFamily = figtreeFontFamily,
-            fontWeight = FontWeight.Normal,
-            lineHeight = fontSize * 1.4f
-        )
+    ResponsiveScale(maxFontScale = 1f) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                tint = Tertiary,
+                modifier = Modifier.size(iconSize)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text,
+                fontSize = fontSize,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Normal,
+                lineHeight = fontSize * 1.4f
+            )
+        }
     }
 }
 
@@ -144,35 +149,37 @@ fun PrivacyCard(
     fontSize: TextUnit,
     iconSize: Dp
 ) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        modifier = modifier
-            .height((fontSize * 6.5f).value.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        ),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding((fontSize * 0.2f).value.dp)
+    ResponsiveScale(maxFontScale = 1f) {
+        Card(
+            shape = RoundedCornerShape(8.dp),
+            modifier = modifier
+                .height((fontSize * 6.5f).value.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 6.dp
+            ),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
-
-            // Konten utama
-            Column(
+            Box(
                 modifier = Modifier
-                    .padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                    .fillMaxSize()
+                    .padding((fontSize * 0.2f).value.dp)
             ) {
-                Icon(icon, contentDescription = null)
-                Text(
-                    text,
-                    fontSize = fontSize,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    lineHeight = fontSize
-                )
+
+                // Konten utama
+                Column(
+                    modifier = Modifier
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(icon, contentDescription = null)
+                    Text(
+                        text,
+                        fontSize = fontSize,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        lineHeight = fontSize
+                    )
+                }
             }
         }
     }
@@ -185,24 +192,26 @@ fun NumberedBullet(
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalAlignment = Alignment.Top
-    ) {
-        Text(
-            text = "$number.",
-            fontSize = fontSize,
-            fontFamily = figtreeFontFamily,
-            fontWeight = FontWeight.Medium,
-        )
-        Text(
-            text = text,
-            fontSize = fontSize,
-            fontFamily = figtreeFontFamily,
-            fontWeight = FontWeight.Normal,
-            color = ParagraphGrey,
-            lineHeight = fontSize * 1.4f
-        )
+    ResponsiveScale(maxFontScale = 1f) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Text(
+                text = "$number.",
+                fontSize = fontSize,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Medium,
+            )
+            Text(
+                text = text,
+                fontSize = fontSize,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Normal,
+                color = ParagraphGrey,
+                lineHeight = fontSize * 1.4f
+            )
+        }
     }
 }

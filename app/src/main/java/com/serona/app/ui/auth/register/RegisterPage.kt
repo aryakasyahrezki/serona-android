@@ -51,6 +51,7 @@ import com.serona.app.ui.component.AuthTextField
 import com.serona.app.ui.component.RoundedCheckbox
 import com.serona.app.ui.navigation.Routes
 import com.serona.app.R
+import com.serona.app.utils.ResponsiveScale
 import com.serona.app.utils.rememberNavigationGuard
 
 @Composable
@@ -121,71 +122,74 @@ fun RegisterPage(
     val topPadding = maxWidth * 0.3f
     val space = maxHeight * 0.07f
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(brush = AuthPageGrad)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ellips_splash_bg),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        Column(
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = topPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .background(brush = AuthPageGrad)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.serona_logo),
-                contentDescription = "Serona Logo"
-            )
-            Text(
-                text = "The art of your own glow",
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                color = Color.White,
-                fontFamily = leagueSpartanFontFamily,
-                fontSize = fontSize * 0.8f,
-                letterSpacing = fontSize * 0.25f,
+                painter = painterResource(id = R.drawable.ellips_splash_bg),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
 
-            RegisterCard(navController, registerViewModel, fontSize, space, safeAction)
-
-            if(emailState != EmailVerificationState.Idle) {
-                EmailVerificationDialog(
-                    state = emailState,
-                    onDismiss = {
-                        registerViewModel.resetEmailVerificationState()
-                        resetNavigation()
-                    },
-                    onCheckVerification = { registerViewModel.checkEmailVerification() },
-                    onUseAnotherEmail = {
-                        registerViewModel.resetEmailVerificationState()
-                        registerViewModel.deleteAccount()
-                    },
-                    fontSize = fontSize,
-                    space = space,
-                    safeAction = safeAction
-                )
-            }
-        }
-
-        if (isNavigating) {
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .zIndex(100f)
-                    .background(Color.Transparent)
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                awaitPointerEvent()
+                    .fillMaxWidth()
+                    .padding(top = topPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.serona_logo),
+                    contentDescription = "Serona Logo"
+                )
+                Text(
+                    text = "The art of your own glow",
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    color = Color.White,
+                    fontFamily = leagueSpartanFontFamily,
+                    fontSize = fontSize * 0.8f,
+                    letterSpacing = fontSize * 0.25f,
+                )
+
+                RegisterCard(navController, registerViewModel, fontSize, space, safeAction)
+
+                if (emailState != EmailVerificationState.Idle) {
+                    EmailVerificationDialog(
+                        state = emailState,
+                        onDismiss = {
+                            registerViewModel.resetEmailVerificationState()
+                            resetNavigation()
+                        },
+                        onCheckVerification = { registerViewModel.checkEmailVerification() },
+                        onUseAnotherEmail = {
+                            registerViewModel.resetEmailVerificationState()
+                            registerViewModel.deleteAccount()
+                        },
+                        fontSize = fontSize,
+                        space = space,
+                        safeAction = safeAction
+                    )
+                }
+            }
+
+            if (isNavigating) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .zIndex(100f)
+                        .background(Color.Transparent)
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    awaitPointerEvent()
+                                }
                             }
                         }
-                    }
-            )
+                )
+            }
         }
     }
 }
@@ -201,181 +205,183 @@ fun RegisterCard(
 
     val form = registerViewModel.formState.observeAsState(RegisterFormState()).value
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ){
+    ResponsiveScale(maxFontScale = 1f) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-//            )
-                .background(
-                    brush = glassColor,
-                    shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
-                )
-                .padding(space * 0.5f)
+                .fillMaxSize()
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "Register",
-                    fontSize = fontSize,
-                    color = Color.White,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.5f))
-
-                AuthTextField(
-                    value = form.name,
-                    onValueChange = registerViewModel::onNameChanged,
-                    label = "Full Name",
-                    error = form.nameError,
-                    fontSize = fontSize,
-                    space = space
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.2f))
-
-                AuthTextField(
-                    value = form.email,
-                    onValueChange = registerViewModel::onEmailChanged,
-                    label = "Email",
-                    error = form.emailError,
-                    fontSize = fontSize,
-                    space = space
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.2f))
-
-                AuthPasswordField(
-                    value = form.password,
-                    onValueChange = registerViewModel::onPasswordChanged,
-                    label = "Password",
-                    error = form.passwordError,
-                    fontSize = fontSize,
-                    space = space
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.2f))
-
-                AuthPasswordField(
-                    value = form.confirmPassword,
-                    onValueChange = registerViewModel::onConfirmChanged,
-                    label = "Confirmation Password",
-                    error = form.confirmPasswordError,
-                    fontSize = fontSize,
-                    space = space
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.3f))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RoundedCheckbox(
-                        checked = form.isAgree,
-                        onCheckedChange = registerViewModel::onAgreeChange,
-                        fontSize = fontSize
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+//            )
+                    .background(
+                        brush = glassColor,
+                        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
                     )
-
-                    Spacer(modifier = Modifier.width(space * 0.1f))
-
-                    val annotatedText = buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                color = White,
-                                fontSize = fontSize * 0.7f,
-                                fontFamily = figtreeFontFamily
-                            )
-                        ) {
-                            append("I agree that my personal data will be processed in accordance with the ")
-                        }
-
-                        pushStringAnnotation(
-                            tag = "PRIVACY_POLICY",
-                            annotation = "privacy"
-                        )
-                        withStyle(
-                            style = SpanStyle(
-                                color = Primary,
-                                textDecoration = TextDecoration.Underline,
-                                fontSize = fontSize * 0.7f,
-                                fontFamily = figtreeFontFamily
-                            )
-                        ) {
-                            append("privacy policy")
-                        }
-                        pop()
-                    }
-
-                    ClickableText(
-                        text = annotatedText,
-                        style = TextStyle(
-                            color = Color.White,
-                            fontSize = fontSize * 0.4f
-                        ),
-                        onClick = { offset ->
-                            annotatedText
-                                .getStringAnnotations("PRIVACY_POLICY", offset, offset)
-                                .firstOrNull()
-                                ?.let {
-                                    safeAction {
-                                        navController.navigate("privacyPolicy") {
-                                            popUpTo(Routes.REGISTER) {
-                                                inclusive = false
-                                            }
-                                            launchSingleTop = true
-                                        }
-                                    }
-                                }
-                        }
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(space * 0.4f))
-
-                Button(
-                    enabled = form.isAgree && (form.name != "") && (form.email != "") && (form.password != "") && (form.confirmPassword != ""),
-                    onClick = {
-                        safeAction { registerViewModel.submit() }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(space * 0.8f)
-                ) {
+                    .padding(space * 0.5f)
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "Register",
+                        fontSize = fontSize,
                         color = Color.White,
-                        fontSize = fontSize * 0.8f,
                         fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.SemiBold
                     )
-                }
 
-                Spacer(modifier = Modifier.height(space * 0.1f))
+                    Spacer(modifier = Modifier.height(space * 0.5f))
 
-                Row() {
-                    Text(
-                        text = "Already have an Account ? ",
-                        color = White,
-                        fontSize = fontSize * 0.6f,
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Medium
+                    AuthTextField(
+                        value = form.name,
+                        onValueChange = registerViewModel::onNameChanged,
+                        label = "Full Name",
+                        error = form.nameError,
+                        fontSize = fontSize,
+                        space = space
                     )
 
-                    Text(
-                        text = "Login",
-                        color = Primary,
-                        fontSize = fontSize * 0.6f,
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.clickable{
-                            safeAction { navController.popBackStack() }
+                    Spacer(modifier = Modifier.height(space * 0.2f))
+
+                    AuthTextField(
+                        value = form.email,
+                        onValueChange = registerViewModel::onEmailChanged,
+                        label = "Email",
+                        error = form.emailError,
+                        fontSize = fontSize,
+                        space = space
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.2f))
+
+                    AuthPasswordField(
+                        value = form.password,
+                        onValueChange = registerViewModel::onPasswordChanged,
+                        label = "Password",
+                        error = form.passwordError,
+                        fontSize = fontSize,
+                        space = space
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.2f))
+
+                    AuthPasswordField(
+                        value = form.confirmPassword,
+                        onValueChange = registerViewModel::onConfirmChanged,
+                        label = "Confirmation Password",
+                        error = form.confirmPasswordError,
+                        fontSize = fontSize,
+                        space = space
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.3f))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RoundedCheckbox(
+                            checked = form.isAgree,
+                            onCheckedChange = registerViewModel::onAgreeChange,
+                            fontSize = fontSize
+                        )
+
+                        Spacer(modifier = Modifier.width(space * 0.1f))
+
+                        val annotatedText = buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(
+                                    color = White,
+                                    fontSize = fontSize * 0.7f,
+                                    fontFamily = figtreeFontFamily
+                                )
+                            ) {
+                                append("I agree that my personal data will be processed in accordance with the ")
+                            }
+
+                            pushStringAnnotation(
+                                tag = "PRIVACY_POLICY",
+                                annotation = "privacy"
+                            )
+                            withStyle(
+                                style = SpanStyle(
+                                    color = Primary,
+                                    textDecoration = TextDecoration.Underline,
+                                    fontSize = fontSize * 0.7f,
+                                    fontFamily = figtreeFontFamily
+                                )
+                            ) {
+                                append("privacy policy")
+                            }
+                            pop()
                         }
-                    )
+
+                        ClickableText(
+                            text = annotatedText,
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = fontSize * 0.4f
+                            ),
+                            onClick = { offset ->
+                                annotatedText
+                                    .getStringAnnotations("PRIVACY_POLICY", offset, offset)
+                                    .firstOrNull()
+                                    ?.let {
+                                        safeAction {
+                                            navController.navigate("privacyPolicy") {
+                                                popUpTo(Routes.REGISTER) {
+                                                    inclusive = false
+                                                }
+                                                launchSingleTop = true
+                                            }
+                                        }
+                                    }
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(space * 0.4f))
+
+                    Button(
+                        enabled = form.isAgree && (form.name != "") && (form.email != "") && (form.password != "") && (form.confirmPassword != ""),
+                        onClick = {
+                            safeAction { registerViewModel.submit() }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(space * 0.8f)
+                    ) {
+                        Text(
+                            text = "Register",
+                            color = Color.White,
+                            fontSize = fontSize * 0.8f,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(space * 0.1f))
+
+                    Row() {
+                        Text(
+                            text = "Already have an Account ? ",
+                            color = White,
+                            fontSize = fontSize * 0.6f,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        Text(
+                            text = "Login",
+                            color = Primary,
+                            fontSize = fontSize * 0.6f,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.clickable {
+                                safeAction { navController.popBackStack() }
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -404,138 +410,139 @@ fun EmailVerificationDialog(
         fontWeight = FontWeight.SemiBold
     )
 
-    AlertDialog(
-        modifier = Modifier.drawBehind {
-            drawRoundRect(
-                brush = ForgotPasswordBorderGrad,
-                style = Stroke(width = 3.dp.toPx()),
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(28.dp.toPx())
-            )
-        },
-        containerColor = Color(0xFFFFF2F2).copy(alpha = 0.9f),
-        onDismissRequest = {},
-        title = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "Email Verification",
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Primary,
+    ResponsiveScale(maxFontScale = 1f) {
+        AlertDialog(
+            modifier = Modifier.drawBehind {
+                drawRoundRect(
+                    brush = ForgotPasswordBorderGrad,
+                    style = Stroke(width = 3.dp.toPx()),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(28.dp.toPx())
                 )
-            }
-        },
-        text = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                when (state) {
-                    EmailVerificationState.Sending ->
-                        Text(
-                            "Sending Verification Email...",
-                            style = dialogText,
-                            fontFamily = figtreeFontFamily
-                        )
-
-                    EmailVerificationState.EmailSent ->
-                        Text(
-                            "Verification Email has been sent. Please check your inbox or spam",
-                            style = dialogText,
-                            fontFamily = figtreeFontFamily
-                        )
-
-                    EmailVerificationState.Verified ->
-                        Text(
-                            "Your email has been verified successfully!",
-                            style = dialogText,
-                            fontFamily = figtreeFontFamily
-                        )
-
-                    EmailVerificationState.NotVerified ->
-                        Text(
-                            "Email not verified yet. Please check your inbox or spam email.",
-                            style = dialogText,
-                            fontFamily = figtreeFontFamily
-                        )
-
-                    is EmailVerificationState.Error ->
-                        Text(state.message, fontFamily = figtreeFontFamily, style = dialogText)
-
-                    else -> {}
-                }
-            }
-        },
-        confirmButton = {
-            Column(){
-                if(state == EmailVerificationState.EmailSent || state == EmailVerificationState.NotVerified){
-                    Button(
-                        colors = ButtonDefaults.buttonColors(containerColor = Primary.copy(alpha = 0.8f)),
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        onClick = {
-                            safeAction { onCheckVerification() }
-                        }
-                    ) {
-                        Text(
-                            "I've Verified My Email",
-                            style = buttonText,
-                            color = White,
-                            fontFamily = figtreeFontFamily
-                        )
-                    }
-
-                    TextButton(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        onClick = {
-                            safeAction {
-                                onUseAnotherEmail()
-                                onDismiss()
-                            }
-                        }
-                    ) {
-                        Text(
-                            "Use another email",
-                            style = buttonText,
-                            color = Primary
-                        )
-                    }
-                }
-
-                if (state is EmailVerificationState.Error) {
-                    Button(
-                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            safeAction{
-                                onUseAnotherEmail()
-                                onDismiss()
-                            }
-                        }
-                    ) {
-                        Text("Back to Register", style = buttonText, color = White)
-                    }
-
+            },
+            containerColor = Color(0xFFFFF2F2).copy(alpha = 0.9f),
+            onDismissRequest = {},
+            title = {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(
-                        text = "Note: This will reset your registration so you can try again.",
-                        fontSize = fontSize * 0.5f,
+                        "Email Verification",
                         fontFamily = figtreeFontFamily,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = space * 0.2f),
-                        color = Primary.copy(alpha = 0.7f),
-                        lineHeight = fontSize * 0.4f
+                        fontWeight = FontWeight.SemiBold,
+                        color = Primary,
                     )
                 }
-            }
-        },
-        dismissButton = {}
-    )
+            },
+            text = {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    when (state) {
+                        EmailVerificationState.Sending ->
+                            Text(
+                                "Sending Verification Email...",
+                                style = dialogText,
+                                fontFamily = figtreeFontFamily
+                            )
 
+                        EmailVerificationState.EmailSent ->
+                            Text(
+                                "Verification Email has been sent. Please check your inbox or spam",
+                                style = dialogText,
+                                fontFamily = figtreeFontFamily
+                            )
 
+                        EmailVerificationState.Verified ->
+                            Text(
+                                "Your email has been verified successfully!",
+                                style = dialogText,
+                                fontFamily = figtreeFontFamily
+                            )
+
+                        EmailVerificationState.NotVerified ->
+                            Text(
+                                "Email not verified yet. Please check your inbox or spam email.",
+                                style = dialogText,
+                                fontFamily = figtreeFontFamily
+                            )
+
+                        is EmailVerificationState.Error ->
+                            Text(state.message, fontFamily = figtreeFontFamily, style = dialogText)
+
+                        else -> {}
+                    }
+                }
+            },
+            confirmButton = {
+                Column() {
+                    if (state == EmailVerificationState.EmailSent || state == EmailVerificationState.NotVerified) {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(containerColor = Primary.copy(alpha = 0.8f)),
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onClick = {
+                                safeAction { onCheckVerification() }
+                            }
+                        ) {
+                            Text(
+                                "I've Verified My Email",
+                                style = buttonText,
+                                color = White,
+                                fontFamily = figtreeFontFamily
+                            )
+                        }
+
+                        TextButton(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onClick = {
+                                safeAction {
+                                    onUseAnotherEmail()
+                                    onDismiss()
+                                }
+                            }
+                        ) {
+                            Text(
+                                "Use another email",
+                                style = buttonText,
+                                color = Primary
+                            )
+                        }
+                    }
+
+                    if (state is EmailVerificationState.Error) {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                safeAction {
+                                    onUseAnotherEmail()
+                                    onDismiss()
+                                }
+                            }
+                        ) {
+                            Text("Back to Register", style = buttonText, color = White)
+                        }
+
+                        Text(
+                            text = "Note: This will reset your registration so you can try again.",
+                            fontSize = fontSize * 0.5f,
+                            fontFamily = figtreeFontFamily,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = space * 0.2f),
+                            color = Primary.copy(alpha = 0.7f),
+                            lineHeight = fontSize * 0.4f
+                        )
+                    }
+                }
+            },
+            dismissButton = {}
+        )
+
+    }
 }
 

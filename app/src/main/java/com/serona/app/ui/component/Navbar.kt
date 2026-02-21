@@ -40,6 +40,7 @@ import com.serona.app.theme.Grey40
 import com.serona.app.theme.Primary
 import com.serona.app.theme.White
 import com.serona.app.theme.figtreeFontFamily
+import com.serona.app.utils.ResponsiveScale
 
 @Composable
 fun NavBar(
@@ -51,102 +52,103 @@ fun NavBar(
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-
-        val barHeight = screenHeight * 0.1f
-        val fabSize = barHeight * 0.8f
-        val maxWidth = screenWidth
-
-        val iconSize = barHeight * 0.3f
-        val textSize = (barHeight * 0.17f).value.sp
-
+    ResponsiveScale(maxFontScale = 1f) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(barHeight + (fabSize * 1.4f) / 2)
-        ){
-            Surface(
+        ) {
+
+            val barHeight = screenHeight * 0.1f
+            val fabSize = barHeight * 0.8f
+            val maxWidth = screenWidth
+
+            val iconSize = barHeight * 0.3f
+            val textSize = (barHeight * 0.17f).value.sp
+
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(barHeight)
-                    .align(Alignment.BottomCenter),
-                color = White,
-                shape = NavBarShape(),
-                shadowElevation = 10.dp
+                    .height(barHeight + (fabSize * 1.4f) / 2)
             ) {
-                Row(
+                Surface(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = maxWidth * 0.07f),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxWidth()
+                        .height(barHeight)
+                        .align(Alignment.BottomCenter),
+                    color = White,
+                    shape = NavBarShape(),
+                    shadowElevation = 10.dp
                 ) {
-                    NavBarItem(
-                        "Home",
-                        icon = Icons.Outlined.Home,
-                        iconSize = iconSize,
-                        textSize = textSize,
-                        selectedIndex == 0
-                    ){
-                        onItemSelected(0)
-                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = maxWidth * 0.07f),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        NavBarItem(
+                            "Home",
+                            icon = Icons.Outlined.Home,
+                            iconSize = iconSize,
+                            textSize = textSize,
+                            selectedIndex == 0
+                        ) {
+                            onItemSelected(0)
+                        }
 
-                    NavBarItem(
-                        "Tutorial",
-                        icon = Icons.Outlined.Book,
-                        iconSize = iconSize,
-                        textSize = textSize,
-                        selectedIndex == 1
-                    ){
-                        onItemSelected(1)
-                    }
+                        NavBarItem(
+                            "Tutorial",
+                            icon = Icons.Outlined.Book,
+                            iconSize = iconSize,
+                            textSize = textSize,
+                            selectedIndex == 1
+                        ) {
+                            onItemSelected(1)
+                        }
 
-                    Spacer(modifier = Modifier.width(iconSize))
+                        Spacer(modifier = Modifier.width(iconSize))
 
-                    NavBarItem(
-                        "Favorite",
-                        icon = Icons.Outlined.FavoriteBorder,
-                        iconSize = iconSize,
-                        textSize = textSize,
-                        selectedIndex == 2
-                    ){
-                        onItemSelected(2)
-                    }
+                        NavBarItem(
+                            "Favorite",
+                            icon = Icons.Outlined.FavoriteBorder,
+                            iconSize = iconSize,
+                            textSize = textSize,
+                            selectedIndex == 2
+                        ) {
+                            onItemSelected(2)
+                        }
 
-                    NavBarItem(
-                        "Profile",
-                        icon = Icons.Outlined.PersonOutline,
-                        iconSize = iconSize,
-                        textSize = textSize,
-                        selectedIndex == 3
-                    ){
-                        onItemSelected(3)
+                        NavBarItem(
+                            "Profile",
+                            icon = Icons.Outlined.PersonOutline,
+                            iconSize = iconSize,
+                            textSize = textSize,
+                            selectedIndex == 3
+                        ) {
+                            onItemSelected(3)
+                        }
                     }
                 }
-            }
 
-            FloatingActionButton(
-                onClick = onCenterClick,
-                containerColor = Primary,
-                modifier = Modifier
-                    .size(fabSize)
-                    .align(Alignment.TopCenter),
-                shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(8.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ar_on_you),
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(iconSize * 1.25f)
-                )
+                FloatingActionButton(
+                    onClick = onCenterClick,
+                    containerColor = Primary,
+                    modifier = Modifier
+                        .size(fabSize)
+                        .align(Alignment.TopCenter),
+                    shape = CircleShape,
+                    elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ar_on_you),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(iconSize * 1.25f)
+                    )
+                }
             }
         }
     }
-
 }
 
 @Composable
@@ -160,22 +162,24 @@ fun NavBarItem(
 ) {
     val color = if (selected) Primary else Grey40
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable{onClick()}
-    ) {
-        Icon(
-            icon,
-            contentDescription = label,
-            tint = color,
-            modifier = Modifier.size(iconSize)
-        )
-        Text(
-            text = label,
-            fontSize = textSize,
-            fontFamily = figtreeFontFamily,
-            fontWeight = FontWeight.Medium,
-            color = color
-        )
+    ResponsiveScale(maxFontScale = 1f) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.clickable { onClick() }
+        ) {
+            Icon(
+                icon,
+                contentDescription = label,
+                tint = color,
+                modifier = Modifier.size(iconSize)
+            )
+            Text(
+                text = label,
+                fontSize = textSize,
+                fontFamily = figtreeFontFamily,
+                fontWeight = FontWeight.Medium,
+                color = color
+            )
+        }
     }
 }

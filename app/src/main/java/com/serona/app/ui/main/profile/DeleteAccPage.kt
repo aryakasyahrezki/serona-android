@@ -53,6 +53,7 @@ import com.serona.app.theme.Primary
 import com.serona.app.theme.Tertiary
 import com.serona.app.theme.White
 import com.serona.app.theme.figtreeFontFamily
+import com.serona.app.utils.ResponsiveScale
 
 @Composable
 fun DeleteAccPage(
@@ -84,124 +85,126 @@ fun DeleteAccPage(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(brush = BgGrad)
-            .padding(horizontal = horiPadding, vertical = vertiPadding),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-                .padding(horizontal = horiPadding * 0.5f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+    ResponsiveScale(maxFontScale = 1f) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(brush = BgGrad)
+                .padding(horizontal = horiPadding, vertical = vertiPadding),
         ) {
-
-            Text(
-                text = "Delete Account",
-                color = Tertiary,
-                fontSize = fontSize,
-                fontFamily = figtreeFontFamily,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            Spacer(modifier = Modifier.height(space * 1.8f))
-
-            Box(
-                modifier = Modifier
-                    .size(iconSize * 2.3f)
-                    .background(
-                        color = Primary,
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .padding(horizontal = horiPadding * 0.5f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = null,
-                    tint = White,
-                    modifier = Modifier.size(iconSize)
-                )
-            }
 
-            Spacer(modifier = Modifier.height(space * 1.8f))
-
-            Text(
-                text = "Are you sure ?",
-                fontSize = fontSize,
-                fontFamily = figtreeFontFamily,
-                fontWeight = FontWeight.SemiBold,
-                color = Tertiary
-            )
-
-            Spacer(modifier = Modifier.height(space * 0.5f))
-
-            Text(
-                text = "If you delete your account, all your data, such as your profile, preferences, and usage history, will be permanently removed.",
-                fontSize = fontSize * 0.58f,
-                color = Heading,
-                fontFamily = figtreeFontFamily,
-                fontWeight = FontWeight.Normal,
-                textAlign = TextAlign.Center,
-                lineHeight = 20.sp
-            )
-
-            Spacer(modifier = Modifier.height(space * 0.5f))
-
-            Text(
-                text = "Are you sure you want to delete your account?",
-                fontSize = fontSize * 0.58f,
-                fontFamily = figtreeFontFamily,
-                fontWeight = FontWeight.Normal,
-                color = Color.DarkGray,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(space * 1.3f))
-
-            Button(
-                onClick = { showDialog = true },
-                enabled = !isLoading,
-                colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(maxHeight * 0.055f),
-                shape = RoundedCornerShape(8.dp)
-            ) {
                 Text(
-                    text = if (isLoading) "Deleting..." else "Delete Account",
-                    color = Color.White,
+                    text = "Delete Account",
+                    color = Tertiary,
+                    fontSize = fontSize,
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(modifier = Modifier.height(space * 1.8f))
+
+                Box(
+                    modifier = Modifier
+                        .size(iconSize * 2.3f)
+                        .background(
+                            color = Primary,
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = null,
+                        tint = White,
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(space * 1.8f))
+
+                Text(
+                    text = "Are you sure ?",
+                    fontSize = fontSize,
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Tertiary
+                )
+
+                Spacer(modifier = Modifier.height(space * 0.5f))
+
+                Text(
+                    text = "If you delete your account, all your data, such as your profile, preferences, and usage history, will be permanently removed.",
+                    fontSize = fontSize * 0.58f,
+                    color = Heading,
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 20.sp
+                )
+
+                Spacer(modifier = Modifier.height(space * 0.5f))
+
+                Text(
+                    text = "Are you sure you want to delete your account?",
+                    fontSize = fontSize * 0.58f,
+                    fontFamily = figtreeFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.DarkGray,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(space * 1.3f))
+
+                Button(
+                    onClick = { showDialog = true },
+                    enabled = !isLoading,
+                    colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(maxHeight * 0.055f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = if (isLoading) "Deleting..." else "Delete Account",
+                        color = Color.White,
+                        fontFamily = figtreeFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = fontSize * 0.65f
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(space * 0.5f))
+
+                Text(
+                    text = "Cancel",
+                    color = Primary,
                     fontFamily = figtreeFontFamily,
                     fontWeight = FontWeight.Bold,
-                    fontSize = fontSize * 0.65f
+                    fontSize = fontSize * 0.65f,
+                    modifier = Modifier
+                        .clickable { onCancel() }
                 )
             }
 
-            Spacer(modifier = Modifier.height(space * 0.5f))
-
-            Text(
-                text = "Cancel",
-                color = Primary,
-                fontFamily = figtreeFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = fontSize * 0.65f,
-                modifier = Modifier
-                    .clickable { onCancel() }
-            )
-        }
-
-        if (showDialog) {
-            DeleteAccountDialog(
-                onConfirm = { inputPassword ->
-                    // Memanggil fungsi delete yang butuh password
-                    viewModel.deleteAccount(inputPassword, onDeleteConfirm)
-                    showDialog = false
-                },
-                onDismiss = { showDialog = false },
-                isLoading = isLoading,
-                fontSize = fontSize,
-                space = space
-            )
+            if (showDialog) {
+                DeleteAccountDialog(
+                    onConfirm = { inputPassword ->
+                        // Memanggil fungsi delete yang butuh password
+                        viewModel.deleteAccount(inputPassword, onDeleteConfirm)
+                        showDialog = false
+                    },
+                    onDismiss = { showDialog = false },
+                    isLoading = isLoading,
+                    fontSize = fontSize,
+                    space = space
+                )
+            }
         }
     }
 }
@@ -218,84 +221,96 @@ fun DeleteAccountDialog(
 
     val buttonHeight = (fontSize * 1.5f).value.dp
 
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(24.dp),
-            color = White,
-            modifier = Modifier.fillMaxWidth(0.95f).wrapContentHeight()
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(space * 0.5f)
+    ResponsiveScale(maxFontScale = 1f) {
+        Dialog(onDismissRequest = onDismiss) {
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = White,
+                modifier = Modifier.fillMaxWidth(0.95f).wrapContentHeight()
             ) {
-
-                Text(
-                    text = "Confirm Password",
-                    fontSize = fontSize * 0.7f,
-                    fontFamily = figtreeFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    color = Primary
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.3f))
-
-                Text(
-                    text = "Please enter your password to permanently delete your account.",
-                    fontSize = fontSize * 0.5f,
-                    color = Color.Gray,
-                    fontFamily = figtreeFontFamily,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.5f))
-
-                // --- Input Password ---
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    placeholder = { Text("Enter your password", fontFamily = figtreeFontFamily, fontSize = fontSize * 0.6f, color = MutedLight) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(), // Sensor password
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Primary,
-                        unfocusedBorderColor = Color.LightGray
-                    ),
-                    textStyle = androidx.compose.ui.text.TextStyle(
-                        fontSize = fontSize * 0.5f,
-                        fontFamily = figtreeFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        color = MutedLight
-                    ),
-                )
-
-                Spacer(modifier = Modifier.height(space * 0.8f))
-
-                Button(
-                    onClick = { onConfirm(password) },
-                    enabled = !isLoading && password.isNotBlank(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Primary, disabledContainerColor = Primary.copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth().height(buttonHeight)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(space * 0.5f)
                 ) {
-                    Text(
-                        text = if (isLoading) "Processing..." else "Delete Permanently",
-                        color = White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = fontSize * 0.6f,
-                        fontFamily = figtreeFontFamily
-                    )
-                }
 
-                TextButton(onClick = onDismiss) {
                     Text(
-                        "Cancel",
-                        color = Primary,
+                        text = "Confirm Password",
+                        fontSize = fontSize * 0.7f,
+                        fontFamily = figtreeFontFamily,
                         fontWeight = FontWeight.Bold,
-                        fontSize = fontSize * 0.6f,
-                        fontFamily = figtreeFontFamily
+                        color = Primary
                     )
+
+                    Spacer(modifier = Modifier.height(space * 0.3f))
+
+                    Text(
+                        text = "Please enter your password to permanently delete your account.",
+                        fontSize = fontSize * 0.5f,
+                        color = Color.Gray,
+                        fontFamily = figtreeFontFamily,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.5f))
+
+                    // --- Input Password ---
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        placeholder = {
+                            Text(
+                                "Enter your password",
+                                fontFamily = figtreeFontFamily,
+                                fontSize = fontSize * 0.6f,
+                                color = MutedLight
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(), // Sensor password
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Primary,
+                            unfocusedBorderColor = Color.LightGray
+                        ),
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = fontSize * 0.5f,
+                            fontFamily = figtreeFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            color = MutedLight
+                        ),
+                    )
+
+                    Spacer(modifier = Modifier.height(space * 0.8f))
+
+                    Button(
+                        onClick = { onConfirm(password) },
+                        enabled = !isLoading && password.isNotBlank(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Primary,
+                            disabledContainerColor = Primary.copy(alpha = 0.5f)
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().height(buttonHeight)
+                    ) {
+                        Text(
+                            text = if (isLoading) "Processing..." else "Delete Permanently",
+                            color = White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = fontSize * 0.6f,
+                            fontFamily = figtreeFontFamily
+                        )
+                    }
+
+                    TextButton(onClick = onDismiss) {
+                        Text(
+                            "Cancel",
+                            color = Primary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = fontSize * 0.6f,
+                            fontFamily = figtreeFontFamily
+                        )
+                    }
                 }
             }
         }
