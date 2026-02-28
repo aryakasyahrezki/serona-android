@@ -1,6 +1,8 @@
 package com.serona.app.ui.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -94,6 +96,7 @@ fun EditProfileField(
                 expanded = expanded && isDropdown,
                 onExpandedChange = {
                     if (isDropdown) expanded = !expanded
+                    if (!expanded) focusManager.clearFocus()
                 }
             ) {
                 OutlinedTextField(
@@ -157,7 +160,6 @@ fun EditProfileField(
                     shape = RoundedCornerShape(15.dp),
                 )
 
-
                 if (expanded) {
                     Popup(
                         alignment = Alignment.TopEnd,
@@ -200,6 +202,7 @@ fun EditProfileField(
                                     onClick = {
                                         onDropdownItemSelected(item)
                                         expanded = false
+                                        focusManager.clearFocus()
                                     }
                                 )
                             }
