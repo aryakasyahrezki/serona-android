@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "344062899272",
+    "project_id": "serona-project-b26b1",
+    "storage_bucket": "serona-project-b26b1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:344062899272:android:bbbeba8ec112a53d48d47d",
+        "android_client_info": {
+          "package_name": "com.example.serona"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAx2p9SJCcrwFioTwLH0xK5gyEM1Z0qulM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:344062899272:android:8aaa655014f3c95948d47d",
+        "android_client_info": {
+          "package_name": "com.serona.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAx2p9SJCcrwFioTwLH0xK5gyEM1Z0qulM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
