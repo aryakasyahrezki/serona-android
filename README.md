@@ -1,73 +1,100 @@
-# 📱 Serona Frontend (Android App)
+# 📱 Serona Android - Mobile App
 
-> **Serona** is an AI-powered personal makeup assistant. This repository contains the **Frontend** mobile application built with **Kotlin** and **Jetpack Compose**, serving as the primary user interface for real-time face analysis and beauty recommendations.
+> Mobile application for **Serona**, an AI-powered personal makeup assistant that provides real-time face analysis and personalized beauty recommendations.
 
----
+![Kotlin](https://img.shields.io/badge/Kotlin-1.9-7F52FF)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-1.5-4285F4)
+![Min SDK](https://img.shields.io/badge/Min_SDK-24-3DDC84)
+![Target SDK](https://img.shields.io/badge/Target_SDK-34-3DDC84)
 
-## 🛠 Built With
-
-- **Kotlin 1.9** & **Jetpack Compose** (Modern UI)
-- **CameraX** (Real-time Frame Processing)
-- **Dagger Hilt** (Dependency Injection)
-- **Retrofit 2.9** (Network Orchestration)
-- **Material 3** (User Experience)
+**Built with:** Kotlin • Jetpack Compose • CameraX • Retrofit • Hilt
 
 ---
 
 ## 📖 What is Serona?
 
-**Serona** helps users discover makeup styles suited to their unique features. Using the device's camera, the app performs **live real-time scanning**. The ML model continuously analyzes face shape and skin tone, updating predictions automatically.
+**Serona** is an Android app that helps users discover makeup styles suited to their unique features through **live real-time face scanning**.
 
-Once the user clicks **"See Result"**, the app provides:
+**Key Features:**
+1. **Live face shape detection** — Heart, Oblong, Oval, Round, Square
+2. **Skin tone analysis** — Fair Light, Medium Tan, Deep
+3. **Personalized recommendations** — Makeup tutorials tailored to face shape and skin tone
 
-- Detailed face shape classification  
-- Skin tone analysis  
-- Personalized step-by-step makeup tutorial recommendations  
-
-### ✨ Core Features
-
-1. **Live Face Scanning** — Real-time detection (Heart, Oblong, Oval, Round, Square)
-2. **Skin Tone Detection** — Regional color analysis (Fair Light, Medium Tan, Deep)
-3. **Personalized Tutorials** — Tailored articles based on combined analysis
-
-🔗 [Download on Google Playstore](https://play.google.com/store/apps/details?id=com.serona.app)
+🔗 [Download on Google Play Store](https://play.google.com/store/apps/details?id=com.serona.app&pcampaignid=web_share)
 
 ---
 
-# ⚙️ Local Installation & Setup
+## ⚡ Quick Start (This App Only)
 
-Follow these steps in order to ensure the environment is ready before running the Android app.
+### Prerequisites
+- Android Studio (Otter 2025.2.1 or newer)
+- Android Emulator or Physical Device
+- Backend services running (see Complete System Setup below)
 
-## Prerequisites
-- Docker & Docker Compose installed
-- Android Studio installed
-- Git installed
+### Run in Android Studio
+```bash
+# Clone repository
+git clone https://github.com/aryakasyahrezki/serona-android.git
+cd serona-android
 
-## 🧩 Step 1: Clone All Repositories & Run Services
+# Open in Android Studio
+# File → Open → Select serona-android folder
 
-You need the entire **Serona ecosystem** (ML, Backend, and Android) to run the project locally. You only need to complete Steps 1 and 2 if the ML service and Backend are not already running.
-If both services are already running locally (via Docker), you may skip directly to Step 3.
+# Select Build Variant: debug
+# View → Tool Windows → Build Variants → Set :app to debug
 
-### 1️⃣ Clone and Run Serona ML Service
+# Run app (Shift + F10)
+```
+
+**Note:** This assumes backend services (ML + Backend) are already running. If not, see Complete System Setup below.
+
+---
+
+## 🔗 Running Complete Serona System
+
+> **Note:** To use the app, you need all services running (ML + Backend + Android). Follow the steps below to set up the complete system.
+
+### System Architecture
+```
+Android App (serona-android)
+    ├─→ ML API (serona-ml) :8000
+    │   └─→ Returns face shape + skin tone
+    │
+    └─→ Backend API (serona-backend) :8080
+        └─→ Stores user data + provides articles
+```
+
+**Note:** ML API and Backend API are independent services. The Android app communicates with both separately.
+
+---
+
+### Prerequisites
+- Docker & Docker Compose
+- Android Studio (Otter 2025.2.1+)
+- Git
+
+---
+
+### Step 1: Start ML Service
 ```bash
 # Clone ML repository
 git clone https://github.com/aryakasyahrezki/serona-ml.git
 cd serona-ml
 
-# Build Docker image
+# Build and run
 docker build -t serona-ml .
-
-# Run container (detached mode)
 docker run -d -p 8000:8000 --name serona-ml-api serona-ml
 
-# Verify it's running
+# Verify
 curl http://localhost:8000/
-# Expected: {"status":"online","service":"Serona AI",...}
+# Expected: {"status":"online",...}
 ```
 
-### 2️⃣ Clone and Run Serona Backend (Laravel)
+---
+
+### Step 2: Start Backend Service
 ```bash
-# Go back to parent directory
+# Navigate to parent directory
 cd ..
 
 # Clone backend repository
@@ -76,129 +103,132 @@ cd serona-backend
 
 # Copy environment file
 copy .env.example .env
-# Note: Docker will override database configuration automatically
 
-# Build and run containers (Laravel + MySQL)
+# Build and run (Laravel + MySQL)
 docker compose up -d --build
 
-# Verify backend is running
+# Wait ~30 seconds for migrations to complete
+
+# Verify
 curl http://localhost:8080/
-# Expected: Laravel response or API home page
+# Expected: Laravel response
 ```
 
-### 3️⃣ Clone Serona Android App
+---
+
+### Step 3: Run Android App
 ```bash
-# Go back to parent directory
+# Navigate to parent directory
 cd ..
 
 # Clone Android repository
 git clone https://github.com/aryakasyahrezki/serona-android.git
 cd serona-android
 
-# Open project in Android Studio
-# (Continue to next section for Android setup)
+# Open in Android Studio
+# File → Open → Select serona-android folder
 ```
 
 ---
 
-## 🔧 Step 2: Configure Android Build Variant
+### Step 4: Setup Port Forwarding
 
-1. Open the `serona-android` project in **Android Studio (Otter | 2025.2.1 or newer)**  
-2. Go to: `View` → `Tool Windows` → `Build Variants`
+**Android devices cannot access `localhost` directly. Run the connection script:**
 
-
-3. Set the **Active Build Variant** for the `:app` module to: `debug`
-
-This ensures the app communicates with your local Docker containers using: `http://127.0.0.1:8080/api/`
-
----
-
-## 🔁 Step 3: Execute the Network Bridge
-
-The app uses `127.0.0.1` to access local services.  
-You must bridge ports from your laptop to your device using `adb reverse`.
-
-Run the script located in the root folder:
-
-### Option A: Double Click
-- Locate `connect_to_docker.bat`
-- Double-click the file
-
-### Option B: Via Terminal
-
-```powershell
-./connect_to_docker.bat
+**Windows:**
+```bash
+connect_to_docker.bat
 ```
 
+**Mac/Linux:**
+```bash
+./connect_to_docker.sh
+```
+
+This forwards device ports to your computer:
+- Port 8080 (Backend) → `http://127.0.0.1:8080`
+- Port 8000 (ML API) → `http://127.0.0.1:8000`
+
 ---
 
-## 🚀 Step 4: Connect & Run the App
+### Step 5: Configure Camera (Emulator Only)
 
-You can use either:
+If using Android Emulator for face scanning:
 
-- **Android Emulator**
-- **Physical Smartphone (USB Cable)**
+1. **Device Manager** → Edit AVD
+2. **Show Advanced Settings**
+3. **Camera** → Front Camera → Webcam0
+4. **Finish**
 
 ---
 
-### 🖥 Option 1: Android Emulator (Webcam Setup)
+### Step 6: Run App
 
-To enable real-time scanning:
+1. **Select Build Variant:** View → Build Variants → Set `:app` to `debug`
+2. **Run:** Click Run (▶️) or press Shift+F10
+3. **Test:**
+   - Register new account
+   - Login
+   - Open camera for face scan
+   - View results and recommendations
 
-1. Open **Device Manager** in Android Studio  
-2. Click **Edit (pencil icon)** on your AVD  
-3. Select **Show Advanced Settings**  
-4. Scroll to **Camera**  
-5. Set: `Front Camera` → `Webcam0`
-6. Click **Finish**
-7. Start the emulator
-8. Click **Run** in Android Studio
+---
 
+### Verification Checklist
 
+After starting all services:
 
-### 📱 Option 2: Physical Device (USB)
+- [ ] ML API running: http://localhost:8000
+- [ ] Backend running: http://localhost:8080
+- [ ] Port forwarding active: Run `adb reverse --list`
+- [ ] Android app opens without crashes
+- [ ] Face scan works and returns predictions
 
-1. Connect your phone via USB  
-2. Enable **USB Debugging** in Developer Options  
-3. Run `connect_to_docker.bat`  
-4. Select your device in Android Studio  
-5. Click **Run**
+### Service Ports
 
+| Service | Port | Desktop URL | Android Emulator URL |
+|---------|------|-------------|---------------------|
+| ML API | 8000 | http://localhost:8000 | http://127.0.0.1:8000 |
+| Backend | 8080 | http://localhost:8080 | http://127.0.0.1:8080 |
+| Database | 3306 | localhost:3306 | - |
 
+---
 
-## 🔐 Build Variant Logic
+## 🔐 Build Variants
 
-| Variant  | Target Environment       | API Base URL                              |
-|----------|-------------------------|-------------------------------------------|
-| Debug    | Local Docker Containers | http://127.0.0.1:8080/api/                |
-| Release  | Production (Azure)      | https://serona.azurewebsites.net/api/     |
+| Variant | Environment | API Base URL |
+|---------|-------------|--------------|
+| **debug** | Local Docker | http://127.0.0.1:8080/api/ |
+| **release** | Production | https://serona.azurewebsites.net/api/ |
 
-> ⚠️ If you encounter a **"User Not Found"** error in Debug mode, register a new account locally because your local MySQL database starts empty.
+**Note:** In debug mode, you must register a new account since the local database starts empty.
 
 ---
 
 ## 🔗 Related Repositories
 
-| Repository        | Role                              | Link |
-|------------------|-----------------------------------|------|
-| serona-backend   | Business Logic & Articles         | https://github.com/aryakasyahrezki/serona-backend |
-| serona-ml        | Face Shape & Skin Tone Analysis   | https://github.com/aryakasyahrezki/serona-ml |
-| serona-android   | Mobile UI (This Repository)       | https://github.com/aryakasyahrezki/serona-android |
+| Repository | Description | Link |
+|------------|-------------|------|
+| **serona-ml** | ML API for face analysis | [serona-ml](https://github.com/aryakasyahrezki/serona-ml) |
+| **serona-backend** | Backend API & database | [serona-backend](https://github.com/aryakasyahrezki/serona-backend) |
+| **serona-android** | Android mobile app ← *You are here* | [serona-android](https://github.com/aryakasyahrezki/serona-android) |
 
 ---
 
-## 👥 Team — Group 5 (DINAS Group)
+## 👥 Team
 
-| Name                               | Student ID  |
-|------------------------------------|-------------|
-| Aryaka Syahrezki                   | 2802540244  |
-| Dea Audreyla Hadi                  | 2802540074  |
+**Group 5 — DINAS**
+
+| Name | Student ID |
+|------|-----------|
+| Aryaka Syahrezki | 2802540244 |
+| Dea Audreyla Hadi | 2802540074 |
 | I Gusti Ngurah Radithya Bagus Santosa | 2802538675 |
-| Iyurichie Lay                      | 2802539980  |
-| Shinta Aulia                       | 2802538731  |
+| Iyurichie Lay | 2802539980 |
+| Shinta Aulia | 2802538731 |
 
 ---
 
-# 📄 License
+## 📄 License
 
-This project is developed for academic purposes — **Bina Nusantara University**
+This project is for academic purposes — Bina Nusantara University.
