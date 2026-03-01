@@ -25,15 +25,20 @@ android {
     }
 
     buildTypes {
-        release {
-            // isMinifyEnabled tetap false untuk debugging, ubah ke true saat sudah rilis final
+        getByName("debug") {
+            buildConfigField("String", "BASE_URL_USER", "\"http://127.0.0.1:8080/api/\"")
+            buildConfigField("String", "BASE_URL_ML", "\"https://127.0.0.1:8000/\"")
+        }
+
+        getByName("release") {
+            buildConfigField("String", "BASE_URL_USER", "\"https://serona.azurewebsites.net/api/\"")
+            buildConfigField("String", "BASE_URL_ML", "\"https://serona-ml.wittysmoke-32718122.southeastasia.azurecontainerapps.io/\"")
+
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -43,6 +48,7 @@ android {
         jvmTarget = "17"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     composeOptions {

@@ -94,6 +94,9 @@ fun RegisterPage(
             is EmailVerificationState.NotVerified -> {
                 resetNavigation()
             }
+            is EmailVerificationState.Error -> {
+                resetNavigation()
+            }
             else -> Unit
         }
     }
@@ -170,7 +173,8 @@ fun RegisterPage(
                         },
                         fontSize = fontSize,
                         space = space,
-                        safeAction = safeAction
+                        safeAction = safeAction,
+                        resetNavigation = resetNavigation
                     )
                 }
             }
@@ -396,7 +400,8 @@ fun EmailVerificationDialog(
     onDismiss: () -> Unit,
     onCheckVerification: () -> Unit,
     onUseAnotherEmail: () -> Unit,
-    safeAction: (action: () -> Unit) -> Unit
+    safeAction: (action: () -> Unit) -> Unit,
+    resetNavigation: () -> Unit
 ) {
     val dialogText = TextStyle(
         fontFamily = figtreeFontFamily,
@@ -517,6 +522,7 @@ fun EmailVerificationDialog(
                             colors = ButtonDefaults.buttonColors(containerColor = Primary),
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
+                                resetNavigation()
                                 safeAction {
                                     onUseAnotherEmail()
                                     onDismiss()

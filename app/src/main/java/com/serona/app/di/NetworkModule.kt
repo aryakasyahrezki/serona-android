@@ -1,5 +1,6 @@
 package com.serona.app.di
 
+import com.serona.app.BuildConfig
 import com.serona.app.data.api.UserApi
 import com.serona.app.data.api.TutorialApi
 import com.serona.app.data.api.FaceAnalysisApi
@@ -52,7 +53,7 @@ object NetworkModule {
     @Singleton
     fun provideUserRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://serona.azurewebsites.net/api/")
+            .baseUrl(BuildConfig.BASE_URL_USER)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -64,7 +65,7 @@ object NetworkModule {
     @Singleton
     fun provideFaceAnalysisRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://serona-ml.wittysmoke-32718122.southeastasia.azurecontainerapps.io/")
+            .baseUrl(BuildConfig.BASE_URL_ML)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
