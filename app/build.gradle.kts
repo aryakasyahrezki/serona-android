@@ -27,7 +27,7 @@ android {
     buildTypes {
         getByName("debug") {
             buildConfigField("String", "BASE_URL_USER", "\"http://127.0.0.1:8080/api/\"")
-            buildConfigField("String", "BASE_URL_ML", "\"https://127.0.0.1:8000/\"")
+            buildConfigField("String", "BASE_URL_ML", "\"http://127.0.0.1:8000/\"")
         }
 
         getByName("release") {
