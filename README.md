@@ -38,8 +38,6 @@ Once the user clicks **"See Result"**, the app provides:
 
 Follow these steps in order to ensure the environment is ready before running the Android app.
 
----
-
 ## Prerequisites
 - Docker & Docker Compose installed
 - Android Studio installed
@@ -67,8 +65,6 @@ curl http://localhost:8000/
 # Expected: {"status":"online","service":"Serona AI",...}
 ```
 
----
-
 ### 2️⃣ Clone and Run Serona Backend (Laravel)
 ```bash
 # Go back to parent directory
@@ -89,8 +85,6 @@ docker compose up -d --build
 curl http://localhost:8080/
 # Expected: Laravel response or API home page
 ```
-
----
 
 ### 3️⃣ Clone Serona Android App
 ```bash
