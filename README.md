@@ -42,24 +42,39 @@ Follow these steps in order to ensure the environment is ready before running th
 
 ## 🧩 Step 1: Clone All Repositories & Run Services
 
-You need the entire **Serona ecosystem** (ML, Backend, and Android) to run the project locally.
+You need the entire **Serona ecosystem** (ML, Backend, and Android) to run the project locally. You only need to complete Steps 1 and 2 if the ML service and Backend are not already running.
+If both services are already running locally (via Docker), you may skip directly to Step 3.
 
+#### 1️⃣ Clone and run Serona ML Service
 ```bash
-# 1️⃣ Clone and run Serona ML Service
 git clone https://github.com/aryakasyahrezki/serona-ml.git
 cd serona-ml
-docker-compose up -d --build
+# Build image
+docker build -t serona-ml
+# Run container
+docker run -p 8000:8000 serona-ml
+# API available at http://localhost:8000
+```
 
-# 2️⃣ Clone and run Serona Backend (Laravel)
-cd ..
+#### 2️⃣ Clone and run Serona Backend (Laravel)
+```bash
 git clone https://github.com/aryakasyahrezki/serona-backend.git
 cd serona-backend
 
-# Copy .env.example → .env and configure if needed
-docker-compose up -d --build
+# Copy Environment File
+copy .env.example .env
+# No manual configuration needed.
+# Docker will override database configuration automatically.
 
-# 3️⃣ Clone Serona Android (This Repo)
-cd ..
+# Generate Application Key
+docker compose run --rm app php artisan key:generate
+
+# Build and Run Containers
+docker compose up --build
+```
+
+#### 3️⃣ Clone Serona Android (This Repo)
+```bash
 git clone https://github.com/aryakasyahrezki/serona-android.git
 ```
 
