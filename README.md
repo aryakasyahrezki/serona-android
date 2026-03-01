@@ -40,42 +40,69 @@ Follow these steps in order to ensure the environment is ready before running th
 
 ---
 
+## Prerequisites
+- Docker & Docker Compose installed
+- Android Studio installed
+- Git installed
+
 ## 🧩 Step 1: Clone All Repositories & Run Services
 
 You need the entire **Serona ecosystem** (ML, Backend, and Android) to run the project locally. You only need to complete Steps 1 and 2 if the ML service and Backend are not already running.
 If both services are already running locally (via Docker), you may skip directly to Step 3.
 
-#### 1️⃣ Clone and run Serona ML Service
+### 1️⃣ Clone and Run Serona ML Service
 ```bash
+# Clone ML repository
 git clone https://github.com/aryakasyahrezki/serona-ml.git
 cd serona-ml
-# Build image
-docker build -t serona-ml
-# Run container
-docker run -p 8000:8000 serona-ml
-# API available at http://localhost:8000
+
+# Build Docker image
+docker build -t serona-ml .
+
+# Run container (detached mode)
+docker run -d -p 8000:8000 --name serona-ml-api serona-ml
+
+# Verify it's running
+curl http://localhost:8000/
+# Expected: {"status":"online","service":"Serona AI",...}
 ```
 
-#### 2️⃣ Clone and run Serona Backend (Laravel)
+---
+
+### 2️⃣ Clone and Run Serona Backend (Laravel)
 ```bash
+# Go back to parent directory
+cd ..
+
+# Clone backend repository
 git clone https://github.com/aryakasyahrezki/serona-backend.git
 cd serona-backend
 
-# Copy Environment File
+# Copy environment file
 copy .env.example .env
-# No manual configuration needed.
-# Docker will override database configuration automatically.
+# Note: Docker will override database configuration automatically
 
-# Generate Application Key
-docker compose run --rm app php artisan key:generate
+# Build and run containers (Laravel + MySQL)
+docker compose up -d --build
 
-# Build and Run Containers
-docker compose up --build
+# Verify backend is running
+curl http://localhost:8080/
+# Expected: Laravel response or API home page
 ```
 
-#### 3️⃣ Clone Serona Android (This Repo)
+---
+
+### 3️⃣ Clone Serona Android App
 ```bash
+# Go back to parent directory
+cd ..
+
+# Clone Android repository
 git clone https://github.com/aryakasyahrezki/serona-android.git
+cd serona-android
+
+# Open project in Android Studio
+# (Continue to next section for Android setup)
 ```
 
 ---
