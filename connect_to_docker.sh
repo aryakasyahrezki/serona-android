@@ -1,36 +1,67 @@
 #!/bin/bash
 
-# Define ADB path based on OS (macOS or Linux)
+echo "==================================================="
+echo "   ANDROID TO DOCKER - AUTO SETUP AND REVERSE"
+echo "==================================================="
+
+# 1. Deteksi OS dan Tentukan lokasi standar ADB
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    # Default path for macOS
-    ADB_PATH="$HOME/Library/Android/sdk/platform-tools/adb"
+    SDK_PATH="$HOME/Library/Android/sdk/platform-tools"
+    # Default Mac sekarang pakai .zshrc
+    CONF_FILE="$HOME/.zshrc"
+    [[ ! -f "$CONF_FILE" ]] && CONF_FILE="$HOME/.bash_profile"
 else
-    # Default path for Linux
-    ADB_PATH="$HOME/Android/Sdk/platform-tools/adb"
+    SDK_PATH="$HOME/Android/Sdk/platform-tools"
+    # Linux biasanya pakai .bashrc
+    CONF_FILE="$HOME/.bashrc"
 fi
 
-echo "----------------------------------------------------"
-echo "  Android-to-Docker Connection Bridge (Unix/Mac)    "
-echo "----------------------------------------------------"
+ADB_EXE="adb"
 
-# 1. Check if 'adb' is already in the System PATH
+# 2. Cek apakah adb sudah ada di System PATH
 if command -v adb >/dev/null 2>&1; then
-    adb reverse tcp:8080 tcp:8080
-    adb reverse tcp:8000 tcp:8000
-    echo "✅ Success! Using 'adb' from System PATH."
-    echo "You can now use 127.0.0.1 in your Android code."
-
-# 2. If not in PATH, check the standard SDK location
-elif [ -f "$ADB_PATH" ]; then
-    "$ADB_PATH" reverse tcp:8080 tcp:8080
-    "$ADB_PATH" reverse tcp:8000 tcp:8000
-    echo "✅ Success! Using 'adb' from SDK location."
-    echo "You can now use 127.0.0.1 in your Android code."
-
+    echo "[OK] ADB sudah terdaftar di System Path."
 else
-    echo "❌ [ERROR] adb not found."
-    echo "Please ensure Android SDK is installed or adb is in your PATH."
+    echo "[WAIT] ADB belum terdaftar di Path. Mencari di lokasi standar..."
+    
+    if [ -f "$SDK_PATH/adb" ]; then
+        echo "[ACTION] Menambahkan ADB ke $CONF_FILE secara permanen..."
+        
+        # Cek dulu biar nggak duplikat
+        if ! grep -q "$SDK_PATH" "$CONF_FILE" 2>/dev/null; then
+            echo "" >> "$CONF_FILE"
+            echo "# Android SDK Platform Tools" >> "$CONF_FILE"
+            echo "export PATH=\$PATH:$SDK_PATH" >> "$CONF_FILE"
+            echo "[SUCCESS] Berhasil ditambahkan ke $CONF_FILE!"
+            echo "[INFO] Silakan restart Terminal setelah ini."
+        else
+            echo "[SKIP] Path sudah ada di konfigurasi."
+        fi
+        
+        # Gunakan path lengkap agar langsung bisa dipakai saat ini juga
+        ADB_EXE="$SDK_PATH/adb"
+    else
+        echo "[ERROR] ADB tidak ditemukan di $SDK_PATH"
+        read -p "Tekan [Enter] untuk keluar..."
+        exit 1
+    fi
 fi
 
-echo "----------------------------------------------------"
-read -p "Press [Enter] to exit..."
+echo ""
+echo "---------------------------------------------------"
+echo "   MENGHUBUNGKAN PORT 8080 DAN 8000"
+echo "---------------------------------------------------"
+
+# 3. Jalankan ADB Reverse
+"$ADB_EXE" -d reverse tcp:8080 tcp:8080
+"$ADB_EXE" -d reverse tcp:8000 tcp:8000
+
+if [ $? -eq 0 ]; then
+    echo "[SUCCESS] Jembatan AKTIF!"
+else
+    echo "[ERROR] Gagal! Pastikan HP sudah tercolok dan USB Debugging ON."
+fi
+
+echo "---------------------------------------------------"
+echo "Selesai! Tekan [Enter] untuk menutup."
+read
