@@ -162,17 +162,25 @@ cd serona-android
 
 ### Step 4: Setup Port Forwarding
 
-**Android devices cannot access `localhost` directly. Run the connection script:**
+**Android devices cannot access `localhost` directly. Run the connection script every time you reconnect your physical phone, restart your device or laptop, or once your emulator has fully finished booting up:**
 
 **Windows:**
+
+Double-click the file:
 ```bash
 connect_to_docker.bat
 ```
 
 **Mac/Linux:**
-```bash
-./connect_to_docker.sh
-```
+1. Open your Terminal in this folder.
+2. Give the script permission to run (only needs to be done once):
+   ```bash
+   chmod +x connect_to_docker.sh
+   ```
+3. Run the scripts
+    ```bash
+    ./connect_to_docker.sh
+    ```
 
 This forwards device ports to your computer:
 - Port 8080 (Backend) → `http://127.0.0.1:8080`
