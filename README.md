@@ -282,7 +282,7 @@ docker compose exec app php artisan cache:clear
 
 - Click **Sync Project with Gradle Files**
 - Go to **Build → Clean Project**
-- Then **Build → Rebuild Project**
+- Then **Build → Rebuild Project/Assemble Project**
   
 ---
 
