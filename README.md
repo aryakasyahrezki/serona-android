@@ -188,7 +188,105 @@ This forwards device ports to your computer:
 
 ---
 
-### Step 5: Configure Camera (Emulator Only)
+### Step 5: Firebase Configuration
+
+This app requires **Firebase Authentication** (Login & Register).  
+You can use the existing credentials provided in the repo, or set up your own Firebase project by following these steps:
+
+
+
+#### **1. Create a Project in Firebase Console**
+
+- Open the Firebase Console  
+- Click **Add Project**  
+- Enter your project name (e.g., `Serona-App`)  
+- Click **Create Project**
+
+
+#### **2. Register the Android App**
+
+- In the Firebase Dashboard, click the **Android icon** to add a new app.
+- Fill in the following:
+    - **Android Package Name**  
+      Open `build.gradle.kts` (Module `:app`) and find the `namespace` or `applicationId`.  
+      It must match exactly (`com.serona.app`).
+
+    - **App Nickname** (Optional)  
+       Example: `Serona Mobile`
+
+- Click **Register App**.
+
+
+#### **3. Install `google-services.json`**
+
+- Download the `google-services.json` file from Firebase.
+- In Android Studio, change the folder view from **Android → Project**.
+- Navigate to the `app/` folder.
+- **Delete** the old `google-services.json`.
+- **Paste** your new file inside the `app/` folder.
+
+> Note: You can skip the **"Add Firebase SDK"** step in the console — it is already configured in this project.
+
+
+#### **4. Enable Authentication Services**
+
+- Go to **Build → Authentication → Get Started**.
+- Open the **Sign-in method** tab.
+- Enable **Email/Password**.
+
+
+#### **5. Connect to Backend (Service Account)**
+
+- Go to **Project Settings (⚙️) → Service Accounts**.
+- Click **Generate New Private Key**.  
+  A `.json` file will be downloaded.
+
+Then:
+
+- Open your `serona-backend` folder.
+- Navigate to:
+
+```
+storage/app/
+```
+
+- Delete the old `firebase-admin.json`.
+- Paste your new key file.
+- Rename it exactly to:
+
+```
+firebase-admin.json
+```
+
+- Make sure your backend `.env` file points to this file correctly.
+
+
+#### **6. Refresh the Backend Containers**
+
+Warning: This will reset your local database.
+
+```bash
+# Stop and remove all existing data
+docker compose down -v
+
+# Rebuild and restart services
+docker compose up -d --build
+
+# Clear Laravel cache
+docker compose exec app php artisan config:clear
+docker compose exec app php artisan cache:clear
+```
+
+
+#### **7. Sync Android Studio**
+
+- Click **Sync Project with Gradle Files**
+- Go to **Build → Clean Project**
+- Then **Build → Rebuild Project**
+  
+---
+
+### Step 6: Configure Camera (Emulator Only)
 
 If using Android Emulator for face scanning:
 
@@ -199,7 +297,7 @@ If using Android Emulator for face scanning:
 
 ---
 
-### Step 6: Run App
+### Step 7: Run App
 
 1. **Select Build Variant:** View → Build Variants → Set `:app` to `debug`
 2. **Run:** Click Run (▶️) or press Shift+F10
