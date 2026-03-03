@@ -155,7 +155,7 @@ git clone https://github.com/aryakasyahrezki/serona-android.git
 cd serona-android
 
 # Open in Android Studio
-# File → Open → Select serona-android folder
+# File → Open → Select serona-android folder that contains app folder
 ```
 
 ---
